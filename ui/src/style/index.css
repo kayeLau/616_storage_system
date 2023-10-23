@@ -1,0 +1,17 @@
+@import "./menu.css";
+@import "./card.css";
+
+:root{
+    --background-color:#f2f6fc;
+    --menu-hover-bg-color:#e2ecfc;
+    --menu-active-bg-color:#d3e3fd;
+}
+
+*{
+    padding:0;
+    margin:0;
+}
+
+body{
+   background-color: var(--background-color); 
+}

@@ -1,0 +1,6 @@
+.el-card{
+    --el-card-border-radius:15px;
+}
+.el-card__body{
+    height: 100%;
+}

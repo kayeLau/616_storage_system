@@ -1,0 +1,14 @@
+.el-menu{
+    border:none;
+}
+
+.el-menu-item{
+    border-radius: 0 35px 35px 0;
+}
+
+.el-menu-item:hover{
+    background-color: var(--menu-hover-bg-color);
+}
+.el-menu-item.is-active{
+    background-color: var(--menu-active-bg-color);
+}
