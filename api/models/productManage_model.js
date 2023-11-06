@@ -2,17 +2,17 @@ const db = require('./connection_db')
 const { checkRepeated, createNew , updateItem , deleteItem , getItems } = require('./base_model')
 
 function createNewProduct(data) {
-    return checkRepeated("product_info","shopName",data.shopName)
+    return checkRepeated("product_info","productCode",data.productCode)
         .then(() => createNew("product_info",data))
         .catch(err => err)
 }
 
-function updateProductInformation(shopId,data){
-    return updateItem("product_info",data,'shopId',shopId)
+function updateProductInformation(productCode,data){
+    return updateItem("product_info",data,'productCode',productCode)
 }
 
-function deleteProductItem(shopId){
-    return deleteItem("product_info",'shopId',shopId)
+function deleteProductItem(productCode){
+    return deleteItem("product_info",'productCode',productCode)
 }
 
 function getProductItems(options,size,page){

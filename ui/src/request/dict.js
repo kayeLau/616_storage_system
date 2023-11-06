@@ -18,14 +18,18 @@ export const departmentDict = {
 }
 
 export const shopType = {
-    0:'616牛肉火鍋專門店'
+    0:'616牛肉火鍋專門店',
+    2:'616燒肉酒場',
+    3:'虎喰燒肉·洒場',
+    4:'616客香邨'
 }
 
 export function dictToOptions(dict){
     let res = []
     Object.keys(dict).forEach(key => {
         res.push({
-            label:dict[key],value:key
+            label:dict[key],
+            value:key
         })
     })
     return res

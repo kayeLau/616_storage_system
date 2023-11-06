@@ -132,12 +132,6 @@ onMounted(() => {
     text-decoration: line-through;
     color: #ccc;
 }
-.btn-group{
-    padding-top: 10px;
-    display: flex;
-    justify-content: flex-end;
-}
-
 .band-list-tree::-webkit-scrollbar {
     width: 0.4em;
 }

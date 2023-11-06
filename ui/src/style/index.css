@@ -1,5 +1,6 @@
 @import "./menu.css";
 @import "./card.css";
+@import "./input.css";
 
 :root{
     --background-color:#f2f6fc;
@@ -14,4 +15,10 @@
 
 body{
    background-color: var(--background-color); 
+}
+
+.btn-group{
+    padding-top: 10px;
+    display: flex;
+    justify-content: flex-end;
 }

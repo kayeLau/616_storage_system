@@ -1,9 +1,9 @@
-var { getCurrentTime, checkNull } = require('../utils')
+const { getCurrentTime, checkNull } = require('../utils')
 const { getShopItems , createNewShop , updateShopInformation , deleteShopItem , bindProductTOShop , getBindProducts} = require('../models/shopManage_model')
 const { generateUUID } = require('../models/encryption');
 const { verifyToken } = require('../models/verification')
-const config = require('../config/development_config')
-const jwt = require('jsonwebtoken')
+// const config = require('../config/development_config')
+// const jwt = require('jsonwebtoken')
 
 module.exports = class Shop {
 

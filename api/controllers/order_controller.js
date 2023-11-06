@@ -1,18 +1,18 @@
 const { getCurrentTime } = require('../utils')
 const { generateUUID } = require('../models/encryption');
-const { getProductItems , createNewProduct , updateProductInformation , deleteProductItem } = require('../models/productManage_model')
+const { getOrderItems , createNewOrder , updateOrderInformation , deleteOrderItem } = require('../models/orderManage_model')
 const { verifyToken } = require('../models/verification')
 
-module.exports = class product {
-    getProductList(req, res, next){
+module.exports = class order {
+    getOrderList(req, res, next){
         const token = req.headers['token'];
-        const options = req.body.freezersNum ? { freezersNum: req.body.freezersNum } : {}
+        const options = req.body.updateDate ? { updateDate: req.body.updateDate } : {}
         const size = req.body.size
         const page = req.body.page
 
         verifyToken(token).then(tokenResult => {
             if (tokenResult.success === true) {
-                getProductItems(options,size,page).then(result => {
+                getOrderItems(options,size,page).then(result => {
                     res.json(result)
                 }).catch(err => {
                     res.json(err)
@@ -23,47 +23,19 @@ module.exports = class product {
         })
     }
 
-    postCreateProduct(req, res, next) {
+    postCreateOrder(req, res, next) {
         const token = req.headers['token'];
-        const productData = {
-            productCode: req.body.productCode,
-            productName: req.body.productName,
-            freezersNum: req.body.freezersNum,
-            department: req.body.department,
-            standard: req.body.standard,
-            unit: req.body.unit,
+        const orderData = {
+            orderId:generateUUID(),
+            orderType: req.body.orderType,
+            orderName: req.body.orderName,
             createDate:getCurrentTime(),
             updateDate:getCurrentTime()
         }
 
         verifyToken(token).then(tokenResult => {
             if (tokenResult.success === true) {
-                createNewProduct(productData).then(result => {
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
-        })
-    }
-
-    postUpdateProduct(req, res, next){
-        const token = req.headers['token'];
-        const productCode = req.body.productCode
-        const productData = {
-            productName: req.body.productName,
-            freezersNum: req.body.freezersNum,
-            department: req.body.department,
-            standard: req.body.standard,
-            unit: req.body.unit,
-            updateDate:getCurrentTime()
-        }
-
-        verifyToken(token).then(tokenResult => {
-            if (tokenResult.success === true) {
-                updateProductInformation(productCode,productData).then(result => {
+                createNewOrder(orderData).then(result => {
                     console.log(result)
                     res.json(result)
                 }).catch(err => {
@@ -75,13 +47,36 @@ module.exports = class product {
         })
     }
 
-    postDeleteProduct(req, res, next){
+    postUpdateOrder(req, res, next){
         const token = req.headers['token'];
-        const productCode = req.body.productCode
+        const orderId = req.body.orderId
+        const orderData = {
+            orderType: req.body.orderType,
+            orderName: req.body.orderName,
+            updateDate:getCurrentTime()
+        }
 
         verifyToken(token).then(tokenResult => {
             if (tokenResult.success === true) {
-                deleteProductItem(productCode).then(result => {
+                updateOrderInformation(orderId,orderData).then(result => {
+                    console.log(result)
+                    res.json(result)
+                }).catch(err => {
+                    res.json(err)
+                })
+            } else {
+                res.json(tokenResult)
+            }
+        })
+    }
+
+    postDeleteOrder(req, res, next){
+        const token = req.headers['token'];
+        const orderId = req.body.orderId
+
+        verifyToken(token).then(tokenResult => {
+            if (tokenResult.success === true) {
+                deleteOrderItem(orderId).then(result => {
                     console.log(result)
                     res.json(result)
                 }).catch(err => {

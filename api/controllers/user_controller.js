@@ -15,6 +15,9 @@ module.exports = class Member {
             id: generateUUID(),
             name: req.body.name,
             password,
+            auth:req.body.auth,
+            shopId:req.body.shopId,
+            shopName:req.body.shopName,
             createDate: getCurrentTime(),
             updateDate:getCurrentTime(),
         }
@@ -55,13 +58,17 @@ module.exports = class Member {
     postUpdateUser(req, res, next) {
         const token = req.headers['token'];
         const memberData = {
-            password: hashPassword(req.body.password),
-            createDate: getCurrentTime()
+            // password: hashPassword(req.body.password),
+            createDate: getCurrentTime(),
+            auth:req.body.auth,
+            shopId:req.body.shopId,
+            shopName:req.body.shopName
         }
         
         verifyToken(token).then(tokenResult => {
             if (tokenResult.success === true) {
                 const id = tokenResult.data
+                // todo:check user auth by sql
                 updateUserInformation(id, memberData).then(result => {
                     res.json(result)
                 }).catch(err => {

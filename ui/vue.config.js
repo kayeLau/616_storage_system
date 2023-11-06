@@ -18,7 +18,7 @@ const vueConfig = {
   transpileDependencies: [],
   configureWebpack: {
     plugins: []
-  }
+  },
 }
 
 if (isProd) {

@@ -3,12 +3,21 @@ import layout from '../layout/default.vue'
 
 const routes = [
   {
+    path: '/order',
+    component: layout,
+    children:[{
+      path:'',
+      name: 'Order',
+      component: () => import(/* webpackChunkName: "order" */ '../views/Order.vue')
+    }]
+  },
+  {
     path: '/shop',
     component: layout,
     children:[{
       path:'',
       name: 'Shop',
-      component: () => import(/* webpackChunkName: "home" */ '../views/Shop.vue')
+      component: () => import(/* webpackChunkName: "shop" */ '../views/Shop.vue')
     }]
   },
   {
@@ -17,7 +26,7 @@ const routes = [
     children:[{
       path:'',
       name: 'Product',
-      component: () => import(/* webpackChunkName: "about" */ '../views/Product.vue')
+      component: () => import(/* webpackChunkName: "product" */ '../views/Product.vue')
     }]
   },
   {
@@ -31,7 +40,7 @@ const routes = [
   },
   {
     path: '/login',
-    component: import(/* webpackChunkName: "user" */ '../views/Login.vue'),
+    component: import(/* webpackChunkName: "login" */ '../views/Login.vue'),
   }
 ]
 

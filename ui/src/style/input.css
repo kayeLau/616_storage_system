@@ -1,0 +1,12 @@
+.el-select{
+    width: 100%;
+    --el-border-radius-base:10px
+}
+
+.el-input{
+    --el-border-radius-base:10px
+}
+
+.Ktable-container{
+    height: 85vh;
+  }

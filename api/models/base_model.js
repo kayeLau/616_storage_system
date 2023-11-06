@@ -64,7 +64,7 @@ function updateItem(table, data, key, value) {
 function deleteItem(table, key, value) {
     let result = {}
     return new Promise((resolve, reject) => {
-        db.query(`DELETE * FROM ${table} where ${key} = ?`, [value], (err) => {
+        db.query(`DELETE FROM ${table} where ${key} = ?`, [value], (err) => {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
@@ -83,17 +83,22 @@ function optionsSQLFromatter(options) {
     let whereClause = ''
     for (const key in options) {
         if (options.hasOwnProperty(key)) {
+            let query = key === 'updateDate' ? 
+            `${key} BETWEEN DATE('${options[key][0]}') AND DATE('${options[key][1]}')` 
+            : `${key} = '${options[key]}'`
+
             if (whereClause === '') {
-                whereClause += ` WHERE ${key} = '${options[key]}'`;
+                whereClause += ` WHERE ${query}`;
             } else {
-                whereClause += ` AND ${key} = '${options[key]}'`;
+                whereClause += ` AND ${query}`;
             }
         }
     }
+    console.log(whereClause)
     return whereClause
 }
 
-function getItems(table, options, size, page) {
+function getItems(table, options, size, page , orderby = 'updateDate' , sort = 'DESC') {
     let result = {}
     return new Promise((resolve, reject) => {
         let optionsSQL = optionsSQLFromatter(options)
@@ -106,7 +111,7 @@ function getItems(table, options, size, page) {
             }
             result.total = rows[0].total || 0;
         })
-        db.query(`SELECT * FROM ${table} ${ optionsSQL } LIMIT ${size} OFFSET ${(page - 1) * size}`, (err, rows) => {
+        db.query(`SELECT * , DATE_FORMAT(updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate FROM ${table} ${optionsSQL} ORDER BY ${ orderby } ${sort} LIMIT ${size} OFFSET ${(page - 1) * size }`, (err, rows) => {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false

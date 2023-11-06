@@ -3,6 +3,10 @@
         <el-container>
             <el-header class="header-bar" >
                     <img src="../assets/616_logo.jpg" alt="616_logo" class='logo'>
+                    <div class="avatar">
+                        <!-- <span>Kaye</span> -->
+                        <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+                    </div>
             </el-header>
 
             <el-container>
@@ -32,9 +36,9 @@
 import { reactive } from 'vue';
 const menus = reactive([
     {
-        name: "店舖管理",
-        path:'shop',
-        icon:'OfficeBuilding',
+        name: "訂單管理",
+        path:'order',
+        icon:'Tickets',
     },
     {
         name: "產品管理",
@@ -46,18 +50,31 @@ const menus = reactive([
         path:'user',
         icon:'Avatar',
     },
+    {
+        name: "店舖管理",
+        path:'shop',
+        icon:'OfficeBuilding',
+    },
     ])
 </script>
 <style>
 .header-bar{
-    padding: 8px;
+    padding: 8px 20px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
 }
 .logo{
     width:235px;
     height:28px;
     background-size: contain;
 
+}
+.avatar{
+    display: flex;
+    align-items: center;
+}
+.avatar>span{
+    font-weight: bold;
 }
 </style>
