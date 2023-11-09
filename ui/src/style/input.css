@@ -9,4 +9,7 @@
 
 .Ktable-container{
     height: 85vh;
-  }
+}
+.el-input-number{
+    width: 130px;
+}

@@ -1,4 +1,4 @@
-const { getCurrentTime } = require('../utils')
+const { getCurrentTime , getTodayTimeRange} = require('../utils')
 const { generateUUID } = require('../models/encryption');
 const { getOrderItems , createNewOrder , updateOrderInformation , deleteOrderItem } = require('../models/orderManage_model')
 const { verifyToken } = require('../models/verification')
@@ -25,18 +25,23 @@ module.exports = class order {
 
     postCreateOrder(req, res, next) {
         const token = req.headers['token'];
-        const orderData = {
-            orderId:generateUUID(),
-            orderType: req.body.orderType,
-            orderName: req.body.orderName,
-            createDate:getCurrentTime(),
-            updateDate:getCurrentTime()
-        }
 
-        verifyToken(token).then(tokenResult => {
+        verifyToken(token,true).then(tokenResult => {
+            const orderData = {
+                id:generateUUID(),
+                status:0,
+                orderList:req.body.orderList,
+                orderUserId: tokenResult.userInfo.id,
+                orderUserName: tokenResult.userInfo.name,
+                orderShopId: tokenResult.userInfo.shopId,
+                orderShopName: tokenResult.userInfo.shopName,
+                department:tokenResult.userInfo.auth,
+                createDateRange:getTodayTimeRange(),
+                createDate:getCurrentTime(),
+                updateDate:getCurrentTime()
+            }
             if (tokenResult.success === true) {
                 createNewOrder(orderData).then(result => {
-                    console.log(result)
                     res.json(result)
                 }).catch(err => {
                     res.json(err)
@@ -44,6 +49,8 @@ module.exports = class order {
             } else {
                 res.json(tokenResult)
             }
+        }).catch(err => {
+            console.log(err)
         })
     }
 

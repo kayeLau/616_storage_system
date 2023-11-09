@@ -16,12 +16,12 @@
     </div>
 </template>
 <script setup>
-import { defineProps , ref , defineEmits , watch } from 'vue';
+import { defineProps , ref , defineEmits , watch , computed } from 'vue';
 import { ElMessage  } from 'element-plus'
 const props = defineProps({
     comfireCallBack:Function,
     formModel: Object,
-    formColumns: Array
+    formColumns: Array,
 })
 
 const emit = defineEmits(['sumbitSuccess'])
@@ -30,10 +30,11 @@ let _params = ref(props.formModel)
 watch(() => props.formModel,(value)=>{
     console.log(value)
     _params.value = value
-})
+},)
 
 function submitJsonForm(){
-    props.comfireCallBack(_params.value).then(res => {
+    let data = additionData(_params.value)
+    props.comfireCallBack(data).then(res => {
         if(res.success){
             emit('sumbitSuccess')
             ElMessage ({ type: 'success', message: '操作成功：資料已存入數據庫' })
@@ -44,6 +45,20 @@ function submitJsonForm(){
         console.error(err)
     })
 }
+
+const shopNameList = computed(() => {
+    return props.formColumns.find(item => item.prop === 'shopId') || []
+})
+function additionData(data){
+    Object.keys(data).forEach(key => {
+        if(key === 'shopId'){
+            let target = shopNameList.value.options.find(item => item.value  === data.shopId)
+            data.shopName = target.label
+        }
+    })
+    return data
+}
+
 </script>
 <style>
 .el-select{

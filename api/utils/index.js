@@ -22,4 +22,14 @@ const getCurrentTime = () => {
     return yy + '-' + mm + '-' + dd + ' ' + h + ':' + m + ':' + s
 }
 
-module.exports = { getCurrentTime , checkNull}
+const getTodayTimeRange = () => {
+    const date = new Date()
+    const yy = date.getFullYear()
+    const mm = fillZero(date.getMonth() + 1)
+    const dd = fillZero(date.getDate())
+    const start = yy + '-' + mm + '-' + dd + ' 00:00:00'
+    const end = yy + '-' + mm + '-' + dd + ' 23:59:59'
+    return [start,end]
+}
+
+module.exports = { getCurrentTime , checkNull , getTodayTimeRange}

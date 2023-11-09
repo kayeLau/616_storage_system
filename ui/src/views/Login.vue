@@ -22,7 +22,7 @@
 </template>
 <script setup>
 // import md5 from 'js-md5'
-import { setToken } from '../utils/auth'
+import { setToken , setStorge} from '../utils/auth'
 import { login } from '../request/users'
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
@@ -41,6 +41,7 @@ function toLogin() {
     login(data).then(res => {
         if (res.success === true) {
             setToken(res.token)
+            setStorge('userInfo',res.userInfo)
             toHome()
         }
     }).catch(err => {

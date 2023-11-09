@@ -79,12 +79,13 @@ function deleteItem(table, key, value) {
     })
 }
 
+// @params
 function optionsSQLFromatter(options) {
     let whereClause = ''
     for (const key in options) {
         if (options.hasOwnProperty(key)) {
-            let query = key === 'updateDate' ? 
-            `${key} BETWEEN DATE('${options[key][0]}') AND DATE('${options[key][1]}')` 
+            let query = key === 'updateDate' || key === 'createDate' ? 
+            `${key} BETWEEN '${options[key][0]}' AND '${options[key][1]}'` 
             : `${key} = '${options[key]}'`
 
             if (whereClause === '') {
@@ -94,7 +95,6 @@ function optionsSQLFromatter(options) {
             }
         }
     }
-    console.log(whereClause)
     return whereClause
 }
 
@@ -145,4 +145,4 @@ function getAllItem(table, options) {
     })
 }
 
-module.exports = { checkRepeated, createNew, updateItem, deleteItem, getItems, getAllItem }
+module.exports = { checkRepeated, createNew, updateItem, deleteItem, getItems, getAllItem , optionsSQLFromatter}

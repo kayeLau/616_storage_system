@@ -17,7 +17,7 @@
         <el-table :data="data" class="table" highlight-current-row header-cell-class-name="table-header">
             <el-table-column v-if="isExpand" type="expand">
                 <template v-slot="props">
-                    <expandTable :expandTable="props.row.children"></expandTable>
+                    <expandTable :expandTable="props.row.children" :products="products"></expandTable>
                 </template>
             </el-table-column>
             <el-table-column type="index" width="50" />
@@ -55,7 +55,8 @@ const props = defineProps({
     operations: Object,
     params: Object,
     getList: Function,
-    customBtn: Array
+    customBtn: Array,
+    products:Array
 })
 
 let data = ref([])

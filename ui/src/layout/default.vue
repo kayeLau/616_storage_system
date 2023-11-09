@@ -55,9 +55,22 @@ const menus = reactive([
         path:'shop',
         icon:'OfficeBuilding',
     },
+    {
+        name: "落單頁",
+        path:'appOrder',
+        icon:'Iphone',
+    },
     ])
 </script>
 <style>
+ @media only screen and (max-width: 960px) {
+    .el-main {
+        --el-main-padding:0
+    }
+    .el-aside{
+        display: none;
+    }
+ }
 .header-bar{
     padding: 8px 20px;
     display: flex;

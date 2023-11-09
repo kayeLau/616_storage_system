@@ -3,6 +3,24 @@ import layout from '../layout/default.vue'
 
 const routes = [
   {
+    path: '/',
+    component: layout,
+    children:[{
+      path:'',
+      name: 'Order',
+      component: () => import(/* webpackChunkName: "order" */ '../views/Order.vue')
+    }]
+  },
+  {
+    path: '/appOrder',
+    component: layout,
+    children:[{
+      path:'',
+      name: 'appOrder',
+      component: () => import(/* webpackChunkName: "app-order" */ '../views/appOrder.vue')
+    }]
+  },
+  {
     path: '/order',
     component: layout,
     children:[{

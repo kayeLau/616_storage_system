@@ -46,6 +46,12 @@ module.exports = class Member {
                 res.json({
                         success: true,
                         token,
+                        userInfo:{
+                            name:rows[0].name,
+                            shopId:rows[0].shopId,
+                            shopName:rows[0].shopName,
+                            auth:rows[0].auth
+                        },
                         msg: "歡迎 " + rows[0].name + " 的登入！",
                 })
             }

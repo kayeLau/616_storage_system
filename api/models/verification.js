@@ -1,12 +1,16 @@
 const jwt = require('jsonwebtoken')
 const config = require('../config/development_config')
+const { getAllItem } = require('../models/base_model')
 
-function verifyToken(token){
+// @ params
+// getUser 是否需要取得用戶資料
+function verifyToken(token,getUser = false){
     let tokenResult = {
         status: "token verify fail",
         success: false
     }
     const time = Math.floor(Date.now() / 1000);
+
     return new Promise((resolve) => {
         if(token){
             jwt.verify(token,config.secret,(err,decode)=>{
@@ -26,6 +30,12 @@ function verifyToken(token){
                 success: false
             });
         }
+    }).then(async res => {
+        if(getUser){
+            let userInfo = await getAllItem("member_info", {id:res.data})
+            tokenResult.userInfo = userInfo.resource[0]
+        }
+        return tokenResult
     })
 }
 
