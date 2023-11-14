@@ -12,6 +12,11 @@ export const freezersNumDict = {
     5:"五號雪房",
 }
 
+export const orderStateDict = {
+    0:"未分配",
+    1:"已分配"
+}
+
 export const departmentDict = {
     0:"廚房",
     1:"樓面"
@@ -22,6 +27,11 @@ export const shopType = {
     2:'616燒肉酒場',
     3:'虎喰燒肉·洒場',
     4:'616客香邨'
+}
+
+export const orderMode = {
+    0:'前線',
+    1:'追加',
 }
 
 export function dictToOptions(dict){

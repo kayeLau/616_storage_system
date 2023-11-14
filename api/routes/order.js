@@ -13,5 +13,7 @@ router.post('/updateOrder',orderModifyMethod.postUpdateOrder)
 
 router.post('/deleteOrder',orderModifyMethod.postDeleteOrder)
 
+router.post('/createAdditionOrderItem',orderModifyMethod.postAdditionOrder)
+
 
 module.exports = router;

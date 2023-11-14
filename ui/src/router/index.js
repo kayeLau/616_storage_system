@@ -3,15 +3,6 @@ import layout from '../layout/default.vue'
 
 const routes = [
   {
-    path: '/',
-    component: layout,
-    children:[{
-      path:'',
-      name: 'Order',
-      component: () => import(/* webpackChunkName: "order" */ '../views/Order.vue')
-    }]
-  },
-  {
     path: '/appOrder',
     component: layout,
     children:[{
@@ -59,7 +50,14 @@ const routes = [
   {
     path: '/login',
     component: import(/* webpackChunkName: "login" */ '../views/Login.vue'),
-  }
+  },
+  {
+    path: '/',
+    component: layout,
+    redirect: () => {
+      return { path: '/order' }
+    },
+  },
 ]
 
 const router = createRouter({

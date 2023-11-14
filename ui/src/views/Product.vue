@@ -78,7 +78,7 @@ function editHandle(index, row) {
 function deleteHandle(index, row){
   deleteProduct({productCode:row.productCode}).then(res => {
     if(res.success){
-      refreshList()
+      KtableRef.value.fatchList()
     }
   })
 }

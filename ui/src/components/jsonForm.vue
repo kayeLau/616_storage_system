@@ -2,7 +2,10 @@
     <div>
         <el-form label-width="100px">
             <el-form-item v-for="(item, index) of formColumns" :key="index" :label="item.label">
-                <el-input v-if='item.type === "input"' v-model="_params[item.prop]" clearable :disabled="item.disabled"/>
+                <div v-if='item.type === "input"' class="input-box">
+                    <el-input v-model="_params[item.prop]" clearable :disabled="item.disabled"/>
+                    <span v-show="item.unit">{{ item.unit }}</span>
+                </div>
                 <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable :disabled="item.disabled">
                     <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value" />
                 </el-select>
@@ -63,5 +66,13 @@ function additionData(data){
 <style>
 .el-select{
     width: 100%;
+}
+.input-box{
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+.input-box > span{
+    padding: 0 5px;
 }
 </style>

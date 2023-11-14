@@ -16,6 +16,14 @@ export function createOrder(data){
     });
 }
 
+export function createAdditionOrderItem(data){
+  return request({
+      url: '/orders/createAdditionOrderItem',
+      method: 'post',
+      data,
+    });
+}
+
 export function updateOrder(data){
   return request({
       url: '/orders/updateOrder',

@@ -6,6 +6,7 @@
                 <el-skeleton :loading="loading" animated>
                     <template #template>
                         <el-skeleton-item variant="text" style="width: 30%" />
+                        <el-skeleton-item variant="text" style="width: 30%" />
                     </template>
                     <template #default>
                         <div class="product-list">
@@ -71,7 +72,8 @@ function getProducts() {
                 let freezersNum = item.freezersNum > 2 ? item.freezersNum - 1 : item.freezersNum;
                 product.value[freezersNum].children.push({
                     ...item,
-                    orderQuantity:0
+                    orderQuantity:0,
+                    orderMode:0
                 })
             });
         }

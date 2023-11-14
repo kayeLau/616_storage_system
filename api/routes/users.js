@@ -13,4 +13,6 @@ router.post('/update', userModifyMethod.postUpdateUser);
 
 router.post('/getUsersList', userModifyMethod.getUsersList);
 
+router.post('/getUser', userModifyMethod.getUser);
+
 module.exports = router;

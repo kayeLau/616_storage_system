@@ -10,7 +10,8 @@ function createNewOrder(data) {
             item.productName,
             item.orderQuantity,
             item.unit,
-            data.updateDate
+            data.updateDate,
+            item.orderMode
         ]
     })
     delete data.createDateRange
@@ -33,7 +34,8 @@ function insertOrderItems(list) {
                 productName,
                 orderQuantity,
                 unit,
-                updateDate) VALUES ? `, [list], (err) => {
+                updateDate,
+                orderMode) VALUES ? `, [list], (err) => {
                 if (err) {
                     result.msg = "server error,please try again"
                     reject(result)
@@ -114,4 +116,4 @@ function getOrderItems(options, size, page) {
     }).catch(err => err)
 }
 
-module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, getOrderItems }
+module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, getOrderItems , insertOrderItems}

@@ -1,6 +1,6 @@
 <template>
     <div style="height: 100%;">
-        <el-form :inline="true" :model="_params" class="form-inline">
+        <el-form :inline="true" :model="_params" class="form-inline" v-if="searchFormColumns.length">
             <el-form-item v-for='(item, index) of searchFormColumns' :label="item.label" :key="index">
                 <el-input v-if='item.type === "input"' v-model="_params[item.prop]" clearable />
                 <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable>
@@ -17,12 +17,27 @@
         <el-table :data="data" class="table" highlight-current-row header-cell-class-name="table-header">
             <el-table-column v-if="isExpand" type="expand">
                 <template v-slot="props">
-                    <expandTable :expandTable="props.row.children" :products="products"></expandTable>
+                    <expandTable :expandTable="props.row.children" :products="products" @refresh="fatchList"></expandTable>
                 </template>
             </el-table-column>
-            <el-table-column type="index" width="50" />
+            <el-table-column v-if='isSelection' type="selection" width="50" />
+            <el-table-column v-if='isIndex' type="index" width="50" />
             <el-table-column v-for="(item, index) of columns" :prop="item.props" :label="item.label" :width="item.width"
-                :key="index" :formatter="item.formatter" />
+                :key="index" :formatter="item.formatter">
+                <template #default="scope">
+                    <template v-if="!item.render">
+                        <template v-if="item.formatter">
+                            <span v-html="item.formatter(scope.row, scope.column)"></span>
+                        </template>
+                        <template v-else>
+                            <span>{{ scope.row[scope.column.property] }}</span>
+                        </template>
+                    </template>
+                    <template v-else>
+                        <expand-dom :column="column" :row="scope.row" :render="column.render" :index="index"></expand-dom>
+                    </template>
+                </template>
+            </el-table-column>
             <el-table-column v-if='operations' fixed="right" label="操作" :width="operations.width">
                 <template #default="scope">
                     <el-button v-for="(item, index) of operations.children" :type="item.type" :key="index" :icon="item.icon"
@@ -32,8 +47,10 @@
         </el-table>
         <!-- pagination -->
         <div class="pagination">
-            <el-button v-for="(item, index) of customBtn" :type="item.type" :key="index" @click="item.onClick()"
-                :icon="item.icon" plain>{{ item.label}}</el-button>
+            <div>
+                <el-button v-for="(item, index) of customBtn" :type="item.type" :key="index" @click="item.onClick()"
+                    :icon="item.icon" plain>{{ item.label }}</el-button>
+            </div>
             <el-pagination background layout="total, prev, pager, next" :total="_params.total"
                 v-model:current-page="_params.page" :page-size="_params.size" @size-change="fatchList"
                 @current-change="fatchList" />
@@ -41,8 +58,8 @@
     </div>
 </template>
 <script setup>
-import { defineProps, defineExpose , reactive, onMounted, ref } from 'vue';
-import { ElMessage  } from 'element-plus'
+import { defineProps, defineExpose, reactive, onMounted, ref } from 'vue';
+import { ElMessage } from 'element-plus'
 import expandTable from './expandTable.vue'
 
 const props = defineProps({
@@ -50,32 +67,46 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
+    isSelection:{
+        type: Boolean,
+        default: false
+    },
+    isIndex:{
+        type: Boolean,
+        default: true
+    },
     searchFormColumns: Array,
     columns: Array,
     operations: Object,
     params: Object,
     getList: Function,
     customBtn: Array,
-    products:Array
+    products: Array
 })
 
 let data = ref([])
 let _params = reactive(props.params)
 
 function fatchList() {
-    props.getList(props.params).then(res => {
-        console.log(res)
-        if (res.success) {
-            data.value = res.resource
-            _params.total = res.total
-        } else {
-            data.value = []
-            ElMessage ({ type: 'error', message: '數據查詢失败' })
-        }
-    })
+    if (typeof props.getList === 'function') {
+        props.getList(props.params).then(res => {
+            if (res.success) {
+                data.value = res.resource
+                _params.total = res.total
+            } else {
+                data.value = []
+                ElMessage({ type: 'error', message: '數據查詢失败' })
+            }
+        })
+    }
 }
 
-defineExpose({fatchList})
+function addItem(row){
+    data.value.unshift(row)
+    _params.total++
+}
+
+defineExpose({ fatchList , addItem , data})
 
 onMounted(() => {
     fatchList()
@@ -84,7 +115,7 @@ onMounted(() => {
 <style>
 .table {
     width: 100%;
-    height: calc(100% - 132px)
+    height: calc(100% - 112px)
 }
 
 .table-header {
@@ -104,4 +135,5 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     padding-top: 10px;
-}</style>
+}
+</style>

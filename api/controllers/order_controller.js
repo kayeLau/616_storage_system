@@ -1,6 +1,6 @@
 const { getCurrentTime , getTodayTimeRange} = require('../utils')
 const { generateUUID } = require('../models/encryption');
-const { getOrderItems , createNewOrder , updateOrderInformation , deleteOrderItem } = require('../models/orderManage_model')
+const { getOrderItems , createNewOrder , updateOrderInformation , deleteOrderItem , insertOrderItems} = require('../models/orderManage_model')
 const { verifyToken } = require('../models/verification')
 
 module.exports = class order {
@@ -51,6 +51,38 @@ module.exports = class order {
             }
         }).catch(err => {
             console.log(err)
+        })
+    }
+
+    postAdditionOrder(req, res, next){
+        const token = req.headers['token'];
+        const updateDate = getCurrentTime()
+        let orderList = req.body.orderList
+        if(Array.isArray(orderList)){
+            orderList = orderList.map(item => {
+                return [
+                    item.orderId,
+                    item.productCode,
+                    item.productName,
+                    item.orderQuantity,
+                    item.unit,
+                    updateDate,
+                    item.orderMode
+                ]
+            })
+        }
+
+        verifyToken(token).then(tokenResult => {
+            if (tokenResult.success === true) {
+                insertOrderItems(orderList).then(result => {
+                    console.log(result)
+                    res.json(result)
+                }).catch(err => {
+                    res.json(err)
+                })
+            } else {
+                res.json(tokenResult)
+            }
         })
     }
 

@@ -1,5 +1,5 @@
 const loginCheck = require('../models/login')
-const { toRegister, updateUserInformation, getUsersItems } = require('../models/register_model')
+const { toRegister, updateUserInformation, getUsersItems , getUser} = require('../models/register_model')
 var { getCurrentTime, checkNull } = require('../utils')
 const { generateUUID, hashPassword } = require('../models/encryption');
 const { verifyToken } = require('../models/verification')
@@ -95,6 +95,22 @@ module.exports = class Member {
         verifyToken(token).then(tokenResult => {
             if (tokenResult.success === true) {
                 getUsersItems(options,size,page).then(result => {
+                    res.json(result)
+                }).catch(err => {
+                    res.json(err)
+                })
+            } else {
+                res.json(tokenResult)
+            }
+        })
+    }
+
+    getUser(){
+        const token = req.headers['token'];
+
+        verifyToken(token).then(tokenResult => {
+            if (tokenResult.success === true) {
+                getUser(tokenResult.data).then(result => {
                     res.json(result)
                 }).catch(err => {
                     res.json(err)

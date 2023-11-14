@@ -48,6 +48,7 @@
 import { defineProps, computed, ref } from 'vue';
 import { getStorge } from '../utils/auth'
 import { createOrder } from '../request/orders'
+import { ElMessage  } from 'element-plus'
 
 const userInfo = computed(() => {
     let user = getStorge('userInfo')
@@ -76,7 +77,11 @@ function jumpToOrderComfire(){
 
 function comfireOrder(){
     createOrder({orderList:orderList.value}).then(res => {
-        console.log(res)
+        if(res.success){
+            ElMessage ({ type: 'success', message: '提交成功' })
+        }else{
+            ElMessage ({ type: 'error', message: '提交失敗' })
+        }
     })
 }
 
