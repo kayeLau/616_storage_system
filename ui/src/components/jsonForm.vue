@@ -27,7 +27,7 @@ const props = defineProps({
     formColumns: Array,
 })
 
-const emit = defineEmits(['sumbitSuccess'])
+const emit = defineEmits(['sumbitSuccess','sumbit'])
 
 let _params = ref(props.formModel)
 watch(() => props.formModel,(value)=>{
@@ -36,17 +36,21 @@ watch(() => props.formModel,(value)=>{
 },)
 
 function submitJsonForm(){
-    let data = additionData(_params.value)
-    props.comfireCallBack(data).then(res => {
-        if(res.success){
-            emit('sumbitSuccess')
-            ElMessage ({ type: 'success', message: '操作成功：資料已存入數據庫' })
-        }else{
-            ElMessage ({ type: 'error', message: '操作失败：' + res.msg })
-        }
-    }).catch(err => {
-        console.error(err)
-    })
+    if(!props.comfireCallBack){
+        emit('sumbit',_params.value)
+    }else{
+        let data = additionData(_params.value)
+        props.comfireCallBack(data).then(res => {
+            if(res.success){
+                emit('sumbitSuccess')
+                ElMessage ({ type: 'success', message: '操作成功：資料已存入數據庫' })
+            }else{
+                ElMessage ({ type: 'error', message: '操作失败：' + res.msg })
+            }
+        }).catch(err => {
+            console.error(err)
+        })
+    }
 }
 
 const shopNameList = computed(() => {

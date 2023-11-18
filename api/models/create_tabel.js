@@ -27,6 +27,9 @@ const sql_tabel = [
             assignQuantity FLOAT NOT NULL COMMENT '分配數量',
             unit VARCHAR(10) NOT NULL DEFAULT '' COMMENT '單位' COLLATE 'utf8mb4_0900_ai_ci',
             updateDate DATETIME NULL DEFAULT NULL,
+            orderMode INT(10) NULL DEFAULT NULL COMMENT '下單模式 0:前線 1:系統',
+            status INT(10) NULL DEFAULT '0' COMMENT '分配狀態 0:未分配 1:已分配',
+            remark TEXT NULL DEFAULT NULL COMMENT '備注' COLLATE 'utf8mb4_0900_ai_ci',
             PRIMARY KEY (id) USING BTREE,
             INDEX FK_order_detail_info_order_info (orderId) USING BTREE,
             CONSTRAINT FK_order_detail_info_order_info FOREIGN KEY (orderId) REFERENCES order_info (id) ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -37,7 +40,7 @@ const sql_tabel = [
         sql: `CREATE TABLE order_info (
             id VARCHAR(50) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
             orderCode VARCHAR(10) NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci',
-            status INT(10) NOT NULL,
+            status INT(10) NOT NULL COMMENT '0:未處理 1:已處理',
             orderUserId VARCHAR(50) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
             orderUserName VARCHAR(50) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
             orderShopId VARCHAR(50) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
@@ -51,14 +54,16 @@ const sql_tabel = [
     {
         name: 'product_info',
         sql: `CREATE TABLE product_info (
+            productCode VARCHAR(50) NOT NULL COMMENT '商品編號' COLLATE 'utf8mb4_0900_ai_ci',
             department INT(10) NOT NULL DEFAULT '0' COMMENT '0:廚房 1:樓面',
             freezersNum INT(10) NOT NULL DEFAULT '0' COMMENT '雪房號碼 0:干貨',
-            productCode VARCHAR(50) NOT NULL COMMENT '商品編號' COLLATE 'utf8mb4_0900_ai_ci',
+            classify INT(10) NOT NULL COMMENT '分類',
             productName VARCHAR(50) NOT NULL COMMENT '商品名稱' COLLATE 'utf8mb4_0900_ai_ci',
             unit VARCHAR(10) NULL DEFAULT NULL COMMENT '單位' COLLATE 'utf8mb4_0900_ai_ci',
             standard VARCHAR(50) NULL DEFAULT '0' COMMENT '規格' COLLATE 'utf8mb4_0900_ai_ci',
             createDate DATETIME NULL DEFAULT NULL,
             updateDate DATETIME NULL DEFAULT NULL,
+            disable INT(10) NOT NULL COMMENT '0:否 1:是',
             PRIMARY KEY (productCode) USING BTREE
         )`
     },

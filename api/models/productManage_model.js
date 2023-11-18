@@ -1,4 +1,3 @@
-const db = require('./connection_db')
 const { checkRepeated, createNew , updateItem , deleteItem , getItems } = require('./base_model')
 
 function createNewProduct(data) {
@@ -18,6 +17,5 @@ function deleteProductItem(productCode){
 function getProductItems(options,size,page){
     return getItems("product_info",options,size,page)
 }
-
 
 module.exports = { getProductItems , createNewProduct , updateProductInformation , deleteProductItem }

@@ -24,6 +24,14 @@ export function createAdditionOrderItem(data){
     });
 }
 
+export function updateOrderDetailAssignQuantity(data){
+  return request({
+      url: '/orders/updateOrderDetailAssignQuantity',
+      method: 'post',
+      data,
+    });
+}
+
 export function updateOrder(data){
   return request({
       url: '/orders/updateOrder',

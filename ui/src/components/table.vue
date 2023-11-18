@@ -3,10 +3,10 @@
         <el-form :inline="true" :model="_params" class="form-inline" v-if="searchFormColumns.length">
             <el-form-item v-for='(item, index) of searchFormColumns' :label="item.label" :key="index">
                 <el-input v-if='item.type === "input"' v-model="_params[item.prop]" clearable />
-                <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable>
+                <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable style="width: 150px;">
                     <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value" />
                 </el-select>
-                <el-date-picker v-if='item.type === "datePicker"' v-model="_params[item.prop]" type="daterange"
+                <el-date-picker v-if='item.type === "datePicker"' v-model="_params[item.prop]" type="daterange" style="width: 250px;"
                     range-separator="至" start-placeholder="Start date" end-placeholder="End date" clearable />
             </el-form-item>
             <el-form-item>
@@ -17,7 +17,7 @@
         <el-table :data="data" class="table" highlight-current-row header-cell-class-name="table-header">
             <el-table-column v-if="isExpand" type="expand">
                 <template v-slot="props">
-                    <expandTable :expandTable="props.row.children" :products="products" @refresh="fatchList"></expandTable>
+                    <expandTable :expandTable="props.row.children" :products="products"></expandTable>
                 </template>
             </el-table-column>
             <el-table-column v-if='isSelection' type="selection" width="50" />
@@ -87,18 +87,21 @@ const props = defineProps({
 let data = ref([])
 let _params = reactive(props.params)
 
-function fatchList() {
+async function fatchList() {
+    let result = {}
     if (typeof props.getList === 'function') {
-        props.getList(props.params).then(res => {
+        await props.getList(props.params).then(res => {
             if (res.success) {
                 data.value = res.resource
                 _params.total = res.total
+                result = res
             } else {
                 data.value = []
                 ElMessage({ type: 'error', message: '數據查詢失败' })
             }
         })
     }
+    return result
 }
 
 function addItem(row){

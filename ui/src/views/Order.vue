@@ -1,16 +1,15 @@
 <template>
   <div>
     <el-card class="Ktable-container">
-      <Ktable isExpand :columns="columns" :operations="operations" :params="params" :getList="getOrderList"
-        :searchFormColumns="searchFormColumns" :customBtn="[]" :expandHeader="expandHeader" :expandColumns="expandColumns"
+      <Ktable ref='KtableRef2' isExpand :columns="columns" :operations="operations" :params="params" :getList="getOrderList"
+        :searchFormColumns="searchFormColumns" :customBtn="[]" :expandHeader="{}" :expandColumns="{}"
         :products="products"></Ktable>
     </el-card>
     <el-dialog v-model="orderDetailShow" title="訂單明細" width="90%" style="height:80vh;position: relative;" top="10vh">
-      <Ktable :columns="ODcolumns" :operations="ODoperations" :params="params" :getList="getOrderListDetail"
+      <Ktable ref='KtableRef' :columns="ODcolumns" :operations="ODoperations" :params="ODparams" :getList="getOrderListDetail"
         :searchFormColumns="[]" :customBtn="ODcustomBtn" isSelection :isIndex="false"></Ktable>
       <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
-        <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :comfireCallBack="JsonFormComfireCallBack"
-          @sumbitSuccess="refreshList"></jsonForm>
+        <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" @sumbit="updateAssignQuantity"></jsonForm>
       </el-drawer>
     </el-dialog>
   </div>
@@ -20,12 +19,14 @@
 // import { ElMessage  } from 'element-plus'
 import jsonForm from '../components/jsonForm.vue';
 import { getProductList } from '../request/products';
-import { getOrderList } from '../request/orders';
+import { getOrderList, updateOrderDetailAssignQuantity } from '../request/orders';
 import { departmentDict, orderStateDict, orderMode } from '../request/dict';
 import Ktable from '../components/table.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted , nextTick } from 'vue';
+import { ElMessage  } from 'element-plus'
 
 // order tabel
+const KtableRef2 = ref()
 const departmentFormatter = (row, column) => {
   let cell = row[column.property]
   return departmentDict[cell]
@@ -33,7 +34,7 @@ const departmentFormatter = (row, column) => {
 const orderStateFormatter = (row, column) => {
   let cell = row[column.property]
   let color = cell === 0 ? 'var(--el-color-danger)' : 'var(--el-color-success)'
-  return `<span style='color:${color}'>${ orderStateDict[cell] }<span>`
+  return `<span style='color:${color}'>${orderStateDict[cell]}<span>`
 }
 const columns = [
   { props: 'status', label: '訂單狀態', formatter: orderStateFormatter },
@@ -63,17 +64,20 @@ const searchFormColumns = [
 
 // order detail tabel
 let currentRow = ref({})
+const KtableRef = ref()
 const orderModeFormatter = (row, column) => {
   let cell = row[column.property]
   return orderMode[cell]
 }
 const ODcolumns = [
+  { props: 'status', label: '分配狀態' , formatter:orderStateFormatter},
   { props: 'productCode', label: '產品編號' },
   { props: 'productName', label: '產品名稱' },
   { props: 'orderQuantity', label: '下單數量', formatter: (row, column) => row[column.property] + row.unit },
   { props: 'assignQuantity', label: '分配數量', formatter: (row, column) => row[column.property] + row.unit },
   { props: 'orderMode', label: '下單模式', formatter: orderModeFormatter },
   { props: 'updateDate', label: '修改時間' },
+  { props: 'remark', label: '備注' },
 ]
 const ODoperations = {
   width: 120,
@@ -81,6 +85,10 @@ const ODoperations = {
   children: [
     { type: "primary", name: '分配', onClick: editHandle, icon: 'Coin', show: (row) => row.type !== 'additem' },
   ]
+}
+const ODparams = {
+  size: 20,
+  page: 1,
 }
 const ODcustomBtn = [
   {
@@ -106,9 +114,16 @@ async function getOrderListDetail() {
 }
 
 let orderDetailShow = ref(false)
+let rowIndex = ref(null)
 function showDetailHandle(index, row) {
-  currentRow.value = row
+  rowIndex.value = index
   orderDetailShow.value = !orderDetailShow.value
+  if(orderDetailShow.value){
+    currentRow.value = row
+    nextTick(()=>{
+      KtableRef.value.fatchList()
+    })
+  }
 }
 
 // jsonForm
@@ -120,18 +135,19 @@ const editFormColumns = ref([
     prop: 'productCode',
     label: '產品編號:',
     options: [],
-    disabled:true
+    disabled: true
   },
   {
     type: 'input',
     prop: 'productName',
     label: '產品名稱:',
-    disabled:true
+    disabled: true
   },
   {
     type: 'input',
     prop: 'orderQuantity',
     label: '下單數量:',
+    disabled: true
   },
   {
     type: 'input',
@@ -142,20 +158,47 @@ const editFormColumns = ref([
     type: 'input',
     prop: 'orderMode',
     label: '分配數量:',
-    disabled:true
+    disabled: true
+  },
+  {
+    type: 'input',
+    prop: 'remark',
+    label: '備注:',
   },
 ])
 
-function editHandle(index, row){
+function editHandle(index, row) {
   editFormColumns.value[2].unit = row.unit
   editFormColumns.value[3].unit = row.unit
-  editFormModel.value = row
+  editFormModel.value = JSON.parse(JSON.stringify(row))
   jsonFormShow.value = !jsonFormShow.value
 }
 
 function addOrderItem() {
   let newItem = { type: 'additem', productCode: "", productName: "", orderQuantity: '', assignQuantity: '', unit: "", updateDate: '', orderMode: 1 }
   currentRow.value.children.unshift(newItem)
+}
+
+async function updateAssignQuantity(row) {
+  let assignQuantitys = [{
+    id: row.id,
+    assignQuantity:row.assignQuantity,
+    remark:row.remark
+  }]
+  let orderId = currentRow.value.id
+  await updateOrderDetailAssignQuantity({assignQuantitys,orderId}).then(res => {
+    if (res.success) {
+      ElMessage({ type: 'success', message: '操作成功：資料已存入數據庫' })
+    } else {
+      ElMessage({ type: 'error', message: '操作失败：' + res.msg })
+    }
+  }).catch(err => {
+    console.error(err)
+  })
+  let result = await KtableRef2.value.fatchList()
+  let target = result.resource.find(item => item.id === currentRow.value.id)
+  currentRow.value = target
+  KtableRef.value.fatchList()
 }
 
 // function setOrderItem(index) {

@@ -19,7 +19,7 @@ function getShopItems(options, size, page) {
     return getItems("shop_info", options, size, page)
 }
 
-function getBindProducts(options, size, page) {
+function getBandProducts(options, size, page) {
     return getItems("shop_product_info", options, size, page)
 }
 
@@ -48,4 +48,4 @@ function bindProductTOShop(productList) {
 }
 
 
-module.exports = { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop , getBindProducts}
+module.exports = { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop , getBandProducts}

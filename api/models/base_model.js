@@ -84,9 +84,21 @@ function optionsSQLFromatter(options) {
     let whereClause = ''
     for (const key in options) {
         if (options.hasOwnProperty(key)) {
-            let query = key === 'updateDate' || key === 'createDate' ? 
-            `${key} BETWEEN '${options[key][0]}' AND '${options[key][1]}'` 
-            : `${key} = '${options[key]}'`
+            if(options[key] === null || options[key] === undefined || options[key] === '') continue ;
+            let query
+            switch(key){
+                case 'updateDate':
+                    query = `${key} BETWEEN '${options[key][0]}' AND '${options[key][1]}'`
+                    break
+                case 'createDate':
+                    query = `${key} BETWEEN '${options[key][0]}' AND '${options[key][1]}'`
+                    break
+                default:
+                    query = `${key} = '${options[key]}'`
+            }
+            // let query = key === 'updateDate' || key === 'createDate' ? 
+            // `${key} BETWEEN '${options[key][0]}' AND '${options[key][1]}'` 
+            // : `${key} = '${options[key]}'`
 
             if (whereClause === '') {
                 whereClause += ` WHERE ${query}`;

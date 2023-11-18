@@ -33,34 +33,44 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
-const menus = reactive([
+import { computed } from 'vue';
+import { getStorge } from '../utils/auth'
+const userInfo = computed(() => {
+    let user = getStorge('userInfo')
+    return user ? JSON.parse(user) : {}
+})
+const menus = [
     {
         name: "訂單管理",
         path:'order',
         icon:'Tickets',
+        whiteList:true
     },
     {
         name: "產品管理",
         path:'product',
         icon:'Goods',
+        whiteList:false
     },
     {
         name: "用戶管理",
         path:'user',
         icon:'Avatar',
+        whiteList:false
     },
     {
         name: "店舖管理",
         path:'shop',
         icon:'OfficeBuilding',
+        whiteList:false
     },
     {
         name: "落單頁",
         path:'appOrder',
         icon:'Iphone',
+        whiteList:true
     },
-    ])
+    ].filter(item => userInfo.value.auth === -1 ? true : item.whiteList)
 </script>
 <style>
  @media only screen and (max-width: 960px) {

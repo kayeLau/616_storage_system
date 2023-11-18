@@ -1,7 +1,7 @@
 export const authDict = {
-    0:"管理員",
+    '-1':"管理員",
+    0:"前線廚房",
     1:"前線樓面 ",
-    2:"前線廚房",
 }
 
 export const freezersNumDict = {
@@ -32,6 +32,11 @@ export const shopType = {
 export const orderMode = {
     0:'前線',
     1:'追加',
+}
+
+export const productDisable = {
+    0:'啟用',
+    1:'隱藏',
 }
 
 export function dictToOptions(dict){

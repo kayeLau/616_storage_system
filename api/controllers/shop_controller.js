@@ -1,5 +1,5 @@
 const { getCurrentTime, checkNull } = require('../utils')
-const { getShopItems , createNewShop , updateShopInformation , deleteShopItem , bindProductTOShop , getBindProducts} = require('../models/shopManage_model')
+const { getShopItems , createNewShop , updateShopInformation , deleteShopItem , bindProductTOShop , getBandProducts} = require('../models/shopManage_model')
 const { generateUUID } = require('../models/encryption');
 const { verifyToken } = require('../models/verification')
 // const config = require('../config/development_config')
@@ -99,7 +99,7 @@ module.exports = class Shop {
 
         verifyToken(token).then(tokenResult => {
             if (tokenResult.success === true) {
-                getBindProducts(options,size,page).then(result => {
+                getBandProducts(options,size,page).then(result => {
                     res.json(result)
                 }).catch(err => {
                     res.json(err)

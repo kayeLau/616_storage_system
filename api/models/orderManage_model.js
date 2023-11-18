@@ -17,8 +17,8 @@ function createNewOrder(data) {
     delete data.createDateRange
     delete data.orderList
     return checkOrderRepeated("order_info", { orderShopId: data.orderShopId, createDate: createDateRange })
-        .then(() => createNew("order_info", data))
-        .then(() => insertOrderItems(orderList))
+        .then(() => createNew("order_info", data)) // 訂單
+        .then(() => insertOrderItems(orderList)) // 訂單明細
         .catch(err => err)
 }
 
@@ -78,17 +78,80 @@ function checkOrderRepeated(table, options) {
     })
 }
 
-function updateOrderInformation(shopId, data) {
-    return updateItem("order_info", data, 'shopId', shopId)
+function updateOrderDetailAssignQuantity(list,orderId){
+    let result = {}
+    result.success = false
+    return new Promise((resolve, reject) => {
+        if (Array.isArray(list)) {
+            let assignQuantity = ''
+            let status = ''
+            let remark = ''
+            let ids = []
+            list.forEach(item => {
+                ids.push(item.id)
+                assignQuantity += `WHEN ${item.id} THEN ${Number(item.assignQuantity)}`
+                status += `WHEN ${item.id} THEN ${Number(1)}`
+                remark += `WHEN ${item.id} THEN ${item.remark}`
+            })
+            db.query(`UPDATE order_detail_info SET
+            assignQuantity=CASE id
+            ${assignQuantity}
+            END,
+            status=CASE id
+            ${status}
+            END,
+            remark=CASE id
+            ${remark}
+            END
+            WHERE id IN (?)`, [ids], (err) => {
+                if (err) {
+                    result.msg = "server error,please try again"
+                    reject(result)
+                    console.log(err)
+                    return
+                }
+                result.msg = "success"
+                result.success = true
+                resolve(result)
+            })
+        } else {
+            result.msg = "wrong input"
+            reject(result)
+        }
+    }).then(res => {
+        if(res.success){
+            setOrderItemStatus(orderId)
+            return res
+        }
+    })
+}
+
+function updateOrderInformation(orderId, data) {
+    return updateItem("order_info", data, 'id', orderId)
+}
+
+function setOrderItemStatus(orderId) {
+    getItems("order_detail_info", { orderId }, 999, 1).then(res => {
+        if (res.success) {
+            let orderDetailStatus = res.resource.find(item => item.status === 0 || item.status === null)
+            console.log(res.resource)
+            return orderDetailStatus
+        }
+    }).then(orderDetailStatus => {
+        console.log(orderDetailStatus)
+        if(!orderDetailStatus){
+            updateOrderInformation(orderId, {status:1})
+        }else{
+            updateOrderInformation(orderId, {status:0})
+        }
+    }).catch(err => {
+        console.log(err)
+    })
 }
 
 function deleteOrderItem(shopId) {
     return deleteItem("order_info", 'shopId', shopId)
 }
-
-// function getOrderDetailItems(options, size, page){
-//     return getItems("order_detail_info", options, size, page)
-// }
 
 function getOrderItems(options, size, page) {
     const result = {}
@@ -116,4 +179,4 @@ function getOrderItems(options, size, page) {
     }).catch(err => err)
 }
 
-module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, getOrderItems , insertOrderItems}
+module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, getOrderItems , insertOrderItems , updateOrderDetailAssignQuantity , setOrderItemStatus}

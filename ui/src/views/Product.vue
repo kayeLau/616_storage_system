@@ -10,7 +10,7 @@
 </template>
 <script setup>
 import { getProductList , updateProduct , createProduct , deleteProduct} from '../request/products'
-import { freezersNumDict , departmentDict , dictToOptions} from '../request/dict'
+import { freezersNumDict , departmentDict , dictToOptions , productDisable} from '../request/dict'
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
 import { ref } from 'vue';
@@ -53,6 +53,12 @@ const editFormColumns = ref([
     type: 'input',
     prop: 'unit',
     label: '規格:',
+  },
+  {
+    type: 'select',
+    prop: 'disable',
+    label: '狀態:',
+    options:dictToOptions(productDisable)
   }
 ])
 
@@ -69,7 +75,7 @@ function createHandle() {
 }
 
 function editHandle(index, row) {
-    editFormModel.value = { ...row , freezersNum:String(row.freezersNum) , department:String(row.department)}
+    editFormModel.value = { ...row , freezersNum:String(row.freezersNum) , department:String(row.department) , disable:String(row.disable)}
     JsonFormComfireCallBack.value = updateProduct
     editFormColumns.value[0].disabled = true
     jsonFormShow.value = !jsonFormShow.value
@@ -94,7 +100,14 @@ const departmentFormatter = (row , column)=>{
     return departmentDict[cell]
 }
 
+const productDisableFormatter = (row , column)=>{
+    let cell = row[column.property]
+    let color = cell === 1 ? 'var(--el-color-danger)' : 'var(--el-color-success)'
+    return `<span style='color:${color}'>${productDisable[cell]}<span>`
+}
+
 const columns = [
+  {props:'disable',label:'狀態',formatter:productDisableFormatter},
   {props:'productCode',label:'產品編號'},
   {props:'productName',label:'產品名稱'},
   {props:'freezersNum',label:'雪房號碼',formatter:freezersNumFormatter},
@@ -121,6 +134,12 @@ const searchFormColumns = [
       prop:'freezersNum',
       label:'雪房號碼:',
       options:dictToOptions(freezersNumDict)
+  },
+  {
+      type:'select',
+      prop:'disable',
+      label:'狀態:',
+      options:dictToOptions(productDisable)
   }
 ]
 const customBtn = [
