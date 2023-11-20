@@ -93,6 +93,9 @@ function optionsSQLFromatter(options) {
                 case 'createDate':
                     query = `${key} BETWEEN '${options[key][0]}' AND '${options[key][1]}'`
                     break
+                case 'productName':
+                    query = `${key} LIKE '%${options[key]}%'`
+                    break
                 default:
                     query = `${key} = '${options[key]}'`
             }

@@ -2,7 +2,7 @@
     <div style="height: 100%;">
         <el-form :inline="true" :model="_params" class="form-inline" v-if="searchFormColumns.length">
             <el-form-item v-for='(item, index) of searchFormColumns' :label="item.label" :key="index">
-                <el-input v-if='item.type === "input"' v-model="_params[item.prop]" clearable />
+                <el-input v-if='item.type === "input"' v-model="_params[item.prop]" clearable style="width: 150px;"/>
                 <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable style="width: 150px;">
                     <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value" />
                 </el-select>
@@ -14,7 +14,7 @@
             </el-form-item>
         </el-form>
         <!-- tabel -->
-        <el-table :data="data" class="table" highlight-current-row header-cell-class-name="table-header">
+        <el-table :data="data" class="table" highlight-current-row header-cell-class-name="table-header" @selection-change="handleSelectionChange">
             <el-table-column v-if="isExpand" type="expand">
                 <template v-slot="props">
                     <expandTable :expandTable="props.row.children" :products="products"></expandTable>
@@ -58,9 +58,11 @@
     </div>
 </template>
 <script setup>
-import { defineProps, defineExpose, reactive, onMounted, ref } from 'vue';
+import { defineProps, defineExpose, reactive, onMounted, ref , defineEmits } from 'vue';
 import { ElMessage } from 'element-plus'
 import expandTable from './expandTable.vue'
+
+const emit = defineEmits(['selectionChange'])
 
 const props = defineProps({
     isExpand: {
@@ -104,12 +106,11 @@ async function fatchList() {
     return result
 }
 
-function addItem(row){
-    data.value.unshift(row)
-    _params.total++
+function handleSelectionChange(value){
+    emit('selectionChange',value)
 }
 
-defineExpose({ fatchList , addItem , data})
+defineExpose({ fatchList  })
 
 onMounted(() => {
     fatchList()
@@ -118,7 +119,7 @@ onMounted(() => {
 <style>
 .table {
     width: 100%;
-    height: calc(100% - 112px)
+    height: calc(100% - 90px)
 }
 
 .table-header {
@@ -138,5 +139,11 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     padding-top: 10px;
+}
+.el-date-editor{
+    border-radius: 10px;
+}
+.el-form--inline .el-form-item{
+    margin-right: 20px;
 }
 </style>

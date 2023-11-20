@@ -88,7 +88,7 @@ module.exports = class Member {
 
     getUsersList(req, res, next){
         const token = req.headers['token'];
-        const options = req.body.shopType ? { shopType: req.body.shopType } : {}
+        const options = { auth: req.body.auth }
         const size = parseInt(req.body.size)
         const page = parseInt(req.body.page)
 

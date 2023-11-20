@@ -130,6 +130,11 @@ const params = {
 }
 const searchFormColumns = [
   {
+      type:'input',
+      prop:'productName',
+      label:'產品名稱:',
+  },
+  {
       type:'select',
       prop:'freezersNum',
       label:'雪房號碼:',

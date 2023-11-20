@@ -1,13 +1,14 @@
 <template>
   <div>
     <el-card class="Ktable-container">
-      <Ktable ref='KtableRef2' isExpand :columns="columns" :operations="operations" :params="params" :getList="getOrderList"
-        :searchFormColumns="searchFormColumns" :customBtn="[]" :expandHeader="{}" :expandColumns="{}"
-        :products="products"></Ktable>
+      <Ktable ref='KtableRef2' isExpand :columns="columns" :operations="operations" :params="params"
+        :getList="getOrderList" :searchFormColumns="searchFormColumns" :customBtn="[]" :expandHeader="{}"
+        :expandColumns="{}" :products="products"></Ktable>
     </el-card>
     <el-dialog v-model="orderDetailShow" title="訂單明細" width="90%" style="height:80vh;position: relative;" top="10vh">
-      <Ktable ref='KtableRef' :columns="ODcolumns" :operations="ODoperations" :params="ODparams" :getList="getOrderListDetail"
-        :searchFormColumns="[]" :customBtn="ODcustomBtn" isSelection :isIndex="false"></Ktable>
+      <Ktable ref='KtableRef' :columns="ODcolumns" :operations="ODoperations" :params="ODparams"
+        :getList="getOrderListDetail" :searchFormColumns="[]" :customBtn="ODcustomBtn" isSelection :isIndex="false"
+        @selectionChange="ODselectionChange"></Ktable>
       <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
         <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" @sumbit="updateAssignQuantity"></jsonForm>
       </el-drawer>
@@ -16,17 +17,29 @@
 </template>
 <script setup>
 // import { createAdditionOrderItem } from '../request/orders';
-// import { ElMessage  } from 'element-plus'
 import jsonForm from '../components/jsonForm.vue';
 import { getProductList } from '../request/products';
+import { getShopList } from '../request/shops'
 import { getOrderList, updateOrderDetailAssignQuantity } from '../request/orders';
-import { departmentDict, orderStateDict, orderMode } from '../request/dict';
+import { departmentDict, orderStateDict, orderMode , dictToOptions } from '../request/dict';
 import Ktable from '../components/table.vue';
-import { ref, onMounted , nextTick } from 'vue';
-import { ElMessage  } from 'element-plus'
+import { ref, onMounted, nextTick } from 'vue';
+import { ElMessage } from 'element-plus'
 
+async function fatchShopList() {
+    let result = []
+    await getShopList({ size: 999, page: 1 }).then(res => {
+        if (res.success) {
+            result = res.resource.map(item => {
+                return { label: item.shopName, value: item.shopId }
+            })
+        }
+    })
+    searchFormColumns.value[2].options = result
+}
 // order tabel
 const KtableRef2 = ref()
+const departmentOptions = dictToOptions(departmentDict)
 const departmentFormatter = (row, column) => {
   let cell = row[column.property]
   return departmentDict[cell]
@@ -38,7 +51,7 @@ const orderStateFormatter = (row, column) => {
 }
 const columns = [
   { props: 'status', label: '訂單狀態', formatter: orderStateFormatter },
-  { props: 'orderShopName', label: '落單門店' },
+  { props: 'orderShopName', label: '落單門店' , width:250},
   { props: 'department', label: '落單部門', formatter: departmentFormatter },
   { props: 'orderUserName', label: '落單人' },
   { props: 'updateDate', label: '落單時間', width: 250 }
@@ -54,13 +67,26 @@ const params = {
   size: 20,
   page: 1,
 }
-const searchFormColumns = [
+const searchFormColumns = ref([
   {
     type: 'datePicker',
     prop: 'updateDate',
     label: '下單時間:',
+  },
+  {
+    type: 'select',
+    prop: 'department',
+    label: '落單部門:',
+    options: departmentOptions
+  },
+  {
+    type: 'select',
+    prop: 'orderShopId',
+    label: '落單門店:',
+    options: []
   }
-]
+])
+fatchShopList()
 
 // order detail tabel
 let currentRow = ref({})
@@ -70,7 +96,7 @@ const orderModeFormatter = (row, column) => {
   return orderMode[cell]
 }
 const ODcolumns = [
-  { props: 'status', label: '分配狀態' , formatter:orderStateFormatter},
+  { props: 'status', label: '分配狀態', formatter: orderStateFormatter },
   { props: 'productCode', label: '產品編號' },
   { props: 'productName', label: '產品名稱' },
   { props: 'orderQuantity', label: '下單數量', formatter: (row, column) => row[column.property] + row.unit },
@@ -101,9 +127,14 @@ const ODcustomBtn = [
     type: 'primary',
     label: '按下單數量分配',
     icon: 'Coin',
-    onClick: addOrderItem
+    onClick: updateAssignQuantity
   }
 ]
+
+let selection = ref([])
+function ODselectionChange(value) {
+  selection.value = value
+}
 
 async function getOrderListDetail() {
   return {
@@ -118,9 +149,9 @@ let rowIndex = ref(null)
 function showDetailHandle(index, row) {
   rowIndex.value = index
   orderDetailShow.value = !orderDetailShow.value
-  if(orderDetailShow.value){
+  if (orderDetailShow.value) {
     currentRow.value = row
-    nextTick(()=>{
+    nextTick(() => {
       KtableRef.value.fatchList()
     })
   }
@@ -180,13 +211,9 @@ function addOrderItem() {
 }
 
 async function updateAssignQuantity(row) {
-  let assignQuantitys = [{
-    id: row.id,
-    assignQuantity:row.assignQuantity,
-    remark:row.remark
-  }]
+  let assignQuantitys = generateAssignQuantityParams(row)
   let orderId = currentRow.value.id
-  await updateOrderDetailAssignQuantity({assignQuantitys,orderId}).then(res => {
+  await updateOrderDetailAssignQuantity({ assignQuantitys, orderId }).then(res => {
     if (res.success) {
       ElMessage({ type: 'success', message: '操作成功：資料已存入數據庫' })
     } else {
@@ -201,6 +228,29 @@ async function updateAssignQuantity(row) {
   KtableRef.value.fatchList()
 }
 
+function generateAssignQuantityParams(row){
+  let flag = row ? 'signal' : 'muti'
+  if(flag === 'signal'){
+    row = [row]
+  }else{
+    row = selection.value
+    if(!row.length){
+      ElMessage({ type: 'warning', message: '最少選擇一個產品' })
+    }
+    row.forEach(item => {
+      item.assignQuantity = item.orderQuantity
+    })
+  }
+
+  let assignQuantitys = row.map(item => {
+    return {
+      id: item.id,
+      assignQuantity: item.assignQuantity,
+      remark: item.remark
+    }
+  })
+  return assignQuantitys
+}
 // function setOrderItem(index) {
 //   let productCode = currentRow.value.children[index].productCode
 //   let product = products.value.find(item => item.productCode === productCode)

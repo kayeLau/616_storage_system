@@ -95,7 +95,7 @@ const columns = [
     { props: 'password', label: '用戶密碼' },
     { props: 'auth', label: '用戶角色', formatter: authFormatter },
     // { props: 'shopCode', label: '商店編號' },
-    { props: 'shopName', label: '所屬分店' },
+    { props: 'shopName', label: '所屬分店', width:250 },
     { props: 'updateDate', label: '修改時間', width: 250 }
 ]
 const operations = {
@@ -115,11 +115,7 @@ const searchFormColumns = [
         type: 'select',
         prop: 'auth',
         label: '用戶角色:',
-        options: [
-            { label: '管理員', value: 0 },
-            { label: '前線樓面', value: 1 },
-            { label: '前線廚房', value: 2 }
-        ]
+        options: authOptions
     }
 ]
 const customBtn = [

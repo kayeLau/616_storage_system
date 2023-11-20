@@ -6,7 +6,7 @@ const { verifyToken } = require('../models/verification')
 module.exports = class order {
     getOrderList(req, res, next){
         const token = req.headers['token'];
-        const options = req.body.updateDate ? { updateDate: req.body.updateDate } : {}
+        const options = { updateDate: req.body.updateDate , department: req.body.department, orderShopId: req.body.orderShopId }
         const size = req.body.size
         const page = req.body.page
 

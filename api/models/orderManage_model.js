@@ -1,4 +1,5 @@
 const db = require('./connection_db')
+const { getCurrentTime } = require('../utils')
 const { optionsSQLFromatter, createNew, updateItem, deleteItem, getItems } = require('./base_model')
 
 function createNewOrder(data) {
@@ -86,23 +87,27 @@ function updateOrderDetailAssignQuantity(list,orderId){
             let assignQuantity = ''
             let status = ''
             let remark = ''
+            let updateDate = ''
             let ids = []
+            const currentTime = getCurrentTime()
             list.forEach(item => {
                 ids.push(item.id)
-                assignQuantity += `WHEN ${item.id} THEN ${Number(item.assignQuantity)}`
-                status += `WHEN ${item.id} THEN ${Number(1)}`
-                remark += `WHEN ${item.id} THEN ${item.remark}`
+                assignQuantity += `WHEN ${item.id} THEN ${Number(item.assignQuantity)} \n`
+                status += `WHEN ${item.id} THEN ${Number(1)} \n`
+                updateDate += `WHEN ${item.id} THEN "${currentTime}" \n`
+                if(item.remark){
+                    remark += `WHEN ${item.id} THEN "${item.remark}" \n`
+                }
             })
             db.query(`UPDATE order_detail_info SET
             assignQuantity=CASE id
-            ${assignQuantity}
-            END,
+            ${assignQuantity} END,
             status=CASE id
-            ${status}
-            END,
+            ${status} END,
             remark=CASE id
-            ${remark}
-            END
+            ${remark} END,
+            updateDate=CASE id
+            ${updateDate} END
             WHERE id IN (?)`, [ids], (err) => {
                 if (err) {
                     result.msg = "server error,please try again"

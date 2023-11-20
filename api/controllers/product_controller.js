@@ -7,7 +7,7 @@ const { verifyToken } = require('../models/verification')
 module.exports = class product {
     async getProductList(req, res, next) {
         const token = req.headers['token'];
-        let options = { freezersNum: req.body.freezersNum, disable: req.body.disable }
+        let options = { freezersNum: req.body.freezersNum, disable: req.body.disable , productName: req.body.productName }
         const size = req.body.size
         const page = req.body.page
         let bandList = []
