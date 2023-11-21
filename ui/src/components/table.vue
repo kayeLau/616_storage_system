@@ -41,7 +41,7 @@
             <el-table-column v-if='operations' fixed="right" label="操作" :width="operations.width">
                 <template #default="scope">
                     <el-button v-for="(item, index) of operations.children" :type="item.type" :key="index" :icon="item.icon"
-                        plain @click="item.onClick(scope.$index, scope.row)">{{ item.name }}</el-button>
+                        plain @click="item.onClick(scope.$index, scope.row)" :disabled="item.disabled ? item.disabled(scope.row) : false">{{ item.name }}</el-button>
                 </template>
             </el-table-column>
         </el-table>

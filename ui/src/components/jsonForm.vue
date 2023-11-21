@@ -58,7 +58,7 @@ const shopNameList = computed(() => {
 })
 function additionData(data){
     Object.keys(data).forEach(key => {
-        if(key === 'shopId'){
+        if(key === 'shopId' && shopNameList.value.length){
             let target = shopNameList.value.options.find(item => item.value  === data.shopId)
             data.shopName = target.label
         }

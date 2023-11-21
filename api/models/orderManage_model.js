@@ -11,6 +11,7 @@ function createNewOrder(data) {
             item.productName,
             item.orderQuantity,
             item.unit,
+            item.standard,
             data.updateDate,
             item.orderMode
         ]
@@ -35,6 +36,7 @@ function insertOrderItems(list) {
                 productName,
                 orderQuantity,
                 unit,
+                standard,
                 updateDate,
                 orderMode) VALUES ? `, [list], (err) => {
                 if (err) {
@@ -95,9 +97,7 @@ function updateOrderDetailAssignQuantity(list,orderId){
                 assignQuantity += `WHEN ${item.id} THEN ${Number(item.assignQuantity)} \n`
                 status += `WHEN ${item.id} THEN ${Number(1)} \n`
                 updateDate += `WHEN ${item.id} THEN "${currentTime}" \n`
-                if(item.remark){
-                    remark += `WHEN ${item.id} THEN "${item.remark}" \n`
-                }
+                remark += `WHEN ${item.id} THEN "${item.remark}" \n`
             })
             db.query(`UPDATE order_detail_info SET
             assignQuantity=CASE id
@@ -184,4 +184,4 @@ function getOrderItems(options, size, page) {
     }).catch(err => err)
 }
 
-module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, getOrderItems , insertOrderItems , updateOrderDetailAssignQuantity , setOrderItemStatus}
+module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, getOrderItems , insertOrderItems , updateOrderDetailAssignQuantity , setOrderItemStatus }

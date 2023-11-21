@@ -35,6 +35,11 @@ const editFormColumns = [
   },
   {
     type: 'input',
+    prop: 'shopCode',
+    label: '店舖編號:',
+  },
+  {
+    type: 'input',
     prop: 'shopName',
     label: '店舖名稱:',
   }
@@ -64,7 +69,8 @@ const shopTypeFormatter = (row, column) => {
 
 const columns = [
   { props: 'shopType', label: '店舖類型', formatter: shopTypeFormatter },
-  { props: 'shopName', label: '店舖名稱' },
+  { props: 'shopCode', label: '店舖編號' },
+  { props: 'shopName', label: '店舖名稱' , width: 250},
   // {props:'productCount',label:'產品種類'},
   { props: 'updateDate', label: '修改時間', width: 250 }
 ]

@@ -72,6 +72,7 @@ const sql_tabel = [
         sql: `CREATE TABLE shop_info (
             shopId VARCHAR(50) NOT NULL COMMENT '店铺id' COLLATE 'utf8mb4_0900_ai_ci',
             shopType INT(10) NOT NULL COMMENT '0:616 ',
+            shopCode VARCHAR(50) NOT NULL COMMENT '店舖編號' COLLATE 'utf8mb4_0900_ai_ci',
             shopName VARCHAR(50) NOT NULL COMMENT '店铺名称' COLLATE 'utf8mb4_0900_ai_ci',
             productCount INT(10) NULL DEFAULT NULL COMMENT '產品種類',
             createDate DATETIME NULL DEFAULT NULL,

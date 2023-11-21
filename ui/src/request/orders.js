@@ -47,3 +47,11 @@ export function deleteOrder(data){
       data,
     });
 }
+
+export function exportExcel(data){
+  return request({
+      url: '/orders/postExportExcel',
+      method: 'post',
+      data,
+    });
+}

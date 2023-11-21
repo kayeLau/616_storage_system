@@ -21,21 +21,22 @@ import jsonForm from '../components/jsonForm.vue';
 import { getProductList } from '../request/products';
 import { getShopList } from '../request/shops'
 import { getOrderList, updateOrderDetailAssignQuantity } from '../request/orders';
-import { departmentDict, orderStateDict, orderMode , dictToOptions } from '../request/dict';
+import { departmentDict, orderStateDict, orderMode, dictToOptions } from '../request/dict';
+import { exportExcel } from '../utils/export';
 import Ktable from '../components/table.vue';
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage } from 'element-plus'
 
 async function fatchShopList() {
-    let result = []
-    await getShopList({ size: 999, page: 1 }).then(res => {
-        if (res.success) {
-            result = res.resource.map(item => {
-                return { label: item.shopName, value: item.shopId }
-            })
-        }
-    })
-    searchFormColumns.value[2].options = result
+  let result = []
+  await getShopList({ size: 999, page: 1 }).then(res => {
+    if (res.success) {
+      result = res.resource.map(item => {
+        return { label: item.shopName, value: item.shopId }
+      })
+    }
+  })
+  searchFormColumns.value[2].options = result
 }
 // order tabel
 const KtableRef2 = ref()
@@ -51,16 +52,17 @@ const orderStateFormatter = (row, column) => {
 }
 const columns = [
   { props: 'status', label: '訂單狀態', formatter: orderStateFormatter },
-  { props: 'orderShopName', label: '落單門店' , width:250},
+  { props: 'orderShopName', label: '落單門店', width: 250 },
   { props: 'department', label: '落單部門', formatter: departmentFormatter },
   { props: 'orderUserName', label: '落單人' },
   { props: 'updateDate', label: '落單時間', width: 250 }
 ]
 const operations = {
-  width: 120,
+  width: 240,
   size: "small",
   children: [
-    { type: "primary", name: '編輯訂單', onClick: showDetailHandle, icon: 'Edit' },
+    { type: "primary", name: '編輯', onClick: showDetailHandle, icon: 'Edit' },
+    { type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Edit' , disabled:(row)=>row.status === 0 }
   ]
 }
 const params = {
@@ -87,6 +89,21 @@ const searchFormColumns = ref([
   }
 ])
 fatchShopList()
+
+function exportOrderExcel(index, row) {
+  let data = [
+    ['',row.orderShopName,],
+    ['貨品編號', '貨品名稱', '數量/重量', '單位'],
+    // assuming `row.children` is an array of objects
+    ...row.children.map(item => [
+      item.productCode,
+      item.productName,
+      item.assignQuantity,
+      item.unit,
+    ])
+  ];
+  exportExcel(row.orderShopName + '出貨表', data)
+}
 
 // order detail tabel
 let currentRow = ref({})
@@ -228,13 +245,13 @@ async function updateAssignQuantity(row) {
   KtableRef.value.fatchList()
 }
 
-function generateAssignQuantityParams(row){
+function generateAssignQuantityParams(row) {
   let flag = row ? 'signal' : 'muti'
-  if(flag === 'signal'){
+  if (flag === 'signal') {
     row = [row]
-  }else{
+  } else {
     row = selection.value
-    if(!row.length){
+    if (!row.length) {
       ElMessage({ type: 'warning', message: '最少選擇一個產品' })
     }
     row.forEach(item => {

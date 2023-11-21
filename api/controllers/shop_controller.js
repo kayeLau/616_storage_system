@@ -30,6 +30,7 @@ module.exports = class Shop {
         const token = req.headers['token'];
         const shopData = {
             shopId:generateUUID(),
+            shopCode: req.body.shopCode,
             shopType: req.body.shopType,
             shopName: req.body.shopName,
             createDate:getCurrentTime(),
@@ -55,6 +56,7 @@ module.exports = class Shop {
         const shopId = req.body.shopId
         const shopData = {
             shopType: req.body.shopType,
+            shopCode: req.body.shopCode,
             shopName: req.body.shopName,
             updateDate:getCurrentTime()
         }

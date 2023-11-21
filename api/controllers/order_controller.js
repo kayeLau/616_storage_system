@@ -1,6 +1,6 @@
 const { getCurrentTime , getTodayTimeRange} = require('../utils')
 const { generateUUID } = require('../models/encryption');
-const { getOrderItems , createNewOrder , updateOrderInformation , deleteOrderItem , insertOrderItems , updateOrderDetailAssignQuantity , setOrderItemStatus} = require('../models/orderManage_model')
+const { getOrderItems , createNewOrder , updateOrderInformation , deleteOrderItem , insertOrderItems , updateOrderDetailAssignQuantity } = require('../models/orderManage_model')
 const { verifyToken } = require('../models/verification')
 
 module.exports = class order {
@@ -145,4 +145,5 @@ module.exports = class order {
             }
         })
     }
+
 }
