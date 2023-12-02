@@ -24,6 +24,14 @@ export function createAdditionOrderItem(data){
     });
 }
 
+export function checkOrderRepeated(data){
+  return request({
+      url: '/orders/checkOrderRepeated',
+      method: 'post',
+      data,
+    });
+}
+
 export function updateOrderDetailAssignQuantity(data){
   return request({
       url: '/orders/updateOrderDetailAssignQuantity',

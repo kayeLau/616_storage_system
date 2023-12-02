@@ -183,7 +183,8 @@ const editFormColumns = ref([
     prop: 'productCode',
     label: '產品編號:',
     options: [],
-    disabled: true
+    disabled: true,
+    change:productChange
   },
   {
     type: 'input',
@@ -202,12 +203,12 @@ const editFormColumns = ref([
     prop: 'assignQuantity',
     label: '分配數量:',
   },
-  {
-    type: 'input',
-    prop: 'orderMode',
-    label: '分配數量:',
-    disabled: true
-  },
+  // {
+  //   type: 'input',
+  //   prop: 'orderMode',
+  //   label: '分配數量:',
+  //   disabled: true
+  // },
   {
     type: 'input',
     prop: 'remark',
@@ -216,6 +217,7 @@ const editFormColumns = ref([
 ])
 
 function editHandle(index, row) {
+  editFormColumns.value.forEach(item => item.prop === 'assignQuantity' || item.prop === 'remark' ? item.disabled = false : item.disabled = true)
   editFormColumns.value[2].unit = row.unit
   editFormColumns.value[3].unit = row.unit
   editFormModel.value = JSON.parse(JSON.stringify(row))
@@ -223,12 +225,23 @@ function editHandle(index, row) {
 }
 
 function addOrderItem() {
-  let newItem = { type: 'additem', productCode: "", productName: "", orderQuantity: '', assignQuantity: '', unit: "", updateDate: '', orderMode: 1 }
-  currentRow.value.children.unshift(newItem)
+  editFormColumns.value.forEach(item => item.disabled = false)
+  editFormModel.value = {}
+  jsonFormShow.value = !jsonFormShow.value
 }
 
+function productChange(productCode){
+  let product = products.value.find(item => item.productCode === productCode)
+  editFormModel.value.productName = product.productName
+}
+
+// 提交分配數量
 async function updateAssignQuantity(row) {
   let assignQuantitys = generateAssignQuantityParams(row)
+  if (!assignQuantitys.length) {
+      ElMessage({ type: 'warning', message: '最少選擇一個產品' })
+      return
+    }
   let orderId = currentRow.value.id
   await updateOrderDetailAssignQuantity({ assignQuantitys, orderId }).then(res => {
     if (res.success) {
@@ -251,9 +264,6 @@ function generateAssignQuantityParams(row) {
     row = [row]
   } else {
     row = selection.value
-    if (!row.length) {
-      ElMessage({ type: 'warning', message: '最少選擇一個產品' })
-    }
     row.forEach(item => {
       item.assignQuantity = item.orderQuantity
     })
@@ -313,7 +323,8 @@ function getProducts() {
           label: item.productCode
         }
       })
-      console.log(productsOption)
+      // console.log(productsOption)
+      editFormColumns.value[0].options = productsOption
     } else {
       products.value = []
     }

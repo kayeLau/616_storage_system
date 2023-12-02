@@ -5,8 +5,10 @@
             <el-tab-pane v-for="(item,index) of product" :label="item.label" :name="item.name" :key="index">
                 <el-skeleton :loading="loading" animated>
                     <template #template>
-                        <el-skeleton-item variant="text" style="width: 30%" />
-                        <el-skeleton-item variant="text" style="width: 30%" />
+                        <div class="product-list">
+                            <el-skeleton-item variant="text" style="width: 80%" />
+                            <el-skeleton-item variant="text" style="width: 50%" />
+                        </div>
                     </template>
                     <template #default>
                         <div class="product-list">
@@ -29,6 +31,7 @@
 import cart from '../components/cart.vue'
 import { ref, onMounted } from 'vue';
 import { getProductList } from '../request/products';
+import { checkOrderRepeated } from '../request/orders';
 const tabName = ref('dry')
 let loading = ref(true)
 let orderMap = ref({})
@@ -60,6 +63,11 @@ const product = ref([
     },
 ])
 
+function setOrderMap(product){
+    let productCode = product.productCode
+    orderMap.value[productCode] = product
+}
+
 // 獲取產品列表
 function getProducts() {
     const params = {
@@ -81,13 +89,15 @@ function getProducts() {
     })
 }
 
-function setOrderMap(product){
-    let productCode = product.productCode
-    orderMap.value[productCode] = product
+function checkExistOrder(){
+    checkOrderRepeated().then(res => {
+        console.log(res)
+    })
 }
 
 onMounted(() => {
     getProducts()
+    checkExistOrder()
 })
 
 </script>
@@ -120,19 +130,5 @@ onMounted(() => {
 }
 .order-quantity{
     float: right;
-}
-.product-list::-webkit-scrollbar {
-    width: 0.4em;
-}
-
-.product-list::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
-    border-radius: 20px;
-}
-
-.product-list::-webkit-scrollbar-thumb {
-  background-color: var(--el-color-primary);
-  border-radius: 20px;
-  /* outline: 1px solid var(--el-color-primary); */
 }
 </style>

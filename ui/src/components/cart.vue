@@ -3,13 +3,13 @@
         <div class="cart-bar">
             <div class="cart">
                 <div class="cart-left">
-                    <el-badge :value="orderItems" class="item" @click="detailBoxSwitch = !detailBoxSwitch">
+                    <el-badge :value="orderList.length" class="item" @click="detailBoxSwitch = !detailBoxSwitch">
                         <el-icon :size="30">
                             <ShoppingTrolley />
                         </el-icon>
                     </el-badge>
                 </div>
-                <div class="cart-right" @click='jumpToOrderComfire' :style="{backgroundColor: orderItems ? '' : '#ccc'}">落单</div>
+                <div class="cart-right" @click='jumpToOrderComfire' :style="{backgroundColor: orderList.length ? '' : '#ccc'}">落单</div>
             </div>
         </div>
         <div class="detail-box" v-show="detailBoxSwitch">
@@ -58,19 +58,19 @@ const userInfo = computed(() => {
 const props = defineProps({
     orderMap: Object
 })
-const orderItems = computed(() => {
-    return Object.keys(props.orderMap).length
-})
+// const orderItems = computed(() => {
+//     return Object.keys(props.orderMap).length
+// })
 
 const orderList = computed(() => {
-    return Object.values(props.orderMap)
+    return Object.values(props.orderMap).filter(item => item.orderQuantity !== 0)
 })
 
 let detailBoxSwitch = ref(false)
 let drawerSwitch = ref(false)
 
 function jumpToOrderComfire(){
-    if(orderItems.value > 0){
+    if(orderList.value.length > 0){
         drawerSwitch.value = !drawerSwitch.value
     }
 }
@@ -143,7 +143,7 @@ function comfireOrder(){
 }
 
 .detail-box {
-    padding: 5px;
+    padding: 10px;
     box-sizing: border-box;
     position: absolute;
     background-color: #fff;

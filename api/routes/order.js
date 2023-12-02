@@ -17,5 +17,7 @@ router.post('/createAdditionOrderItem',orderModifyMethod.postAdditionOrder)
 
 router.post('/updateOrderDetailAssignQuantity',orderModifyMethod.postupdateOrderDetailAssignQuantity)
 
+router.post('/checkOrderRepeated',orderModifyMethod.postCheckOrderRepeated)
+
 
 module.exports = router;

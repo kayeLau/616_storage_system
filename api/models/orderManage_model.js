@@ -4,28 +4,35 @@ const { optionsSQLFromatter, createNew, updateItem, deleteItem, getItems } = req
 
 function createNewOrder(data) {
     let createDateRange = data.createDateRange
-    let orderList = data.orderList.map(item => {
-        return [
-            data.id,
-            item.productCode,
-            item.productName,
-            item.orderQuantity,
-            item.unit,
-            item.standard,
-            data.updateDate,
-            item.orderMode
-        ]
-    })
-    delete data.createDateRange
-    delete data.orderList
     return checkOrderRepeated("order_info", { orderShopId: data.orderShopId, createDate: createDateRange })
-        .then(() => createNew("order_info", data)) // 訂單
-        .then(() => insertOrderItems(orderList)) // 訂單明細
+        .then((res) => {
+            const id = res.resource ? res.resource.id : data.id
+            let orderList = data.orderList.map(item => {
+                return [
+                    id,
+                    item.productCode,
+                    item.productName,
+                    item.orderQuantity,
+                    item.unit,
+                    item.standard,
+                    data.updateDate,
+                    item.orderMode
+                ]
+            })
+            if(!res.resource){
+                delete data.orderList
+                delete data.createDateRange
+                createNew("order_info", data) // 訂單
+            }
+            return orderList
+        })
+        .then((orderList) => insertOrderItems(orderList)) // 訂單明細
         .catch(err => err)
 }
 
 function insertOrderItems(list) {
     let result = {}
+    console.log(list)
     result.success = false
     return new Promise((resolve, reject) => {
         // 需要用二維數組手插入
@@ -64,14 +71,15 @@ function checkOrderRepeated(table, options) {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
-                reject(result)
                 console.log(err)
+                reject(result)
                 return
             }
             if (row.length >= 1) {
-                result.msg = "item always exist"
-                result.success = false
-                reject(result)
+                result.msg = row.length + " item have find"
+                result.success = true
+                result.resource = row[0]
+                resolve(result)
             } else {
                 result.msg = "success"
                 result.success = true
@@ -184,4 +192,4 @@ function getOrderItems(options, size, page) {
     }).catch(err => err)
 }
 
-module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, getOrderItems , insertOrderItems , updateOrderDetailAssignQuantity , setOrderItemStatus }
+module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, getOrderItems , insertOrderItems , updateOrderDetailAssignQuantity , setOrderItemStatus , checkOrderRepeated }

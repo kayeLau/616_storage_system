@@ -47,6 +47,7 @@ const editFormColumns = [
 
 function refreshList(){
   KtableRef.value.fatchList()
+  jsonFormShow.value = !jsonFormShow.value
 }
 
 function createHandle() {

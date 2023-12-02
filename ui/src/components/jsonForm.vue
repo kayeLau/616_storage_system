@@ -1,12 +1,12 @@
 <template>
     <div>
-        <el-form label-width="100px">
+        <el-form ref='formRef' label-width="100px" :model="_params">
             <el-form-item v-for="(item, index) of formColumns" :key="index" :label="item.label">
                 <div v-if='item.type === "input"' class="input-box">
                     <el-input v-model="_params[item.prop]" clearable :disabled="item.disabled"/>
                     <span v-show="item.unit">{{ item.unit }}</span>
                 </div>
-                <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable :disabled="item.disabled">
+                <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable :disabled="item.disabled" @change="item.change">
                     <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value" />
                 </el-select>
                 <el-date-picker v-if='item.type === "datePicker"' v-model="_params[item.prop]" type="daterange"
@@ -19,19 +19,18 @@
     </div>
 </template>
 <script setup>
-import { defineProps , ref , defineEmits , watch , computed } from 'vue';
+import { defineProps , ref , defineEmits , watch , computed , defineExpose} from 'vue';
 import { ElMessage  } from 'element-plus'
 const props = defineProps({
     comfireCallBack:Function,
     formModel: Object,
     formColumns: Array,
 })
-
+const formRef = ref(null)
 const emit = defineEmits(['sumbitSuccess','sumbit'])
 
 let _params = ref(props.formModel)
 watch(() => props.formModel,(value)=>{
-    console.log(value)
     _params.value = value
 },)
 
@@ -65,6 +64,14 @@ function additionData(data){
     })
     return data
 }
+
+function resetFields(){
+    Object.key(_params.value).forEach(key => {
+        _params.value[key] = ''
+    })
+}
+
+defineExpose({ resetFields })
 
 </script>
 <style>
