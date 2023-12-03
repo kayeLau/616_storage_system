@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import layout from '../layout/default.vue'
 
 const routes = [
@@ -8,7 +8,7 @@ const routes = [
     children:[{
       path:'',
       name: 'appOrder',
-      component: () => import(/* webpackChunkName: "app-order" */ '../views/appOrder.vue')
+      component: () => import('../views/appOrder.vue')
     }]
   },
   {
@@ -17,7 +17,7 @@ const routes = [
     children:[{
       path:'',
       name: 'Order',
-      component: () => import(/* webpackChunkName: "order" */ '../views/Order.vue')
+      component: () => import('../views/Order.vue')
     }]
   },
   {
@@ -26,7 +26,7 @@ const routes = [
     children:[{
       path:'',
       name: 'Shop',
-      component: () => import(/* webpackChunkName: "shop" */ '../views/Shop.vue')
+      component: () => import('../views/Shop.vue')
     }]
   },
   {
@@ -35,7 +35,7 @@ const routes = [
     children:[{
       path:'',
       name: 'Product',
-      component: () => import(/* webpackChunkName: "product" */ '../views/Product.vue')
+      component: () => import('../views/Product.vue')
     }]
   },
   {
@@ -44,12 +44,12 @@ const routes = [
     children:[{
       path:'',
       name: 'User',
-      component: () => import(/* webpackChunkName: "user" */ '../views/User.vue')
+      component: () => import('../views/User.vue')
     }]
   },
   {
     path: '/login',
-    component: import(/* webpackChunkName: "login" */ '../views/Login.vue'),
+    component: () => import('../views/Login.vue'),
   },
   {
     path: '/',
@@ -61,7 +61,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHashHistory(),
   routes
 })
 
