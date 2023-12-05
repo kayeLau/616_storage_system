@@ -5,11 +5,12 @@ const { optionsSQLFromatter, createNew, updateItem, deleteItem, getItems } = req
 function createNewOrder(data) {
     let createDateRange = data.createDateRange
     return checkOrderRepeated("order_info", { orderShopId: data.orderShopId, createDate: createDateRange })
-        .then((res) => {
-            const id = res.resource ? res.resource.id : data.id
+        .then(async (res) => {
+            const orderId = res.resource ? res.resource.id : data.id
             let orderList = data.orderList.map(item => {
                 return [
-                    id,
+                    item.id ? item.id : '',
+                    orderId,
                     item.productCode,
                     item.productName,
                     item.orderQuantity,
@@ -23,6 +24,8 @@ function createNewOrder(data) {
                 delete data.orderList
                 delete data.createDateRange
                 createNew("order_info", data) // 訂單
+            }else{
+                await deleteItem("order_detail_info", 'orderId', orderId)
             }
             return orderList
         })
@@ -32,12 +35,12 @@ function createNewOrder(data) {
 
 function insertOrderItems(list) {
     let result = {}
-    console.log(list)
     result.success = false
     return new Promise((resolve, reject) => {
-        // 需要用二維數組手插入
+        // 需要用二維數組插入
         if (Array.isArray(list) && Array.isArray(list[0])) {
             db.query(`INSERT IGNORE INTO order_detail_info (
+                id,
                 orderId,
                 productCode,
                 productName,
@@ -79,7 +82,12 @@ function checkOrderRepeated(table, options) {
                 result.msg = row.length + " item have find"
                 result.success = true
                 result.resource = row[0]
-                resolve(result)
+                getItems("order_detail_info", { orderId: result.resource.id }, 999, 1).then(res => {
+                    if (res.success) {
+                        result.resource.children = res.resource
+                    }
+                    resolve(result)
+                })
             } else {
                 result.msg = "success"
                 result.success = true

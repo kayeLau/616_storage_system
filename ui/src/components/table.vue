@@ -38,9 +38,9 @@
                     </template>
                 </template>
             </el-table-column>
-            <el-table-column v-if='operations' fixed="right" label="操作" :width="operations.width">
+            <el-table-column v-if='operations && _operationsChildren.length' fixed="right" label="操作" :width="operations.width">
                 <template #default="scope">
-                    <el-button v-for="(item, index) of operations.children" :type="item.type" :key="index" :icon="item.icon"
+                    <el-button v-for="(item, index) of _operationsChildren" :type="item.type" :key="index" :icon="item.icon"
                         plain @click="item.onClick(scope.$index, scope.row)" :disabled="item.disabled ? item.disabled(scope.row) : false">{{ item.name }}</el-button>
                 </template>
             </el-table-column>
@@ -88,6 +88,8 @@ const props = defineProps({
 
 let data = ref([])
 let _params = reactive(props.params)
+let _operationsChildren = props.operations.children.filter(item => !item.hide )
+
 
 async function fatchList() {
     let result = {}

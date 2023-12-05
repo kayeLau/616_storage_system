@@ -24,8 +24,14 @@ import { getOrderList, updateOrderDetailAssignQuantity } from '../request/orders
 import { departmentDict, orderStateDict, orderMode, dictToOptions } from '../request/dict';
 import { exportExcel } from '../utils/export';
 import Ktable from '../components/table.vue';
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick , computed} from 'vue';
 import { ElMessage } from 'element-plus'
+import { getStorge } from '../utils/auth'
+
+const userInfo = computed(() => {
+    let user = getStorge('userInfo')
+    return user ? JSON.parse(user) : {}
+})
 
 async function fatchShopList() {
   let result = []
@@ -61,8 +67,8 @@ const operations = {
   width: 240,
   size: "small",
   children: [
-    { type: "primary", name: '編輯', onClick: showDetailHandle, icon: 'Edit' },
-    { type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Edit' , disabled:(row)=>row.status === 0 }
+    { type: "primary", name: '編輯', onClick: showDetailHandle, icon: 'Edit' , hide:userInfo.value.auth !== -1},
+    { type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Edit' , disabled:(row)=>row.status === 0 , hide:userInfo.value.auth !== -1}
   ]
 }
 const params = {
@@ -278,33 +284,6 @@ function generateAssignQuantityParams(row) {
   })
   return assignQuantitys
 }
-// function setOrderItem(index) {
-//   let productCode = currentRow.value.children[index].productCode
-//   let product = products.value.find(item => item.productCode === productCode)
-//   currentRow.value.children[index].productName = product.productName
-//   currentRow.value.children[index].unit = product.unit
-// }
-
-// function submitAdditionOrderItem(){
-//     let orderList = newOrderItems.value.filter(item => item.productCode)
-//     if(!orderList.length){
-//         ElMessage ({ type: 'warning', message: '新增項目為空' })
-//         return
-//     }
-//     let data = {
-//         orderList
-//     }
-//     createAdditionOrderItem(data).then(res => {
-//         if(res.success){
-//             emit("refresh")
-//             ElMessage ({ type: 'success', message: '提交成功' })
-//         }else{
-//             ElMessage ({ type: 'error', message: '提交失敗' })
-//         }
-//     })
-// }
-
-
 
 // 獲取產品列表
 let products = ref([]) // 產品列表

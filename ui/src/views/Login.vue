@@ -51,7 +51,7 @@ function toLogin() {
 
 function toHome() {
     router.push({
-        path: '/shop'
+        path: '/order'
     })
 }
 

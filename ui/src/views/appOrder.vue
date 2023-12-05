@@ -2,7 +2,7 @@
     <div style="position: relative;">
         <div class="tool-bar"></div>
         <el-tabs v-model="tabName" class="product-tabs" type="border-card">
-            <el-tab-pane v-for="(item,index) of product" :label="item.label" :name="item.name" :key="index">
+            <el-tab-pane v-for="(item,index) of products" :label="item.label" :name="item.name" :key="index">
                 <el-skeleton :loading="loading" animated>
                     <template #template>
                         <div class="product-list">
@@ -12,7 +12,7 @@
                     </template>
                     <template #default>
                         <div class="product-list">
-                            <div v-for="(product,index) of item.children" :key="index" class="product-li">
+                            <div v-for="(product,sIndex) of Object.values(item.children)" :key="sIndex" class="product-li">
                                 <div class="product-name">{{ product.productName }}</div>
                                 <div class="order-quantity">
                                     <el-input-number v-model="product.orderQuantity" :min="0" @change="setOrderMap(product)"/><span style="padding-left: 10px;">{{ product.unit }}</span>
@@ -24,7 +24,7 @@
                 </el-skeleton>
             </el-tab-pane>
         </el-tabs>
-        <cart :orderMap="orderMap"></cart>
+        <cart :orderMap="orderMap" @orderDetailChange="orderDetailChange"></cart>
     </div>
 </template>
 <script setup>
@@ -35,37 +35,52 @@ import { checkOrderRepeated } from '../request/orders';
 const tabName = ref('dry')
 let loading = ref(true)
 let orderMap = ref({})
-const product = ref([
+const products = ref([
     {
         name: 'dry',
         label: '干貨',
-        children: []
+        children: {}
     },
     {
         name: 'freeseFirst',
         label: '一號雪房',
-        children: []
+        children: {}
     },
     {
         name: 'freeseThree',
         label: '三號雪房',
-        children: []
+        children: {}
     },
     {
         name: 'freeseFour',
         label: '四號雪房',
-        children: []
+        children: {}
     },
     {
         name: 'freeseFive',
         label: '五號雪房',
-        children: []
+        children: {}
     },
 ])
+
+function orderDetailChange(product){
+    setOrderMap(product)
+    setProductListView(product)
+}
 
 function setOrderMap(product){
     let productCode = product.productCode
     orderMap.value[productCode] = product
+}
+
+function setProductListView(product){
+    for(let i = 0;i < products.value.length;i++){
+        // let target = products.value[i].children[product.productCode]
+        if(products.value[i].children[product.productCode]){
+            products.value[i].children[product.productCode] = product
+        }
+        
+    }
 }
 
 // 獲取產品列表
@@ -78,11 +93,11 @@ function getProducts() {
         if (res.success) {
             res.resource.forEach(item => {
                 let freezersNum = item.freezersNum > 2 ? item.freezersNum - 1 : item.freezersNum;
-                product.value[freezersNum].children.push({
+                products.value[freezersNum].children[item.productCode] = {
                     ...item,
                     orderQuantity:0,
                     orderMode:0
-                })
+                }
             });
         }
         loading.value = false
@@ -91,7 +106,12 @@ function getProducts() {
 
 function checkExistOrder(){
     checkOrderRepeated().then(res => {
-        console.log(res)
+        if(res.success && res.resource.children.length){
+            res.resource.children.forEach(item => {
+                setOrderMap(item)
+                setProductListView(item)
+            })
+        }
     })
 }
 

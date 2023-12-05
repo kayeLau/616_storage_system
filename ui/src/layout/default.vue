@@ -3,9 +3,14 @@
         <el-container>
             <el-header class="header-bar" >
                     <img src="../assets/616_logo.jpg" alt="616_logo" class='logo'>
-                    <div class="avatar">
+                    <div class="avatar" @click="avatarDetailShow = !avatarDetailShow">
                         <!-- <span>Kaye</span> -->
                         <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+                        <el-card class="avatar-detail" v-show="avatarDetailShow">
+                            <p>用戶:{{ userInfo.name }}</p>
+                            <p>角色:{{ authDict[userInfo.auth] }}</p>
+                            <el-button type="primary" style="width: 100%;" @click="logOut">登出</el-button>
+                        </el-card>
                     </div>
             </el-header>
 
@@ -33,8 +38,17 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { getStorge } from '../utils/auth'
+import { computed , ref } from 'vue';
+import { getStorge ,removeToken } from '../utils/auth'
+import { authDict } from '../request/dict'
+import { useRouter } from 'vue-router';
+const router = useRouter()
+function logOut() {
+    removeToken()
+    router.push({
+        path: '/login'
+    })
+}
 const userInfo = computed(() => {
     let user = getStorge('userInfo')
     return user ? JSON.parse(user) : {}
@@ -71,6 +85,8 @@ const menus = [
         whiteList:true
     },
     ].filter(item => userInfo.value.auth === -1 ? true : item.whiteList)
+
+    let avatarDetailShow = ref(false)
 </script>
 <style>
  @media only screen and (max-width: 960px) {
@@ -94,10 +110,23 @@ const menus = [
 
 }
 .avatar{
+    position: relative;
+    cursor: pointer;
     display: flex;
     align-items: center;
 }
 .avatar>span{
     font-weight: bold;
+}
+.avatar-detail{
+    position: absolute;
+    z-index: 999;
+    width: 200px;
+    background-color: #fff;
+    top: 100%;
+    right: 10px;
+}
+.avatar-detail > p{
+    padding-bottom: 5px;
 }
 </style>

@@ -17,7 +17,11 @@
                 <div v-for="(product, index) of orderList" :key="index" class="order-item">
                     <div class="product-name">{{ product.productName }}</div>
                     <div style="color: #ccc;font-size: 14px;">{{ product.standard }}</div>
-                    <div>{{ product.orderQuantity + product.unit }}</div>
+                    <div>
+                        <el-icon @click="emitOrderDetailChange(product,true)"><CirclePlusFilled /></el-icon>
+                        {{ product.orderQuantity + product.unit }}
+                        <el-icon @click="emitOrderDetailChange(product,false)"><RemoveFilled /></el-icon>
+                    </div>
                 </div>
             </div>
         </div>
@@ -45,7 +49,7 @@
     </div>
 </template>
 <script setup>
-import { defineProps, computed, ref } from 'vue';
+import { defineProps, computed, ref , defineEmits } from 'vue';
 import { getStorge } from '../utils/auth'
 import { createOrder } from '../request/orders'
 import { ElMessage  } from 'element-plus'
@@ -58,6 +62,17 @@ const userInfo = computed(() => {
 const props = defineProps({
     orderMap: Object
 })
+
+const emit = defineEmits(['orderDetailChange'])
+function emitOrderDetailChange(product,type){
+    let _product = {...product}
+    if(type){
+        _product.orderQuantity++
+    }else{
+        _product.orderQuantity--
+    }
+    emit('orderDetailChange',_product)
+}
 // const orderItems = computed(() => {
 //     return Object.keys(props.orderMap).length
 // })
