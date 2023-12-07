@@ -7,9 +7,11 @@
                         <!-- <span>Kaye</span> -->
                         <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
                         <el-card class="avatar-detail" v-show="avatarDetailShow">
-                            <p>用戶:{{ userInfo.name }}</p>
-                            <p>角色:{{ authDict[userInfo.auth] }}</p>
-                            <el-button type="primary" style="width: 100%;" @click="logOut">登出</el-button>
+                            <div>
+                                <span>{{ authDict[userInfo.auth] }}</span>
+                                <span>{{ userInfo.name }}</span>
+                            </div>
+                            <el-button type="primary" style="width: 100%" @click="logOut">登出</el-button>
                         </el-card>
                     </div>
             </el-header>
@@ -79,10 +81,16 @@ const menus = [
         whiteList:false
     },
     {
-        name: "落單頁",
+        name: "落單",
         path:'appOrder',
         icon:'Iphone',
         whiteList:true
+    },
+    {
+        name: "設定",
+        path:'setting',
+        icon:'Setting',
+        whiteList:false
     },
     ].filter(item => userInfo.value.auth === -1 ? true : item.whiteList)
 

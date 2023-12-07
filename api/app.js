@@ -1,17 +1,10 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 require('./models/create_tabel')
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var shopsRouter = require('./routes/shops')
-var productsRouter = require('./routes/product')
-var ordersRouter = require('./routes/order')
-
-var app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -23,11 +16,18 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const shopsRouter = require('./routes/shops')
+const productsRouter = require('./routes/product')
+const ordersRouter = require('./routes/order')
+const settingRouter = require('./routes/setting')
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/shops',shopsRouter)
 app.use('/products',productsRouter)
 app.use('/orders',ordersRouter)
+app.use('/setting',settingRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -48,6 +48,15 @@ const routes = [
     }]
   },
   {
+    path: '/setting',
+    component: layout,
+    children:[{
+      path:'',
+      name: 'Setting',
+      component: () => import('../views/Setting.vue')
+    }]
+  },
+  {
     path: '/login',
     component: () => import('../views/Login.vue'),
   },

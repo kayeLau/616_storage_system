@@ -106,7 +106,7 @@ function getProducts() {
 
 function checkExistOrder(){
     checkOrderRepeated().then(res => {
-        if(res.success && res.resource.children.length){
+        if(res.success && res.resource && res.resource.children.length){
             res.resource.children.forEach(item => {
                 setOrderMap(item)
                 setProductListView(item)

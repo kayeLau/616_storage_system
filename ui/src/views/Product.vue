@@ -4,7 +4,7 @@
           <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params" :getList="getProductList" :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
       </el-card>
       <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
-        <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList"></jsonForm>
+        <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules" :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList"></jsonForm>
     </el-drawer>
   </div>
 </template>
@@ -47,12 +47,12 @@ const editFormColumns = ref([
   {
     type: 'input',
     prop: 'standard',
-    label: '單位:',
+    label: '規格:',
   },
   {
     type: 'input',
     prop: 'unit',
-    label: '規格:',
+    label: '單位:',
   },
   {
     type: 'select',
@@ -61,6 +61,29 @@ const editFormColumns = ref([
     options:dictToOptions(productDisable)
   }
 ])
+const editFormRules = {
+  productCode: [
+    { required: true, message: '請輸入產品編號', trigger: 'blur' },
+  ],
+  productName: [
+    { required: true, message: '請輸入產品名稱', trigger: 'blur' },
+  ],
+  freezersNum: [
+    { required: true, message: '請選擇雪房號碼', trigger: 'blur' },
+  ],
+  department: [
+    { required: true, message: '請選擇負責部門', trigger: 'blur' },
+  ],
+  standard: [
+    { required: true, message: '請輸入規格', trigger: 'blur' },
+  ],
+  unit: [
+    { required: true, message: '請輸入單位', trigger: 'blur' },
+  ],
+  disable: [
+    { required: true, message: '請選擇狀態', trigger: 'blur' },
+  ],
+}
 
 function refreshList(){
   KtableRef.value.fatchList()

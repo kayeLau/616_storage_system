@@ -2,8 +2,6 @@ const { getCurrentTime, checkNull } = require('../utils')
 const { getShopItems , createNewShop , updateShopInformation , deleteShopItem , bindProductTOShop , getBandProducts} = require('../models/shopManage_model')
 const { generateUUID } = require('../models/encryption');
 const { verifyToken } = require('../models/verification')
-// const config = require('../config/development_config')
-// const jwt = require('jsonwebtoken')
 
 module.exports = class Shop {
 

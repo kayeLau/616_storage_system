@@ -3,7 +3,7 @@
         <el-form :inline="true" :model="_params" class="form-inline" v-if="searchFormColumns.length">
             <el-form-item v-for='(item, index) of searchFormColumns' :label="item.label" :key="index">
                 <el-input v-if='item.type === "input"' v-model="_params[item.prop]" clearable style="width: 150px;"/>
-                <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable style="width: 150px;">
+                <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable style="width: 150px;" placeholder="請選擇">
                     <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value" />
                 </el-select>
                 <el-date-picker v-if='item.type === "datePicker"' v-model="_params[item.prop]" type="daterange" style="width: 250px;"
@@ -141,9 +141,6 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     padding-top: 10px;
-}
-.el-date-editor{
-    border-radius: 10px;
 }
 .el-form--inline .el-form-item{
     margin-right: 20px;

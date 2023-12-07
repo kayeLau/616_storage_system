@@ -5,7 +5,8 @@
                 :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
         </el-card>
         <el-drawer v-model="jsonFormShow" title="員工資料" direction="rtl">
-            <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :comfireCallBack="JsonFormComfireCallBack"  @sumbitSuccess="refreshList">
+            <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :comfireCallBack="JsonFormComfireCallBack"
+                :rules="editFormRules" @sumbitSuccess="refreshList">
             </jsonForm>
         </el-drawer>
     </div>
@@ -49,6 +50,20 @@ const editFormColumns = ref([
         options: []
     },
 ])
+const editFormRules = {
+    name: [
+        { required: true, message: '請輸入用戶名', trigger: 'blur' },
+    ],
+    password: [
+        { required: true, message: '請輸入用戶密碼', trigger: 'blur' },
+    ],
+    auth: [
+        { required: true, message: '請選擇用戶角色', trigger: 'blur' },
+    ],
+    shopId: [
+        { required: true, message: '請選擇所屬分店', trigger: 'blur' },
+    ],
+}
 
 async function fatchShopList() {
     let result = []
@@ -63,9 +78,9 @@ async function fatchShopList() {
 }
 fatchShopList()
 
-function refreshList(){
-  KtableRef.value.fatchList()
-  jsonFormShow.value = !jsonFormShow.value
+function refreshList() {
+    KtableRef.value.fatchList()
+    jsonFormShow.value = !jsonFormShow.value
 }
 
 function createHandle() {
@@ -95,7 +110,7 @@ const columns = [
     { props: 'password', label: '用戶密碼' },
     { props: 'auth', label: '用戶角色', formatter: authFormatter },
     // { props: 'shopCode', label: '商店編號' },
-    { props: 'shopName', label: '所屬分店', width:250 },
+    { props: 'shopName', label: '所屬分店', width: 250 },
     { props: 'updateDate', label: '修改時間', width: 250 }
 ]
 const operations = {

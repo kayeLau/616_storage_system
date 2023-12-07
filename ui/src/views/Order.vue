@@ -140,12 +140,12 @@ const ODparams = {
   page: 1,
 }
 const ODcustomBtn = [
-  {
-    type: 'success',
-    label: '新增',
-    icon: 'CirclePlus',
-    onClick: addOrderItem
-  },
+  // {
+  //   type: 'success',
+  //   label: '新增',
+  //   icon: 'CirclePlus',
+  //   onClick: addOrderItem
+  // },
   {
     type: 'primary',
     label: '按下單數量分配',
@@ -230,11 +230,11 @@ function editHandle(index, row) {
   jsonFormShow.value = !jsonFormShow.value
 }
 
-function addOrderItem() {
-  editFormColumns.value.forEach(item => item.disabled = false)
-  editFormModel.value = {}
-  jsonFormShow.value = !jsonFormShow.value
-}
+// function addOrderItem() {
+//   editFormColumns.value.forEach(item => item.disabled = false)
+//   editFormModel.value = {}
+//   jsonFormShow.value = !jsonFormShow.value
+// }
 
 function productChange(productCode){
   let product = products.value.find(item => item.productCode === productCode)

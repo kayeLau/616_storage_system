@@ -6,12 +6,13 @@
     </el-card>
     <bandList :dialogVisible="bandListDialogVisible" @closeDialog="manageBandProduct" :shopId="shopId"></bandList>
     <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
-      <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList"></jsonForm>
+      <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules"
+        :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList"></jsonForm>
     </el-drawer>
   </div>
 </template>
 <script setup>
-import { getShopList , updateShop , createShop } from '../request/shops'
+import { getShopList, updateShop, createShop } from '../request/shops'
 import { shopType, dictToOptions } from '../request/dict'
 import bandList from '../components/bandList.vue'
 import Ktable from '../components/table.vue'
@@ -44,22 +45,33 @@ const editFormColumns = [
     label: '店舖名稱:',
   }
 ]
+const editFormRules = {
+  shopType: [
+    { required: true, message: '請選擇店舖類型', trigger: 'blur' },
+  ],
+  shopCode: [
+    { required: true, message: '請輸入店舖編號', trigger: 'blur' },
+  ],
+  shopName: [
+    { required: true, message: '請輸入店舖名稱', trigger: 'blur' },
+  ]
+}
 
-function refreshList(){
+function refreshList() {
   KtableRef.value.fatchList()
   jsonFormShow.value = !jsonFormShow.value
 }
 
 function createHandle() {
-    editFormModel.value = {}
-    JsonFormComfireCallBack.value = createShop
-    jsonFormShow.value = !jsonFormShow.value
+  editFormModel.value = {}
+  JsonFormComfireCallBack.value = createShop
+  jsonFormShow.value = !jsonFormShow.value
 }
 
 function editHandle(index, row) {
-    editFormModel.value = { ...row , shopType:String(row.shopType)}
-    JsonFormComfireCallBack.value = updateShop
-    jsonFormShow.value = !jsonFormShow.value
+  editFormModel.value = { ...row, shopType: String(row.shopType) }
+  JsonFormComfireCallBack.value = updateShop
+  jsonFormShow.value = !jsonFormShow.value
 }
 
 // table
@@ -71,7 +83,7 @@ const shopTypeFormatter = (row, column) => {
 const columns = [
   { props: 'shopType', label: '店舖類型', formatter: shopTypeFormatter },
   { props: 'shopCode', label: '店舖編號' },
-  { props: 'shopName', label: '店舖名稱' , width: 250},
+  { props: 'shopName', label: '店舖名稱', width: 250 },
   // {props:'productCount',label:'產品種類'},
   { props: 'updateDate', label: '修改時間', width: 250 }
 ]
@@ -79,9 +91,9 @@ const operations = {
   width: 360,
   size: "small",
   children: [
-    { type: "primary", name: '編輯', onClick: editHandle ,icon:'Edit'},
-    { type: "warning", name: '管理禁售產品', onClick: manageBandProduct , icon:'Setting'},
-    { type: "danger", name: '删除' ,icon:'Delete'}
+    { type: "primary", name: '編輯', onClick: editHandle, icon: 'Edit' },
+    { type: "warning", name: '管理禁售產品', onClick: manageBandProduct, icon: 'Setting' },
+    { type: "danger", name: '删除', icon: 'Delete' }
   ]
 }
 const params = {
@@ -101,7 +113,7 @@ const customBtn = [
     type: 'success',
     label: '新增',
     icon: 'CirclePlus',
-    onClick:createHandle
+    onClick: createHandle
   }
 ]
 

@@ -13,3 +13,6 @@
 .el-input-number{
     width: 130px;
 }
+.el-date-editor{
+    border-radius: 10px;
+}
