@@ -1,140 +1,100 @@
-const { getCurrentTime, checkNull } = require('../utils')
-const { getShopItems , createNewShop , updateShopInformation , deleteShopItem , bindProductTOShop , getBandProducts} = require('../models/shopManage_model')
+const { getCurrentTime } = require('../utils')
+const { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop, getBandProducts } = require('../models/shopManage_model')
 const { generateUUID } = require('../models/encryption');
-const { verifyToken } = require('../models/verification')
 
 module.exports = class Shop {
 
-    getShopList(req, res, next){
-        const token = req.headers['token'];
+    getShopList(req, res, next) {
         const options = req.body.shopType ? { shopType: req.body.shopType } : {}
         const size = parseInt(req.body.size)
         const page = parseInt(req.body.page)
 
-        verifyToken(token).then(tokenResult => {
-            if (tokenResult.success === true) {
-                getShopItems(options,size,page).then(result => {
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+        getShopItems(options, size, page).then(result => {
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
         })
+
     }
 
     postCreateShop(req, res, next) {
-        const token = req.headers['token'];
         const shopData = {
-            shopId:generateUUID(),
+            shopId: generateUUID(),
             shopCode: req.body.shopCode,
             shopType: req.body.shopType,
             shopName: req.body.shopName,
-            createDate:getCurrentTime(),
-            updateDate:getCurrentTime()
+            createDate: getCurrentTime(),
+            updateDate: getCurrentTime()
         }
 
-        verifyToken(token).then(tokenResult => {
-            if (tokenResult.success === true) {
-                createNewShop(shopData).then(result => {
-                    console.log(result)
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+        createNewShop(shopData).then(result => {
+            console.log(result)
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
         })
     }
 
-    postUpdateShop(req, res, next){
-        const token = req.headers['token'];
+
+    postUpdateShop(req, res, next) {
         const shopId = req.body.shopId
         const shopData = {
             shopType: req.body.shopType,
             shopCode: req.body.shopCode,
             shopName: req.body.shopName,
-            updateDate:getCurrentTime()
+            updateDate: getCurrentTime()
         }
 
-        verifyToken(token).then(tokenResult => {
-            if (tokenResult.success === true) {
-                updateShopInformation(shopId,shopData).then(result => {
-                    console.log(result)
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+        updateShopInformation(shopId, shopData).then(result => {
+            console.log(result)
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
         })
     }
 
-    postDeleteShop(req, res, next){
-        const token = req.headers['token'];
+    postDeleteShop(req, res, next) {
         const shopId = req.body.shopId
 
-        verifyToken(token).then(tokenResult => {
-            if (tokenResult.success === true) {
-                deleteShopItem(shopId).then(result => {
-                    console.log(result)
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+        deleteShopItem(shopId).then(result => {
+            console.log(result)
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
         })
+
     }
 
-    getBindProductList(req, res, next){
-        const token = req.headers['token'];
+    getBindProductList(req, res, next) {
         const options = req.body.shopId ? { shopId: req.body.shopId } : {}
         const size = parseInt(req.body.size)
         const page = parseInt(req.body.page)
 
-        verifyToken(token).then(tokenResult => {
-            if (tokenResult.success === true) {
-                getBandProducts(options,size,page).then(result => {
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+        getBandProducts(options, size, page).then(result => {
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
         })
+
     }
 
-    postBindProductToShop(req, res, next){
-        const token = req.headers['token'];
-
-        verifyToken(token).then(tokenResult => {
-            if (tokenResult.success === true) {
-                let productList = req.body.productList
-                productList = productList.map(item => {
-                    return [
-                        item.shopId + '-' + item.productCode,
-                        item.shopId,
-                        item.productCode,
-                        getCurrentTime(),
-                        getCurrentTime()
-                    ]
-                })
-                bindProductTOShop(productList).then(result => {
-                    console.log(result)
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+    postBindProductToShop(req, res, next) {
+        let productList = req.body.productList
+        productList = productList.map(item => {
+            return [
+                item.shopId + '-' + item.productCode,
+                item.shopId,
+                item.productCode,
+                getCurrentTime(),
+                getCurrentTime()
+            ]
         })
-    }
+        bindProductTOShop(productList).then(result => {
+            console.log(result)
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
+        })
 
+    }
 }

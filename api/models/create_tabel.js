@@ -1,6 +1,8 @@
 const db = require('./connection_db')
 const config = require("../config/development_config")
 
+// INDEX FK_order_detail_info_order_info (orderId) USING BTREE,
+// CONSTRAINT FK_order_detail_info_order_info FOREIGN KEY (orderId) REFERENCES order_info (id) ON UPDATE NO ACTION ON DELETE NO ACTION
 const sql_tabel = [
     {
         name: 'member_info',
@@ -31,8 +33,6 @@ const sql_tabel = [
             status INT(10) NULL DEFAULT '0' COMMENT '分配狀態 0:未分配 1:已分配',
             remark TEXT NULL DEFAULT NULL COMMENT '備注' COLLATE 'utf8mb4_general_ci',
             PRIMARY KEY (id) USING BTREE,
-            INDEX FK_order_detail_info_order_info (orderId) USING BTREE,
-            CONSTRAINT FK_order_detail_info_order_info FOREIGN KEY (orderId) REFERENCES order_info (id) ON UPDATE NO ACTION ON DELETE NO ACTION
         )`
     },
     {

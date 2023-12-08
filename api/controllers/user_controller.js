@@ -1,8 +1,7 @@
 const loginCheck = require('../models/login')
-const { toRegister, updateUserInformation, getUsersItems , getUser} = require('../models/register_model')
+const { toRegister, updateUserInformation, getUsersItems, getUser } = require('../models/register_model')
 var { getCurrentTime, checkNull } = require('../utils')
 const { generateUUID, hashPassword } = require('../models/encryption');
-const { verifyToken } = require('../models/verification')
 const config = require('../config/development_config')
 const jwt = require('jsonwebtoken')
 
@@ -15,11 +14,11 @@ module.exports = class Member {
             id: generateUUID(),
             name: req.body.name,
             password,
-            auth:req.body.auth,
-            shopId:req.body.shopId,
-            shopName:req.body.shopName,
+            auth: req.body.auth,
+            shopId: req.body.shopId,
+            shopName: req.body.shopName,
             createDate: getCurrentTime(),
-            updateDate:getCurrentTime(),
+            updateDate: getCurrentTime(),
         }
 
         toRegister(memberData).then(result => {
@@ -32,27 +31,27 @@ module.exports = class Member {
         const memberData = {
             name: req.body.name,
             password: hashPassword(req.body.password),
-            updateDate:getCurrentTime(),
+            updateDate: getCurrentTime(),
         }
         loginCheck(memberData).then(rows => {
             if (checkNull(rows) === true) {
                 res.json({
-                        success: false,
-                        msg: "請輸入正確的帳號或密碼。"
+                    success: false,
+                    msg: "請輸入正確的帳號或密碼。"
                 })
             } else if (checkNull(rows) === false) {
                 const token = jwt.sign({ data: rows[0].id }, config.secret, { expiresIn: '2h' });
                 // res.setHeader('token', token);
                 res.json({
-                        success: true,
-                        token,
-                        userInfo:{
-                            name:rows[0].name,
-                            shopId:rows[0].shopId,
-                            shopName:rows[0].shopName,
-                            auth:rows[0].auth
-                        },
-                        msg: "歡迎 " + rows[0].name + " 的登入！",
+                    success: true,
+                    token,
+                    userInfo: {
+                        name: rows[0].name,
+                        shopId: rows[0].shopId,
+                        shopName: rows[0].shopName,
+                        auth: rows[0].auth
+                    },
+                    msg: "歡迎 " + rows[0].name + " 的登入！",
                 })
             }
         }).catch(err => {
@@ -62,62 +61,40 @@ module.exports = class Member {
 
     // 更改個人資料
     postUpdateUser(req, res, next) {
-        const token = req.headers['token'];
         const memberData = {
             // password: hashPassword(req.body.password),
             createDate: getCurrentTime(),
-            auth:req.body.auth,
-            shopId:req.body.shopId,
-            shopName:req.body.shopName
+            auth: req.body.auth,
+            shopId: req.body.shopId,
+            shopName: req.body.shopName
         }
-        
-        verifyToken(token).then(tokenResult => {
-            if (tokenResult.success === true) {
-                const id = tokenResult.data
-                // todo:check user auth by sql
-                updateUserInformation(id, memberData).then(result => {
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+
+        const id = tokenResult.data
+        // todo:check user auth by sql
+        updateUserInformation(id, memberData).then(result => {
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
         })
     }
 
-    getUsersList(req, res, next){
-        const token = req.headers['token'];
+    getUsersList(req, res, next) {
         const options = { auth: req.body.auth }
         const size = parseInt(req.body.size)
         const page = parseInt(req.body.page)
 
-        verifyToken(token).then(tokenResult => {
-            if (tokenResult.success === true) {
-                getUsersItems(options,size,page).then(result => {
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+        getUsersItems(options, size, page).then(result => {
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
         })
     }
 
-    getUser(){
-        const token = req.headers['token'];
-
-        verifyToken(token).then(tokenResult => {
-            if (tokenResult.success === true) {
-                getUser(tokenResult.data).then(result => {
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+    getUser() {
+        getUser(tokenResult.data).then(result => {
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
         })
     }
 }

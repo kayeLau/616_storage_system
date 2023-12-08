@@ -7,7 +7,7 @@ const { verifyToken } = require('../models/verification')
 module.exports = class product {
     async getProductList(req, res, next) {
         const token = req.headers['token'];
-        let options = { freezersNum: req.body.freezersNum, disable: req.body.disable , productName: req.body.productName }
+        let options = { freezersNum: req.body.freezersNum, disable: req.body.disable, productName: req.body.productName }
         const size = req.body.size
         const page = req.body.page
         let bandList = []
@@ -22,7 +22,7 @@ module.exports = class product {
             const auth = tokenResult.userInfo.auth
             if (auth !== -1) {
                 bandList = await getBandProducts({ shopId: tokenResult.userInfo.shopId }, 999, 1)
-                .then( res=> res.resource.map(item => item.productCode) )
+                    .then(res => res.resource.map(item => item.productCode))
                 options.department = auth
                 options.disable = 0
             }
@@ -31,20 +31,18 @@ module.exports = class product {
                 if (auth !== -1) {
                     result.resource = result.resource.filter(item => {
                         let isBand = bandList.indexOf(item.productCode) // 禁售商品
-                        return isBand === -1  ? true : false
+                        return isBand === -1 ? true : false
                     })
                 }
                 res.json(result)
             })
         } catch (err) {
-            console.log(err)
             res.json(err)
         }
 
     }
 
     postCreateProduct(req, res, next) {
-        const token = req.headers['token'];
         const productData = {
             productCode: req.body.productCode,
             productName: req.body.productName,
@@ -56,21 +54,14 @@ module.exports = class product {
             updateDate: getCurrentTime()
         }
 
-        verifyToken(token).then(tokenResult => {
-            if (tokenResult.success === true) {
-                createNewProduct(productData).then(result => {
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+        createNewProduct(productData).then(result => {
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
         })
     }
 
     postUpdateProduct(req, res, next) {
-        const token = req.headers['token'];
         const productCode = req.body.productCode
         const productData = {
             productName: req.body.productName,
@@ -82,35 +73,20 @@ module.exports = class product {
             updateDate: getCurrentTime()
         }
 
-        verifyToken(token).then(tokenResult => {
-            if (tokenResult.success === true) {
-                updateProductInformation(productCode, productData).then(result => {
-                    console.log(result)
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+        updateProductInformation(productCode, productData).then(result => {
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
         })
     }
 
     postDeleteProduct(req, res, next) {
-        const token = req.headers['token'];
         const productCode = req.body.productCode
 
-        verifyToken(token).then(tokenResult => {
-            if (tokenResult.success === true) {
-                deleteProductItem(productCode).then(result => {
-                    console.log(result)
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+        deleteProductItem(productCode).then(result => {
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
         })
     }
 }

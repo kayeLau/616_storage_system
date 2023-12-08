@@ -14,7 +14,7 @@ function verifyToken(token,getUser = false){
     return new Promise((resolve) => {
         if(token){
             jwt.verify(token,config.secret,(err,decode)=>{
-                console.log(err)
+                console.log('jwt expired')
                 if(!err && decode.exp > time){
                     tokenResult = {
                         data:decode.data,

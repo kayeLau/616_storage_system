@@ -1,5 +1,5 @@
-const createError = require('http-errors');
 const express = require('express');
+const createError = require('http-errors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -7,22 +7,25 @@ require('./models/create_tabel')
 const app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-const indexRouter = require('./routes/index');
+// auth
+const auth = require('./middleware/auth')
+app.use(auth)
+
+// router
 const usersRouter = require('./routes/users');
 const shopsRouter = require('./routes/shops')
 const productsRouter = require('./routes/product')
 const ordersRouter = require('./routes/order')
 const settingRouter = require('./routes/setting')
-app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/shops',shopsRouter)
 app.use('/products',productsRouter)
