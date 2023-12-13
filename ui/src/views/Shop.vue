@@ -12,7 +12,7 @@
   </div>
 </template>
 <script setup>
-import { getShopList, updateShop, createShop } from '../request/shops'
+import { getShopList, updateShop, createShop , deleteShop } from '../request/shops'
 import { shopType, dictToOptions } from '../request/dict'
 import bandList from '../components/bandList.vue'
 import Ktable from '../components/table.vue'
@@ -74,6 +74,14 @@ function editHandle(index, row) {
   jsonFormShow.value = !jsonFormShow.value
 }
 
+function deleteHandle(index, row){
+  deleteShop({shopId:row.shopId}).then(res => {
+    if(res.success){
+      KtableRef.value.fatchList()
+    }
+  })
+}
+
 // table
 const shopTypeFormatter = (row, column) => {
   let cell = row[column.property]
@@ -93,7 +101,7 @@ const operations = {
   children: [
     { type: "primary", name: '編輯', onClick: editHandle, icon: 'Edit' },
     { type: "warning", name: '管理禁售產品', onClick: manageBandProduct, icon: 'Setting' },
-    { type: "danger", name: '删除', icon: 'Delete' }
+    { type: "danger", name: '删除', icon: 'Delete' , onClick: deleteHandle }
   ]
 }
 const params = {

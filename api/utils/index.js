@@ -1,4 +1,4 @@
-const { getSettingItems } = require('../controllers/setting_controller')
+const { getSettingItems } = require('../models/settingManage_model')
 
 const checkNull = (data) => {
     for (var key in data) {
@@ -26,27 +26,41 @@ const getCurrentTime = () => {
 
 const getTodayTimeRange = () => {
     const date = new Date()
-    const yy = date.getFullYear()
-    const mm = fillZero(date.getMonth() + 1)
-    const dd = fillZero(date.getDate())
-    const start = yy + '-' + mm + '-' + dd + ' 00:00:00'
-    const end = yy + '-' + mm + '-' + dd + ' 23:59:59'
+    const start = dateFormat(date) + ' 00:00:00'
+    const end = dateFormat(date) + ' 23:59:59'
     return [start,end]
 }
 
-const getSettingTimeRange = async() => {
-    getSettingItems({name:lastOrder,size:999,page:1}).then(res => {
+const getSettingTimeRange = async () => {
+    let time = ' 08:00:00'
+    await getSettingItems({name:'lastOrder'},999,1).then(res => {
         if(res.success){
-
+            time = ' ' + res.resource[0].value + ':00'
         }
     })
     const date = new Date()
+    const currentTime = fillZero(date.getHours()) + ':00:00'
+    let start,end
+
+    if (currentTime <= time) {
+        end = dateFormat(date) + time
+        date.setDate(date.getDate() - 1)
+        start = dateFormat(date) + time
+    } else {
+        start = dateFormat(date) + time
+        date.setDate(date.getDate() + 1)
+        end = dateFormat(date) + time
+    }
+    console.log([start,end])
+    return [start,end]
+}
+
+const dateFormat = (date)=>{
     const yy = date.getFullYear()
     const mm = fillZero(date.getMonth() + 1)
     const dd = fillZero(date.getDate())
-    const start = yy + '-' + mm + '-' + dd + ' 00:00:00'
-    const end = yy + '-' + mm + '-' + dd + ' 23:59:59'
-    return [start,end]
+    return yy + '-' + mm + '-' + dd
 }
+
 
 module.exports = { getCurrentTime , checkNull , getTodayTimeRange , getSettingTimeRange }

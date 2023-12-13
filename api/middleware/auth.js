@@ -1,4 +1,7 @@
 const { verifyToken } = require('../models/verification')
+const authMap = {
+
+}
 
 async function auth(req, res, next) {
     const token = req.headers['token'];

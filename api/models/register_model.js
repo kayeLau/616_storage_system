@@ -12,7 +12,7 @@ function updateUserInformation(id,data){
 }
 
 function getUsersItems(options, size, page) {
-    return getItems("member_info", options, size, page)
+    return getItems({table:"member_info", options, size, page})
 }
 
 function getUser(id){

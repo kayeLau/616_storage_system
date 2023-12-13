@@ -16,11 +16,11 @@ function deleteShopItem(shopId) {
 }
 
 function getShopItems(options, size, page) {
-    return getItems("shop_info", options, size, page)
+    return getItems({table:"shop_info", options, size, page})
 }
 
 function getBandProducts(options, size, page) {
-    return getItems("shop_product_info", options, size, page)
+    return getItems({table:"shop_product_info", options, size, page})
 }
 
 function bindProductTOShop(productList) {

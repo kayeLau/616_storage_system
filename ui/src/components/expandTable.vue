@@ -25,12 +25,13 @@
                         <span>{{ item.productCode }}</span>
                         <span>{{ item.productName || '-' }}</span>
                         <span>{{ item.orderQuantity + item.unit }}</span>
-                        <div>
+                        <span>{{ item.assignQuantity === null ? '-' : item.assignQuantity + item.unit }}</span>
+                        <!-- <div>
                             <el-input v-if="editMode" v-model="orderItems[index].assignQuantity" clearable
                                 class="input-short"></el-input>
                             <span v-else>{{ item.assignQuantity }}</span>
                             <span>{{ item.unit }}</span>
-                        </div>
+                        </div> -->
                         <span>{{ orderMode[item.orderMode] }}</span>
                         <span>{{ item.updateDate }}</span>
                         <span>{{ item.remark }}</span>
@@ -93,7 +94,7 @@ const orderStateFormatter = (cell) => {
   let color = cell === 0 ? 'var(--el-color-danger)' : 'var(--el-color-success)'
   return `<span style='color:${color}'>${orderStateDict[cell]}<span>`
 }
-let editMode = ref(false)
+// let editMode = ref(false)
 const expandTable_temp = JSON.parse(JSON.stringify(props.expandTable))
 const orderItems = ref(expandTable_temp)
 // const newOrderItems = ref([])

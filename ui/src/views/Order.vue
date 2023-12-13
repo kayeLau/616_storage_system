@@ -8,7 +8,7 @@
     <el-dialog v-model="orderDetailShow" title="訂單明細" width="90%" style="height:80vh;position: relative;" top="10vh">
       <Ktable ref='KtableRef' :columns="ODcolumns" :operations="ODoperations" :params="ODparams"
         :getList="getOrderListDetail" :searchFormColumns="[]" :customBtn="ODcustomBtn" isSelection :isIndex="false"
-        @selectionChange="ODselectionChange"></Ktable>
+        @selectionChange="ODselectionChange" :tableRowClassName="tableRowClassName"></Ktable>
       <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
         <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" @sumbit="updateAssignQuantity"></jsonForm>
       </el-drawer>
@@ -58,7 +58,7 @@ const orderStateFormatter = (row, column) => {
 }
 const columns = [
   { props: 'status', label: '訂單狀態', formatter: orderStateFormatter },
-  { props: 'orderShopName', label: '落單門店', width: 250 },
+  { props: 'shopName', label: '落單門店', width: 250 },
   { props: 'department', label: '落單部門', formatter: departmentFormatter },
   { props: 'orderUserName', label: '落單人' },
   { props: 'updateDate', label: '落單時間', width: 250 }
@@ -98,17 +98,18 @@ fatchShopList()
 
 function exportOrderExcel(index, row) {
   let data = [
-    ['',row.orderShopName,],
-    ['貨品編號', '貨品名稱', '數量/重量', '單位'],
+    [row.shopCode,row.shopName,],
+    ['貨品編號', '貨品名稱', '數量/重量', '單位','包裝規格'],
     // assuming `row.children` is an array of objects
     ...row.children.map(item => [
       item.productCode,
       item.productName,
       item.assignQuantity,
       item.unit,
+      item.standard,
     ])
   ];
-  exportExcel(row.orderShopName + '出貨表', data)
+  exportExcel(row.shopName + '出貨表', data)
 }
 
 // order detail tabel
@@ -123,7 +124,7 @@ const ODcolumns = [
   { props: 'productCode', label: '產品編號' },
   { props: 'productName', label: '產品名稱' },
   { props: 'orderQuantity', label: '下單數量', formatter: (row, column) => row[column.property] + row.unit },
-  { props: 'assignQuantity', label: '分配數量', formatter: (row, column) => row[column.property] + row.unit },
+  { props: 'assignQuantity', label: '分配數量', formatter: (row, column) => row[column.property] === null ? '-' : row[column.property] + row.unit },
   { props: 'orderMode', label: '下單模式', formatter: orderModeFormatter },
   { props: 'updateDate', label: '修改時間' },
   { props: 'remark', label: '備注' },
@@ -177,6 +178,14 @@ function showDetailHandle(index, row) {
     nextTick(() => {
       KtableRef.value.fatchList()
     })
+  }
+}
+
+function tableRowClassName({row}){
+  if(row.orderQuantity > row.assignQuantity){
+    return 'danger-row'
+  }else if(row.orderQuantity < row.assignQuantity){
+    return 'success-row'
   }
 }
 

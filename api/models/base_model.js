@@ -84,9 +84,9 @@ function optionsSQLFromatter(options) {
     let whereClause = ''
     for (const key in options) {
         if (options.hasOwnProperty(key)) {
-            if(options[key] === null || options[key] === undefined || options[key] === '') continue ;
+            if (options[key] === null || options[key] === undefined || options[key] === '') continue;
             let query
-            switch(key){
+            switch (key) {
                 case 'updateDate':
                     query = `${key} BETWEEN '${options[key][0]}' AND '${options[key][1]}'`
                     break
@@ -113,20 +113,22 @@ function optionsSQLFromatter(options) {
     return whereClause
 }
 
-function getItems(table, options, size, page , orderby = 'updateDate' , sort = 'DESC') {
+function getItems({ table, options, size, page, orderby = 'updateDate', sort = 'DESC', join }) {
     let result = {}
     return new Promise((resolve, reject) => {
         let optionsSQL = optionsSQLFromatter(options)
         db.query(`SELECT COUNT(*) AS total FROM ${table} ${optionsSQL}`, (err, rows) => {
             if (err) {
-              result.msg = "server error, please try again";
-              result.success = false;
-              reject(result);
-              return;
+                result.msg = "server error, please try again";
+                result.success = false;
+                reject(result);
+                return;
             }
             result.total = rows[0].total || 0;
         })
-        db.query(`SELECT * , DATE_FORMAT(updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate FROM ${table} ${optionsSQL} ORDER BY ${ orderby } ${sort} LIMIT ${size} OFFSET ${(page - 1) * size }`, (err, rows) => {
+        db.query(`SELECT * , DATE_FORMAT(${table}.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate 
+        FROM ${join ? join : table} ${optionsSQL} ORDER BY ${table}.${orderby} ${sort} 
+        LIMIT ${size} OFFSET ${(page - 1) * size}`, (err, rows) => {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
@@ -160,4 +162,4 @@ function getAllItem(table, options) {
     })
 }
 
-module.exports = { checkRepeated, createNew, updateItem, deleteItem, getItems, getAllItem , optionsSQLFromatter}
+module.exports = { checkRepeated, createNew, updateItem, deleteItem, getItems, getAllItem, optionsSQLFromatter }

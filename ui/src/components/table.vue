@@ -14,7 +14,7 @@
             </el-form-item>
         </el-form>
         <!-- tabel -->
-        <el-table :data="data" class="table" highlight-current-row header-cell-class-name="table-header" @selection-change="handleSelectionChange">
+        <el-table :data="data" class="table" highlight-current-row header-cell-class-name="table-header" :row-class-name="tableRowClassName" @selection-change="handleSelectionChange">
             <el-table-column v-if="isExpand" type="expand">
                 <template v-slot="props">
                     <expandTable :expandTable="props.row.children" :products="products"></expandTable>
@@ -83,7 +83,8 @@ const props = defineProps({
     params: Object,
     getList: Function,
     customBtn: Array,
-    products: Array
+    products: Array,
+    tableRowClassName:Function
 })
 
 let data = ref([])
@@ -144,5 +145,14 @@ onMounted(() => {
 }
 .el-form--inline .el-form-item{
     margin-right: 20px;
+}
+.el-table .danger-row {
+  --el-table-tr-bg-color: var(--el-color-danger-light-9);
+}
+.el-table .warning-row {
+  --el-table-tr-bg-color: var(--el-color-warning-light-9);
+}
+.el-table .success-row {
+  --el-table-tr-bg-color: var(--el-color-success-light-9);
 }
 </style>

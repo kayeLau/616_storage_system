@@ -16,9 +16,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// auth
+// middleware
 const auth = require('./middleware/auth')
+const rateLimiter = require('./middleware/rateLimiter')
+const helmet = require('helmet')
 app.use(auth)
+app.use(helmet())
+app.use(rateLimiter)
 
 // router
 const usersRouter = require('./routes/users');

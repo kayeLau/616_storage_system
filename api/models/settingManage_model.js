@@ -1,4 +1,3 @@
-const db = require('./connection_db')
 const { updateItem, getItems } = require('./base_model')
 
 function updateSettingInformation(name, data) {
@@ -6,7 +5,7 @@ function updateSettingInformation(name, data) {
 }
 
 function getSettingItems(options, size, page) {
-    return getItems("setting_info", options, size, page)
+    return getItems({table:"setting_info", options, size, page})
 }
 
 

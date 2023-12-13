@@ -15,7 +15,7 @@ function deleteProductItem(productCode){
 }
 
 function getProductItems(options,size,page){
-    return getItems("product_info",options,size,page)
+    return getItems({table:"product_info",options,size,page})
 }
 
 module.exports = { getProductItems , createNewProduct , updateProductInformation , deleteProductItem }

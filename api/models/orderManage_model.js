@@ -20,11 +20,11 @@ function createNewOrder(data) {
                     item.orderMode
                 ]
             })
-            if(!res.resource){
+            if (!res.resource) {
                 delete data.orderList
                 delete data.createDateRange
                 createNew("order_info", data) // 訂單
-            }else{
+            } else {
                 await deleteItem("order_detail_info", 'orderId', orderId)
             }
             return orderList
@@ -82,7 +82,13 @@ function checkOrderRepeated(table, options) {
                 result.msg = row.length + " item have find"
                 result.success = true
                 result.resource = row[0]
-                getItems("order_detail_info", { orderId: result.resource.id }, 999, 1).then(res => {
+                let params = {
+                    table: "order_detail_info",
+                    options: { orderId: result.resource.id },
+                    size: 999,
+                    page: 1
+                }
+                getItems(params).then(res => {
                     if (res.success) {
                         result.resource.children = res.resource
                     }
@@ -97,7 +103,7 @@ function checkOrderRepeated(table, options) {
     })
 }
 
-function updateOrderDetailAssignQuantity(list,orderId){
+function updateOrderDetailAssignQuantity(list, orderId) {
     let result = {}
     result.success = false
     return new Promise((resolve, reject) => {
@@ -113,7 +119,7 @@ function updateOrderDetailAssignQuantity(list,orderId){
                 assignQuantity += `WHEN ${item.id} THEN ${Number(item.assignQuantity)} \n`
                 status += `WHEN ${item.id} THEN ${Number(1)} \n`
                 updateDate += `WHEN ${item.id} THEN "${currentTime}" \n`
-                remark += `WHEN ${item.id} THEN "${item.remark}" \n`
+                remark += `WHEN ${item.id} THEN "${item.remark || '-'}" \n`
             })
             db.query(`UPDATE order_detail_info SET
             assignQuantity=CASE id
@@ -140,7 +146,7 @@ function updateOrderDetailAssignQuantity(list,orderId){
             reject(result)
         }
     }).then(res => {
-        if(res.success){
+        if (res.success) {
             setOrderItemStatus(orderId)
             return res
         }
@@ -152,7 +158,7 @@ function updateOrderInformation(orderId, data) {
 }
 
 function setOrderItemStatus(orderId) {
-    getItems("order_detail_info", { orderId }, 999, 1).then(res => {
+    getItems({ table: "order_detail_info", options: { orderId }, size: 999, page: 1 }).then(res => {
         if (res.success) {
             let orderDetailStatus = res.resource.find(item => item.status === 0 || item.status === null)
             console.log(res.resource)
@@ -160,10 +166,10 @@ function setOrderItemStatus(orderId) {
         }
     }).then(orderDetailStatus => {
         console.log(orderDetailStatus)
-        if(!orderDetailStatus){
-            updateOrderInformation(orderId, {status:1})
-        }else{
-            updateOrderInformation(orderId, {status:0})
+        if (!orderDetailStatus) {
+            updateOrderInformation(orderId, { status: 1 })
+        } else {
+            updateOrderInformation(orderId, { status: 0 })
         }
     }).catch(err => {
         console.log(err)
@@ -176,7 +182,7 @@ function deleteOrderItem(shopId) {
 
 function getOrderItems(options, size, page) {
     const result = {}
-    return getItems("order_info", options, size, page).then(res => {
+    return getItems({ table: "order_info", join: "order_info INNER JOIN shop_info ON orderShopId = shopId", options, size, page }).then(res => {
         let orderItems = []
         if (res.success) {
             orderItems = res.resource
@@ -184,7 +190,7 @@ function getOrderItems(options, size, page) {
         return orderItems
     }).then(async orderItems => {
         const promiseList = orderItems.map((item, index) => {
-            return getItems("order_detail_info", { orderId: item.id }, 999, 1).then(res => {
+            return getItems({ table: "order_detail_info", options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
                 if (res.success) {
                     orderItems[index].children = res.resource
                 }
@@ -200,4 +206,4 @@ function getOrderItems(options, size, page) {
     }).catch(err => err)
 }
 
-module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, getOrderItems , insertOrderItems , updateOrderDetailAssignQuantity , setOrderItemStatus , checkOrderRepeated }
+module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, getOrderItems, insertOrderItems, updateOrderDetailAssignQuantity, setOrderItemStatus, checkOrderRepeated }
