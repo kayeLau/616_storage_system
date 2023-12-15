@@ -64,7 +64,7 @@ const routes = [
     path: '/',
     component: layout,
     redirect: () => {
-      return { path: '/order' }
+      return { path: '/login' }
     },
   },
 ]

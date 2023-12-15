@@ -4,12 +4,18 @@ import { getToken } from '@/utils/auth'
 
 
 router.beforeEach((to, from, next) => {
+  const hasToken = getToken()
+  if(to.path === '/login' && hasToken){
+    next('/order')
+    return
+  }
+  
   if(to.path === '/login'){
     next()
     return
   }
 
-  if (getToken()) {
+  if (hasToken) {
     next()
   } else {
       next('/login')

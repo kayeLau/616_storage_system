@@ -97,8 +97,9 @@ const searchFormColumns = ref([
 fatchShopList()
 
 function exportOrderExcel(index, row) {
-  let data = [
-    [row.shopCode,row.shopName,],
+  const today = new Date().toLocaleDateString()
+  const shipping = [
+    [row.shopCode,row.shopName,today],
     ['貨品編號', '貨品名稱', '數量/重量', '單位','包裝規格'],
     // assuming `row.children` is an array of objects
     ...row.children.map(item => [
@@ -109,7 +110,19 @@ function exportOrderExcel(index, row) {
       item.standard,
     ])
   ];
-  exportExcel(row.shopName + '出貨表', data)
+  const delivery = [
+  ['落單門店:'+row.shopName,'落單人:'+row.orderUserName,'','落單時間:'+row.updateDate],
+    ['貨品名稱', '數量/重量', '單位','備注'],
+    // assuming `row.children` is an array of objects
+    ...row.children.map(item => [
+      item.productName,
+      item.assignQuantity,
+      item.unit,
+      item.remark
+    ])
+  ]
+  exportExcel(today + row.shopName + '出貨表', shipping)
+  exportExcel(today + row.shopName + '送貨單', delivery)
 }
 
 // order detail tabel
