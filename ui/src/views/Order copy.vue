@@ -6,21 +6,19 @@
         :expandColumns="{}" :products="products"></Ktable>
     </el-card>
     <el-dialog v-model="orderDetailShow" title="訂單明細" width="90%" style="height:80vh;position: relative;" top="10vh">
-      <template #header="{ titleId, titleClass }">
-      <div class="my-header">
-        <span :id="titleId" :class="titleClass">訂單明細</span>
-        <el-icon class="refresh" :class="loading ? 'is-loading' : ''">
-          <Refresh v-show="!loading" @click="refreshList"/>
-          <Loading v-show="loading"/>
-        </el-icon>
-      </div>
-    </template>
-      <orderDetailList :data="currentRow" :params="ODparams" @refreshList="refreshList" :products="products"></orderDetailList>
+      <orderDetailList :data="currentRow" :params="ODparams" @refreshList="refreshList"></orderDetailList>
+      <!-- <Ktable ref='KtableRef' :columns="ODcolumns" :operations="ODoperations" :params="ODparams"
+        :getList="getOrderListDetail" :searchFormColumns="[]" :customBtn="ODcustomBtn" isSelection :isIndex="false"
+        @selectionChange="ODselectionChange" :tableRowClassName="tableRowClassName"></Ktable>
+      <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
+        <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" @sumbit="updateAssignQuantity"></jsonForm>
+      </el-drawer> -->
     </el-dialog>
   </div>
 </template>
 <script setup>
 import orderDetailList from '../components/orderDetailList.vue';
+// import jsonForm from '../components/jsonForm.vue';
 import { getProductList } from '../request/products';
 import { getShopList } from '../request/shops'
 import { getOrderList } from '../request/orders';
@@ -129,11 +127,70 @@ function exportOrderExcel(index, row) {
 
 // order detail tabel
 let currentRow = ref({})
+// const KtableRef = ref()
+// const orderModeFormatter = (row, column) => {
+//   let cell = row[column.property]
+//   return orderMode[cell]
+// }
+// const ODcolumns = [
+//   { props: 'status', label: '分配狀態', formatter: orderStateFormatter },
+//   { props: 'productCode', label: '產品編號' },
+//   { props: 'productName', label: '產品名稱' },
+//   { props: 'orderQuantity', label: '下單數量', formatter: (row, column) => row[column.property] + row.unit },
+//   // { props: 'assignQuantity', label: '分配數量', formatter: (row, column) => row[column.property] === null ? '-' : row[column.property] + row.unit },
+//   { props: 'assignQuantity', label: '分配數量',render(h,row, column) {
+//     const component = resolveComponent('el-input')
+//     return h('div',{class:'flex-row-center'},
+//     [
+//       h(component,{ value:row[column.property]}),
+//       h('span',row.unit)
+//     ])
+//   } },
+//   { props: 'orderMode', label: '下單模式', formatter: orderModeFormatter },
+//   { props: 'updateDate', label: '修改時間' },
+//   { props: 'remark', label: '備注' },
+// ]
+
+// const ODoperations = {
+//   width: 120,
+//   size: "small",
+//   children: [
+//     { type: "primary", name: '分配', onClick: editHandle, icon: 'Coin', show: (row) => row.type !== 'additem' },
+//   ]
+// }
 
 const ODparams = {
   size: 20,
   page: 1,
 }
+
+// const ODcustomBtn = [
+//   {
+//     type: 'success',
+//     label: '新增',
+//     icon: 'CirclePlus',
+//     onClick: addOrderItem
+//   },
+//   {
+//     type: 'primary',
+//     label: '按下單數量分配',
+//     icon: 'Coin',
+//     onClick: updateAssignQuantity
+//   }
+// ]
+
+// let selection = ref([])
+// function ODselectionChange(value) {
+//   selection.value = value
+// }
+
+// async function getOrderListDetail() {
+//   return {
+//     resource: currentRow.value.children,
+//     total: currentRow.value.children.length,
+//     success: true
+//   }
+// }
 
 let orderDetailShow = ref(false)
 let rowIndex = ref(null)
@@ -143,10 +200,22 @@ function showDetailHandle(index, row) {
   if (orderDetailShow.value) {
     row.children.forEach(item => item.disabled = true)
     currentRow.value = row
+    // nextTick(() => {
+    //   KtableRef.value.fatchList()
+    // })
   }
 }
 
+// function tableRowClassName({row}){
+//   if(row.orderQuantity > row.assignQuantity){
+//     return 'danger-row'
+//   }else if(row.orderQuantity < row.assignQuantity){
+//     return 'success-row'
+//   }
+// }
+
 // jsonForm
+// const jsonFormShow = ref(false)
 const editFormModel = ref({})
 const editFormColumns = ref([
   {
@@ -174,6 +243,12 @@ const editFormColumns = ref([
     prop: 'assignQuantity',
     label: '分配數量:',
   },
+  // {
+  //   type: 'input',
+  //   prop: 'orderMode',
+  //   label: '分配數量:',
+  //   disabled: true
+  // },
   {
     type: 'input',
     prop: 'remark',
@@ -181,20 +256,73 @@ const editFormColumns = ref([
   },
 ])
 
+// function editHandle(index, row) {
+//   editFormColumns.value.forEach(item => item.prop === 'assignQuantity' || item.prop === 'remark' ? item.disabled = false : item.disabled = true)
+//   editFormColumns.value[2].unit = row.unit
+//   editFormColumns.value[3].unit = row.unit
+//   editFormModel.value = JSON.parse(JSON.stringify(row))
+//   jsonFormShow.value = !jsonFormShow.value
+// }
+
+// function addOrderItem() {
+//   editFormColumns.value.forEach(item => item.disabled = false)
+//   editFormModel.value = {}
+//   jsonFormShow.value = !jsonFormShow.value
+// }
+
 function productChange(productCode){
   let product = products.value.find(item => item.productCode === productCode)
   editFormModel.value.productName = product.productName
 }
 
-let loading = ref(false)
+// 提交分配數量
 async function refreshList(){
-  loading.value = true
   let result = await KtableRef2.value.fatchList()
   let target = result.resource.find(item => item.id === currentRow.value.id)
-  target.children.forEach(item => item.disabled = true)
   currentRow.value = target
-  loading.value = false
 }
+// async function updateAssignQuantity(row) {
+//   let assignQuantitys = generateAssignQuantityParams(row)
+//   if (!assignQuantitys.length) {
+//       ElMessage({ type: 'warning', message: '最少選擇一個產品' })
+//       return
+//     }
+//   let orderId = currentRow.value.id
+//   await updateOrderDetailAssignQuantity({ assignQuantitys, orderId }).then(res => {
+//     if (res.success) {
+//       ElMessage({ type: 'success', message: '操作成功：資料已存入數據庫' })
+//     } else {
+//       ElMessage({ type: 'error', message: '操作失败：' + res.msg })
+//     }
+//   }).catch(err => {
+//     console.error(err)
+//   })
+//   let result = await KtableRef2.value.fatchList()
+//   let target = result.resource.find(item => item.id === currentRow.value.id)
+//   currentRow.value = target
+//   KtableRef.value.fatchList()
+// }
+
+// function generateAssignQuantityParams(row) {
+//   let flag = row ? 'signal' : 'muti'
+//   if (flag === 'signal') {
+//     row = [row]
+//   } else {
+//     row = selection.value
+//     row.forEach(item => {
+//       item.assignQuantity = item.orderQuantity
+//     })
+//   }
+
+//   let assignQuantitys = row.map(item => {
+//     return {
+//       id: item.id,
+//       assignQuantity: item.assignQuantity,
+//       remark: item.remark
+//     }
+//   })
+//   return assignQuantitys
+// }
 
 // 獲取產品列表
 let products = ref([]) // 產品列表
@@ -230,16 +358,5 @@ onMounted(() => {
 .input-short {
   padding-right: 2px;
   width: 75%;
-}
-.my-header{
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-.refresh{
-  font-size: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  color: var(--el-color-primary);
 }
 </style>

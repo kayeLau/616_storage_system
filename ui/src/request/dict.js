@@ -14,8 +14,13 @@ export const freezersNumDict = {
 
 export const orderStateDict = {
     0:"未分配",
-    1:"已分配"
+    1:"已分配",
+    2:"追加中"
 }
+export const orderStateColor = (state) => {
+    let color = state === 0 ? 'var(--el-color-danger)' : state === 1 ? 'var(--el-color-success)' : 'var(--el-color-warning)'
+    return `color:${color}`
+  }
 
 export const departmentDict = {
     0:"廚房",

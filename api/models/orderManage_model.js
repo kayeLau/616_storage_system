@@ -8,8 +8,9 @@ function createNewOrder(data) {
         .then(async (res) => {
             const orderId = res.resource ? res.resource.id : data.id
             let orderList = data.orderList.map(item => {
+                id = item.id ? item.id : ''
                 return [
-                    item.id ? item.id : '',
+                    id,
                     orderId,
                     item.productCode,
                     item.productName,
@@ -34,6 +35,39 @@ function createNewOrder(data) {
 }
 
 function insertOrderItems(list) {
+    let result = {}
+    result.success = false
+    return new Promise((resolve, reject) => {
+        // 需要用二維數組插入
+        if (Array.isArray(list) && Array.isArray(list[0])) {
+            db.query(`INSERT IGNORE INTO order_detail_info (
+                orderId,
+                productCode,
+                productName,
+                assignQuantity,
+                orderQuantity,
+                unit,
+                standard,
+                updateDate,
+                orderMode) VALUES ? `, [list], (err) => {
+                if (err) {
+                    result.msg = "server error,please try again"
+                    reject(result)
+                    console.log(err)
+                    return
+                }
+                result.msg = "success"
+                result.success = true
+                resolve(result)
+            })
+        } else {
+            result.msg = "wrong input"
+            reject(result)
+        }
+    })
+}
+
+function createNewOrderItems(list) {
     let result = {}
     result.success = false
     return new Promise((resolve, reject) => {
@@ -206,4 +240,6 @@ function getOrderItems(options, size, page) {
     }).catch(err => err)
 }
 
-module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, getOrderItems, insertOrderItems, updateOrderDetailAssignQuantity, setOrderItemStatus, checkOrderRepeated }
+module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, 
+    getOrderItems, insertOrderItems, createNewOrderItems, updateOrderDetailAssignQuantity, 
+    setOrderItemStatus, checkOrderRepeated }

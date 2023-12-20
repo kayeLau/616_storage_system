@@ -48,7 +48,6 @@ module.exports = class order {
                 orderUserId: tokenResult.userInfo.id,
                 orderUserName: tokenResult.userInfo.name,
                 orderShopId: tokenResult.userInfo.shopId,
-                orderShopName: tokenResult.userInfo.shopName,
                 department: tokenResult.userInfo.auth,
                 createDateRange: getTodayTimeRange(),
                 createDate: getCurrentTime(),
@@ -75,8 +74,10 @@ module.exports = class order {
                     item.orderId,
                     item.productCode,
                     item.productName,
+                    item.assignQuantity,
                     item.orderQuantity,
                     item.unit,
+                    item.standard,
                     updateDate,
                     item.orderMode
                 ]
