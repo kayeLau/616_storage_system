@@ -7,12 +7,12 @@
     <bandList :dialogVisible="bandListDialogVisible" @closeDialog="manageBandProduct" :shopId="shopId"></bandList>
     <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
       <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules"
-        :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList"></jsonForm>
+        :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList" @addSelectItem="addSelectItem"></jsonForm>
     </el-drawer>
   </div>
 </template>
 <script setup>
-import { getShopList, updateShop, createShop, deleteShop, getPartitionList } from '../request/shops'
+import { getShopList, updateShop, createShop, deleteShop, getPartitionList, createPartition, deletePartitionItem } from '../request/shops'
 import { shopType, dictToOptions } from '../request/dict'
 import bandList from '../components/bandList.vue'
 import Ktable from '../components/table.vue'
@@ -51,7 +51,8 @@ const editFormColumns = ref([
     options: [],
     icon: 'DeleteFilled',
     popconfirmTitle: '是否刪除?',
-    addItem: true
+    addItem: true,
+    deleteSelectOptions: deleteSelectItem
   }
 ])
 const editFormRules = {
@@ -68,6 +69,37 @@ const editFormRules = {
     { required: true, message: '請選擇所屬分區', trigger: 'blur' },
   ]
 }
+
+function getPartitionItems() {
+  getPartitionList().then(res => {
+    if (res.success) {
+      editFormColumns.value[3].options = res.resource.map(item => {
+        return {
+          label: item.partitionName,
+          value: item.id
+        }
+      })
+    }
+  })
+}
+function deleteSelectItem(partitionId) {
+  deletePartitionItem({ id: partitionId }).then(res => {
+    if (res.success) {
+      getPartitionItems()
+    }
+  })
+}
+function addSelectItem(partitionName) {
+  createPartition({ partitionName }).then(res => {
+    if (res.success) {
+      getPartitionItems()
+    }
+  })
+}
+
+onMounted(() => {
+  getPartitionItems()
+})
 
 function refreshList() {
   KtableRef.value.fatchList()
@@ -93,23 +125,6 @@ function deleteHandle(index, row) {
     }
   })
 }
-
-function getPartitionItems() {
-  getPartitionList().then(res => {
-    if (res.success) {
-      editFormColumns.value[3].options = res.resource.map(item => {
-        return {
-          label: item.partitionName,
-          value: item.id
-        }
-      })
-    }
-  })
-}
-
-onMounted(() => {
-  getPartitionItems()
-})
 
 // table
 const shopTypeFormatter = (row, column) => {

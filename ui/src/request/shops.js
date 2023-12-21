@@ -22,6 +22,14 @@ export function createShop(data){
       method: 'post',
       data,
     });
+
+}
+export function createPartition(data){
+  return request({
+      url: '/shops/createPartition',
+      method: 'post',
+      data,
+    });
 }
 
 export function updateShop(data){
@@ -35,6 +43,14 @@ export function updateShop(data){
 export function deleteShop(data){
   return request({
       url: '/shops/deleteShop',
+      method: 'post',
+      data,
+    });
+}
+
+export function deletePartitionItem(data){
+  return request({
+      url: '/shops/deletePartitionItem',
       method: 'post',
       data,
     });

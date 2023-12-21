@@ -11,9 +11,13 @@ router.post('/getPartitionList',shopModifyMethod.getPartitionList)
 
 router.post('/createShop',shopModifyMethod.postCreateShop)
 
+router.post('/createPartition',shopModifyMethod.postCreatePartition)
+
+router.post('/deletePartitionItem',shopModifyMethod.postDeletePartitionItem)
+
 router.post('/updateShop',shopModifyMethod.postUpdateShop)
 
-router.post('/deleteShop',shopModifyMethod.postDeleteShop)
+router.post('/deleteShop',shopModifyMethod.postDeleteShopItem)
 
 router.post('/getBindProductList',shopModifyMethod.getBindProductList)
 

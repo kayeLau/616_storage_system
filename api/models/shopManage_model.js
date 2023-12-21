@@ -7,6 +7,12 @@ function createNewShop(data) {
         .catch(err => err)
 }
 
+function createNewPartition(data) {
+    return checkRepeated("partition_info", "partitionName", data.partitionName)
+        .then(() => createNew("partition_info", data))
+        .catch(err => err)
+}
+
 function updateShopInformation(shopId, data) {
     return updateItem("shop_info", data, 'shopId', shopId)
 }
@@ -15,7 +21,11 @@ function deleteShopItem(shopId) {
     return deleteItem("shop_info", 'shopId', shopId)
 }
 
-function getShopItems(options, size, page) {
+function deletePartitionItem(id) {
+    return deleteItem("partition_info", 'id', id)
+}
+
+async function getShopItems(options, size, page) {
     return getItems({table:"shop_info", options, size, page})
 }
 
@@ -52,4 +62,5 @@ function bindProductTOShop(productList) {
 }
 
 
-module.exports = { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop , getBandProducts , getPartitionItems}
+module.exports = { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop , 
+    getBandProducts , getPartitionItems , deletePartitionItem , createNewPartition }

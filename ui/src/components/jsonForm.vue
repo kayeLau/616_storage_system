@@ -12,7 +12,7 @@
                         <div class="select-options-wicon" v-if="item.icon">
                             <span>{{ opt.label }}</span>
                             <el-popconfirm width="100" confirm-button-text="是" cancel-button-text="否" :icon="InfoFilled"
-                                icon-color="#626AEF" :title="item.popconfirmTitle" confirm-button-type="text">
+                                icon-color="#626AEF" :title="item.popconfirmTitle" confirm-button-type="text" @confirm="item.deleteSelectOptions(opt.value)">
                                 <template #reference>
                                     <el-icon style="color: var(--el-color-danger)" @click.stop="">
                                         <component :is='item.icon'></component>
@@ -23,7 +23,7 @@
                     </el-option>
                     <el-input v-if="item.addItem" v-model="addSelectItem" class="option-input" placeholder="請輸入新增分區">
                         <template #append>
-                            <el-button icon="Select" type="success" style="color:var(--el-color-success);padding-top: 5px;"/>
+                            <el-button icon="Select" type="success" style="color:var(--el-color-success);padding-top: 5px;" @click="addSelectItemFn()"/>
                         </template>
                     </el-input>
                 </el-select>
@@ -41,7 +41,7 @@
     </div>
 </template>
 <script setup>
-import { defineProps, ref, defineEmits, watch, computed, defineExpose } from 'vue';
+import { defineProps, ref, defineEmits, watch, computed, defineExpose , unref } from 'vue';
 import { ElMessage } from 'element-plus'
 const props = defineProps({
     comfireCallBack: Function,
@@ -54,7 +54,7 @@ const props = defineProps({
     }
 })
 const formRef = ref(null)
-const emit = defineEmits(['sumbitSuccess', 'sumbit'])
+const emit = defineEmits(['sumbitSuccess', 'sumbit','addSelectItem'])
 
 let _params = ref(props.formModel)
 watch(() => props.formModel, (value) => {
@@ -108,6 +108,10 @@ function resetFields() {
 }
 
 const addSelectItem = ref('')
+function addSelectItemFn(){
+    emit('addSelectItem',unref(addSelectItem))
+    addSelectItem.value = ''
+}
 
 defineExpose({ resetFields })
 

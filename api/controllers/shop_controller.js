@@ -1,15 +1,27 @@
 const { getCurrentTime } = require('../utils')
-const { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop, getBandProducts , getPartitionItems} = require('../models/shopManage_model')
+const { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop, getBandProducts , 
+    getPartitionItems , createNewPartition , deletePartitionItem } = require('../models/shopManage_model')
 const { generateUUID } = require('../models/encryption');
 
 module.exports = class Shop {
 
-    getShopList(req, res, next) {
+    async getShopList(req, res, next) {
         const options = { shopType: req.body.shopType }
         const size = parseInt(req.body.size)
         const page = parseInt(req.body.page)
+        let partitionDict = {}
+        await getPartitionItems({}, 999, 1).then(result => {
+            if(result.success){
+                result.resource.forEach(item => {
+                    partitionDict[item.id] = item.partitionName
+                });
+            }
+        })
 
         getShopItems(options, size, page).then(result => {
+            result.resource.forEach(item => {
+                item.partition = partitionDict[item.partition]
+            })
             res.json(result)
         }).catch(err => {
             res.json(err)
@@ -42,6 +54,18 @@ module.exports = class Shop {
         })
     }
 
+    postCreatePartition(req, res, next) {
+        const partitionData = {
+            partitionName: req.body.partitionName,
+            updateDate: getCurrentTime()
+        }
+
+        createNewPartition(partitionData).then(result => {
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
+        })
+    }
 
     postUpdateShop(req, res, next) {
         const shopId = req.body.shopId
@@ -61,11 +85,21 @@ module.exports = class Shop {
         })
     }
 
-    postDeleteShop(req, res, next) {
+    postDeleteShopItem(req, res, next) {
         const shopId = req.body.shopId
 
         deleteShopItem(shopId).then(result => {
-            console.log(result)
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
+        })
+
+    }
+
+    postDeletePartitionItem(req, res, next) {
+        const id = req.body.id
+
+        deletePartitionItem(id).then(result => {
             res.json(result)
         }).catch(err => {
             res.json(err)
