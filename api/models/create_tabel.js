@@ -74,10 +74,20 @@ const sql_tabel = [
             shopType INT(10) NOT NULL COMMENT '0:616 ',
             shopCode VARCHAR(50) NOT NULL COMMENT '店舖編號' COLLATE 'utf8mb4_general_ci',
             shopName VARCHAR(50) NOT NULL COMMENT '店铺名称' COLLATE 'utf8mb4_general_ci',
+            partition INT(10) NULL DEFAULT NULL COMMENT '所屬分區',
             productCount INT(10) NULL DEFAULT NULL COMMENT '產品種類',
             createDate DATETIME NULL DEFAULT NULL,
             updateDate DATETIME NULL DEFAULT NULL,
             PRIMARY KEY (shopId) USING BTREE
+        )`
+    },
+    {
+        name: 'partition_info',
+        sql: `CREATE TABLE partition_info (
+            id INT(10) NOT NULL AUTO_INCREMENT,
+            partitionName VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
+            updateDate DATETIME NULL DEFAULT NULL,
+            PRIMARY KEY (id) USING BTREE
         )`
     },
     {

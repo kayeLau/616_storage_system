@@ -19,6 +19,10 @@ function getShopItems(options, size, page) {
     return getItems({table:"shop_info", options, size, page})
 }
 
+function getPartitionItems(options, size, page){
+    return getItems({table:"partition_info", options, size, page})
+}
+
 function getBandProducts(options, size, page) {
     return getItems({table:"shop_product_info", options, size, page})
 }
@@ -48,4 +52,4 @@ function bindProductTOShop(productList) {
 }
 
 
-module.exports = { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop , getBandProducts}
+module.exports = { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop , getBandProducts , getPartitionItems}

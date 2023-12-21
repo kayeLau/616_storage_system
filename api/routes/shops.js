@@ -7,6 +7,8 @@ const shopModifyMethod = new ShopModifyMethod()
 
 router.post('/getShopList',shopModifyMethod.getShopList)
 
+router.post('/getPartitionList',shopModifyMethod.getPartitionList)
+
 router.post('/createShop',shopModifyMethod.postCreateShop)
 
 router.post('/updateShop',shopModifyMethod.postUpdateShop)

@@ -12,12 +12,12 @@
   </div>
 </template>
 <script setup>
-import { getShopList, updateShop, createShop , deleteShop } from '../request/shops'
+import { getShopList, updateShop, createShop, deleteShop, getPartitionList } from '../request/shops'
 import { shopType, dictToOptions } from '../request/dict'
 import bandList from '../components/bandList.vue'
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const shopTypeOptions = dictToOptions(shopType)
 let shopId = ref("")
@@ -27,7 +27,7 @@ const KtableRef = ref()
 let JsonFormComfireCallBack = ref(() => { })
 let jsonFormShow = ref(false)
 const editFormModel = ref({})
-const editFormColumns = [
+const editFormColumns = ref([
   {
     type: 'select',
     prop: 'shopType',
@@ -43,8 +43,17 @@ const editFormColumns = [
     type: 'input',
     prop: 'shopName',
     label: '店舖名稱:',
+  },
+  {
+    type: 'select',
+    prop: 'partition',
+    label: '所屬分區:',
+    options: [],
+    icon: 'DeleteFilled',
+    popconfirmTitle: '是否刪除?',
+    addItem: true
   }
-]
+])
 const editFormRules = {
   shopType: [
     { required: true, message: '請選擇店舖類型', trigger: 'blur' },
@@ -54,6 +63,9 @@ const editFormRules = {
   ],
   shopName: [
     { required: true, message: '請輸入店舖名稱', trigger: 'blur' },
+  ],
+  partition: [
+    { required: true, message: '請選擇所屬分區', trigger: 'blur' },
   ]
 }
 
@@ -74,13 +86,30 @@ function editHandle(index, row) {
   jsonFormShow.value = !jsonFormShow.value
 }
 
-function deleteHandle(index, row){
-  deleteShop({shopId:row.shopId}).then(res => {
-    if(res.success){
+function deleteHandle(index, row) {
+  deleteShop({ shopId: row.shopId }).then(res => {
+    if (res.success) {
       KtableRef.value.fatchList()
     }
   })
 }
+
+function getPartitionItems() {
+  getPartitionList().then(res => {
+    if (res.success) {
+      editFormColumns.value[3].options = res.resource.map(item => {
+        return {
+          label: item.partitionName,
+          value: item.id
+        }
+      })
+    }
+  })
+}
+
+onMounted(() => {
+  getPartitionItems()
+})
 
 // table
 const shopTypeFormatter = (row, column) => {
@@ -89,9 +118,10 @@ const shopTypeFormatter = (row, column) => {
 }
 
 const columns = [
-  { props: 'shopType', label: '店舖類型', formatter: shopTypeFormatter },
   { props: 'shopCode', label: '店舖編號' },
   { props: 'shopName', label: '店舖名稱', width: 250 },
+  { props: 'partition', label: '所屬分區' },
+  { props: 'shopType', label: '店舖類型', formatter: shopTypeFormatter },
   // {props:'productCount',label:'產品種類'},
   { props: 'updateDate', label: '修改時間', width: 250 }
 ]
@@ -101,7 +131,7 @@ const operations = {
   children: [
     { type: "primary", name: '編輯', onClick: editHandle, icon: 'Edit' },
     { type: "warning", name: '管理禁售產品', onClick: manageBandProduct, icon: 'Setting' },
-    { type: "danger", name: '删除', icon: 'Delete' , onClick: deleteHandle }
+    { type: "danger", name: '删除', icon: 'Delete', onClick: deleteHandle }
   ]
 }
 const params = {
@@ -122,16 +152,15 @@ const customBtn = [
     label: '新增',
     icon: 'CirclePlus',
     onClick: createHandle
-  }
+  },
 ]
 
+// popup
 let bandListDialogVisible = ref(false)
-
 function manageBandProduct(index, row) {
   if (row && row.shopId) {
     shopId.value = row.shopId
   }
   bandListDialogVisible.value = !bandListDialogVisible.value
 }
-
 </script>

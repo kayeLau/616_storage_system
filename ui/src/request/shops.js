@@ -8,6 +8,14 @@ export function getShopList(data){
       });
 }
 
+export function getPartitionList(data){
+    return request({
+        url: '/shops/getPartitionList',
+        method: 'post',
+        data,
+      });
+}
+
 export function createShop(data){
   return request({
       url: '/shops/createShop',

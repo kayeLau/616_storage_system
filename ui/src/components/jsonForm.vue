@@ -8,14 +8,31 @@
                 </div>
                 <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable :disabled="item.disabled"
                     @change="item.change" placeholder="請選擇">
-                    <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value" />
+                    <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value">
+                        <div class="select-options-wicon" v-if="item.icon">
+                            <span>{{ opt.label }}</span>
+                            <el-popconfirm width="100" confirm-button-text="是" cancel-button-text="否" :icon="InfoFilled"
+                                icon-color="#626AEF" :title="item.popconfirmTitle" confirm-button-type="text">
+                                <template #reference>
+                                    <el-icon style="color: var(--el-color-danger)" @click.stop="">
+                                        <component :is='item.icon'></component>
+                                    </el-icon>
+                                </template>
+                            </el-popconfirm>
+                        </div>
+                    </el-option>
+                    <el-input v-if="item.addItem" v-model="addSelectItem" class="option-input" placeholder="請輸入新增分區">
+                        <template #append>
+                            <el-button icon="Select" type="success" style="color:var(--el-color-success);padding-top: 5px;"/>
+                        </template>
+                    </el-input>
                 </el-select>
                 <el-date-picker v-if='item.type === "datePicker"' v-model="_params[item.prop]" type="daterange"
-                    range-separator="至" start-placeholder="Start date" end-placeholder="End date" clearable />
+                    range-separator="至" start-placeholder="開始日期" end-placeholder="結束日期" clearable />
                 <el-time-picker v-if='item.type === "timePicker"' v-model="_params[item.prop]" arrow-control
-                    placeholder="select time" clearable />
+                    placeholder="請選擇時間" clearable />
                 <el-time-select v-if='item.type === "timeSelect"' v-model="_params[item.prop]" start="01:00" step="01:00"
-                    end="24:00" placeholder="Select time" clearable />
+                    end="24:00" placeholder="請選擇時間" clearable />
             </el-form-item>
         </el-form>
         <div class="btn-group">
@@ -24,7 +41,7 @@
     </div>
 </template>
 <script setup>
-import { defineProps, ref, defineEmits, watch, computed , defineExpose } from 'vue';
+import { defineProps, ref, defineEmits, watch, computed, defineExpose } from 'vue';
 import { ElMessage } from 'element-plus'
 const props = defineProps({
     comfireCallBack: Function,
@@ -80,7 +97,7 @@ function additionData(data) {
     return data
 }
 
-function clearValidate(){
+function clearValidate() {
     formRef.value.clearValidate()
 }
 
@@ -89,6 +106,8 @@ function resetFields() {
         _params.value[key] = ''
     })
 }
+
+const addSelectItem = ref('')
 
 defineExpose({ resetFields })
 
@@ -106,5 +125,15 @@ defineExpose({ resetFields })
 
 .input-box>span {
     padding: 0 5px;
+}
+
+.select-options-wicon {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.option-input {
+    --el-border-radius-base: 0
 }
 </style>

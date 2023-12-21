@@ -1,11 +1,11 @@
 const { getCurrentTime } = require('../utils')
-const { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop, getBandProducts } = require('../models/shopManage_model')
+const { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop, getBandProducts , getPartitionItems} = require('../models/shopManage_model')
 const { generateUUID } = require('../models/encryption');
 
 module.exports = class Shop {
 
     getShopList(req, res, next) {
-        const options = req.body.shopType ? { shopType: req.body.shopType } : {}
+        const options = { shopType: req.body.shopType }
         const size = parseInt(req.body.size)
         const page = parseInt(req.body.page)
 
@@ -14,7 +14,14 @@ module.exports = class Shop {
         }).catch(err => {
             res.json(err)
         })
+    }
 
+    getPartitionList(req, res, next){
+        getPartitionItems({}, 999, 1).then(result => {
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
+        })
     }
 
     postCreateShop(req, res, next) {
@@ -23,12 +30,12 @@ module.exports = class Shop {
             shopCode: req.body.shopCode,
             shopType: req.body.shopType,
             shopName: req.body.shopName,
+            partition:req.body.partition,
             createDate: getCurrentTime(),
             updateDate: getCurrentTime()
         }
 
         createNewShop(shopData).then(result => {
-            console.log(result)
             res.json(result)
         }).catch(err => {
             res.json(err)
@@ -42,6 +49,7 @@ module.exports = class Shop {
             shopType: req.body.shopType,
             shopCode: req.body.shopCode,
             shopName: req.body.shopName,
+            partition:req.body.partition,
             updateDate: getCurrentTime()
         }
 

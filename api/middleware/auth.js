@@ -11,7 +11,6 @@ async function auth(req, res, next) {
     }
     await verifyToken(token, true).then(tokenResult => {
         if (tokenResult.success === true) {
-            console.log('middleware work')
             next()
         } else {
             res.json(tokenResult)
