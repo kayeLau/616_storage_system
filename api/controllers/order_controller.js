@@ -1,11 +1,11 @@
 const { getCurrentTime, getTodayTimeRange } = require('../utils')
 const { generateUUID } = require('../models/encryption');
 const { getOrderItems, createNewOrder, updateOrderInformation, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated } = require('../models/orderManage_model')
-const { verifyToken } = require('../models/verification')
 
 module.exports = class order {
     getOrderList(req, res, next) {
-        const options = { updateDate: req.body.updateDate, department: req.body.department, orderShopId: req.body.orderShopId }
+        console.log(req.userInfo)
+        const options = { updateDate: req.body.updateDate, department: req.body.department, orderShopId: req.body.shopId }
         const size = req.body.size
         const page = req.body.page
 
@@ -18,50 +18,41 @@ module.exports = class order {
     }
 
     postCheckOrderRepeated(req, res, next) {
-        const token = req.headers['token'];
+        const userInfo = req.userInfo
+        console.log(req.userInfo)
 
-        verifyToken(token, true).then(tokenResult => {
-            if (tokenResult.success === true) {
-                const orderData = {
-                    orderShopId: tokenResult.userInfo.shopId,
-                    createDate: getTodayTimeRange(),
-                }
-                checkOrderRepeated("order_info", orderData).then(result => {
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+        const orderData = {
+            orderShopId: userInfo.shopId,
+            department: userInfo.auth,
+            createDate: getTodayTimeRange(),
+        }
+
+        checkOrderRepeated("order_info", orderData).then(result => {
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
         })
     }
 
     postCreateOrder(req, res, next) {
-        const token = req.headers['token'];
+        const userInfo = req.userInfo
 
-        verifyToken(token, true).then(tokenResult => {
-            const orderData = {
-                id: generateUUID(),
-                status: 0,
-                orderList: req.body.orderList,
-                orderUserId: tokenResult.userInfo.id,
-                orderUserName: tokenResult.userInfo.name,
-                orderShopId: tokenResult.userInfo.shopId,
-                department: tokenResult.userInfo.auth,
-                createDateRange: getTodayTimeRange(),
-                createDate: getCurrentTime(),
-                updateDate: getCurrentTime()
-            }
-            if (tokenResult.success === true) {
-                createNewOrder(orderData).then(result => {
-                    res.json(result)
-                }).catch(err => {
-                    res.json(err)
-                })
-            } else {
-                res.json(tokenResult)
-            }
+        const orderData = {
+            id: generateUUID(),
+            status: 0,
+            orderList: req.body.orderList,
+            orderUserId: userInfo.id,
+            orderUserName: userInfo.name,
+            orderShopId: userInfo.shopId,
+            department: userInfo.auth,
+            createDateRange: getTodayTimeRange(),
+            createDate: getCurrentTime(),
+            updateDate: getCurrentTime()
+        }
+        createNewOrder(orderData).then(result => {
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
         })
     }
 

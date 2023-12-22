@@ -31,3 +31,11 @@ export function updateUserInfo(data){
       data,
     });
 }
+
+export function deleteUser(data){
+  return request({
+      url: '/users/deleteUser',
+      method: 'post',
+      data,
+    });
+}

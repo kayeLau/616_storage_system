@@ -11,6 +11,7 @@ async function auth(req, res, next) {
     }
     await verifyToken(token, true).then(tokenResult => {
         if (tokenResult.success === true) {
+            req.userInfo = tokenResult.userInfo
             next()
         } else {
             res.json(tokenResult)

@@ -78,7 +78,6 @@ module.exports = class Shop {
         }
 
         updateShopInformation(shopId, shopData).then(result => {
-            console.log(result)
             res.json(result)
         }).catch(err => {
             res.json(err)

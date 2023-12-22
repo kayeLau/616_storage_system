@@ -2,6 +2,7 @@ export const authDict = {
     '-1':"管理員",
     0:"前線廚房",
     1:"前線樓面 ",
+    2:"分區經理 ",
 }
 
 export const freezersNumDict = {

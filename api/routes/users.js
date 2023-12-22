@@ -11,6 +11,8 @@ router.post('/login', userModifyMethod.postLogin);
 
 router.post('/update', userModifyMethod.postUpdateUser);
 
+router.post('/deleteUser', userModifyMethod.postDeleteUser);
+
 router.post('/getUsersList', userModifyMethod.getUsersList);
 
 router.post('/getUser', userModifyMethod.getUser);

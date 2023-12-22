@@ -84,12 +84,12 @@ function setProductListView(product){
 }
 
 // 獲取產品列表
-function getProducts() {
+async function getProducts() {
     const params = {
         size: 999,
         page: 1
     }
-    getProductList(params).then(res => {
+    await getProductList(params).then(res => {
         if (res.success) {
             res.resource.forEach(item => {
                 let freezersNum = item.freezersNum > 2 ? item.freezersNum - 1 : item.freezersNum;
@@ -115,8 +115,8 @@ function checkExistOrder(){
     })
 }
 
-onMounted(() => {
-    getProducts()
+onMounted(async () => {
+    await getProducts()
     checkExistOrder()
 })
 

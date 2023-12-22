@@ -5,15 +5,16 @@
                 :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
         </el-card>
         <el-drawer v-model="jsonFormShow" title="員工資料" direction="rtl">
-            <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :comfireCallBack="JsonFormComfireCallBack"
-                :rules="editFormRules" @sumbitSuccess="refreshList">
+            <jsonForm ref='JsonFormRef' :formModel="editFormModel" :formColumns="editFormColumns"
+                :comfireCallBack="JsonFormComfireCallBack" :rules="editFormRules" @sumbitSuccess="refreshList"
+                @addSelectItem="addSelectItem">
             </jsonForm>
         </el-drawer>
     </div>
 </template>
 <script setup>
-import { getShopList } from '../request/shops'
-import { getUsersList, register, updateUserInfo } from '../request/users'
+import { getShopList, getPartitionList, createPartition, deletePartitionItem } from '../request/shops'
+import { getUsersList, register, updateUserInfo, deleteUser } from '../request/users'
 import { authDict, dictToOptions } from '../request/dict'
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
@@ -21,6 +22,7 @@ import { ref } from 'vue'
 
 const authOptions = dictToOptions(authDict)
 const KtableRef = ref()
+const JsonFormRef = ref()
 
 //edit
 let JsonFormComfireCallBack = ref(() => { })
@@ -41,13 +43,24 @@ const editFormColumns = ref([
         type: 'select',
         prop: 'auth',
         label: '用戶角色:',
-        options: authOptions
+        options: authOptions,
+        change: authChange
     },
     {
         type: 'select',
         prop: 'shopId',
         label: '所屬分店:',
         options: []
+    },
+    {
+        type: 'select',
+        prop: 'partition',
+        label: '所屬分區:',
+        options: [],
+        icon: 'DeleteFilled',
+        popconfirmTitle: '是否刪除?',
+        addItem: true,
+        deleteSelectOptions: deleteSelectItem
     },
 ])
 const editFormRules = {
@@ -65,19 +78,69 @@ const editFormRules = {
     ],
 }
 
-async function fatchShopList() {
-    let result = []
-    await getShopList({ size: 999, page: 1 }).then(res => {
+function authChange(auth) {
+    switch (auth) {
+        case '-1':
+            editFormColumns.value[3].remove = true;
+            editFormColumns.value[4].remove = true;
+            break
+        case '2':
+            editFormColumns.value[3].remove = false;
+            editFormColumns.value[4].remove = true;
+            break
+        default:
+            editFormColumns.value[3].remove = false;
+            editFormColumns.value[4].remove = false;
+    }
+}
+
+// 獲取分區分店字典
+async function getPartitionItems() {
+    await getPartitionList().then(res => {
         if (res.success) {
-            result = res.resource.map(item => {
-                return { label: item.shopName, value: item.shopId }
+            editFormColumns.value[4].options = res.resource.map(item => {
+                return {
+                    label: item.partitionName,
+                    value: item.id
+                }
             })
         }
     })
-    editFormColumns.value[3].options = result
+}
+getPartitionItems()
+async function fatchShopList() {
+    await getShopList({ size: 999, page: 1 }).then(res => {
+        if (res.success) {
+            editFormColumns.value[3].options = res.resource.map(item => {
+                return {
+                    label: item.shopName,
+                    value: item.shopId
+                }
+            })
+        }
+    })
 }
 fatchShopList()
 
+function deleteSelectItem(partitionId) {
+    deletePartitionItem({ id: partitionId }).then(res => {
+        if (res.success) {
+            JsonFormRef.value.resetFields(['partition'])
+            getPartitionItems()
+        }
+    })
+}
+
+function addSelectItem(partitionName) {
+    if (!partitionName) return;
+    createPartition({ partitionName }).then(res => {
+        if (res.success) {
+            getPartitionItems()
+        }
+    })
+}
+
+// 增刪查改
 function refreshList() {
     KtableRef.value.fatchList()
     jsonFormShow.value = !jsonFormShow.value
@@ -99,6 +162,14 @@ function editHandle(index, row) {
     jsonFormShow.value = !jsonFormShow.value
 }
 
+function deleteHandle(index, row) {
+    deleteUser({ id: row.id }).then(res => {
+        if (res.success) {
+            KtableRef.value.fatchList()
+        }
+    })
+}
+
 // table
 const authFormatter = (row, column) => {
     let cell = row[column.property]
@@ -118,7 +189,7 @@ const operations = {
     size: "small",
     children: [
         { type: "primary", name: "編輯", onClick: editHandle, icon: 'Edit' },
-        { type: "danger", name: "删除", icon: 'Delete' }
+        { type: "danger", name: "删除", icon: 'Delete', onClick: deleteHandle, }
     ]
 }
 const params = {

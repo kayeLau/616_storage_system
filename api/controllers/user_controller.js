@@ -1,5 +1,5 @@
 const loginCheck = require('../models/login')
-const { toRegister, updateUserInformation, getUsersItems, getUser } = require('../models/register_model')
+const { toRegister, updateUserInformation, getUsersItems, getUser, deleteUsersItem } = require('../models/register_model')
 var { getCurrentTime, checkNull } = require('../utils')
 const { generateUUID, hashPassword } = require('../models/encryption');
 const config = require('../config/development_config')
@@ -63,19 +63,30 @@ module.exports = class Member {
     postUpdateUser(req, res, next) {
         const memberData = {
             // password: hashPassword(req.body.password),
-            createDate: getCurrentTime(),
+            updateDate: getCurrentTime(),
             auth: req.body.auth,
             shopId: req.body.shopId,
             shopName: req.body.shopName
         }
 
-        const id = tokenResult.data
-        // todo:check user auth by sql
+        const id = req.body.id
         updateUserInformation(id, memberData).then(result => {
             res.json(result)
         }).catch(err => {
             res.json(err)
         })
+    }
+
+    // 刪除個人資料
+    postDeleteUser(req, res, next) {
+        const id = req.body.id
+
+        deleteUsersItem(id).then(result => {
+            res.json(result)
+        }).catch(err => {
+            res.json(err)
+        })
+
     }
 
     getUsersList(req, res, next) {

@@ -4,15 +4,14 @@ const { optionsSQLFromatter, createNew, updateItem, deleteItem, getItems } = req
 
 function createNewOrder(data) {
     let createDateRange = data.createDateRange
-    return checkOrderRepeated("order_info", { orderShopId: data.orderShopId, createDate: createDateRange })
+    return checkOrderRepeated("order_info", { orderShopId: data.orderShopId, createDate: createDateRange , department: data.department})
         .then(async (res) => {
             const orderId = res.resource ? res.resource.id : data.id
             let orderList = data.orderList.map(item => {
-                id = item.id ? item.id : ''
                 return [
-                    id,
+                    item.id ? item.id : '',
                     orderId,
-                    item.productCode,
+                    item.productCode,  
                     item.productName,
                     item.orderQuantity,
                     item.unit,
@@ -30,10 +29,11 @@ function createNewOrder(data) {
             }
             return orderList
         })
-        .then((orderList) => insertOrderItems(orderList)) // 訂單明細
+        .then((orderList) => createNewOrderItems(orderList)) // 訂單明細
         .catch(err => err)
 }
 
+// 倉庫追加時用
 function insertOrderItems(list) {
     let result = {}
     result.success = false
@@ -104,6 +104,7 @@ function checkOrderRepeated(table, options) {
     let result = {}
     return new Promise((resolve, reject) => {
         let optionsSQL = optionsSQLFromatter(options)
+        console.log(optionsSQL)
         db.query(`SELECT * FROM ${table} ${optionsSQL}`, (err, row) => {
             if (err) {
                 result.msg = "server error,please try again"
@@ -241,5 +242,5 @@ function getOrderItems(options, size, page) {
 }
 
 module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, 
-    getOrderItems, insertOrderItems, createNewOrderItems, updateOrderDetailAssignQuantity, 
+    getOrderItems, insertOrderItems, updateOrderDetailAssignQuantity, 
     setOrderItemStatus, checkOrderRepeated }

@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-form ref='formRef' :label-width="labelWidth" :model="_params" label-position="left" :rules="rules">
-            <el-form-item v-for="(item, index) of formColumns" :key="index" :label="item.label" :prop="item.prop">
+            <el-form-item v-for="(item, index) of _columns" :key="index" :label="item.label" :prop="item.prop">
                 <div v-if='item.type === "input"' class="input-box">
                     <el-input v-model="_params[item.prop]" clearable :disabled="item.disabled" />
                     <span v-show="item.unit">{{ item.unit }}</span>
@@ -11,7 +11,7 @@
                     <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value">
                         <div class="select-options-wicon" v-if="item.icon">
                             <span>{{ opt.label }}</span>
-                            <el-popconfirm width="100" confirm-button-text="是" cancel-button-text="否" :icon="InfoFilled"
+                            <el-popconfirm width="100" confirm-button-text="是" cancel-button-text="否" icon="InfoFilled"
                                 icon-color="#626AEF" :title="item.popconfirmTitle" confirm-button-type="text" @confirm="item.deleteSelectOptions(opt.value)">
                                 <template #reference>
                                     <el-icon style="color: var(--el-color-danger)" @click.stop="">
@@ -21,7 +21,7 @@
                             </el-popconfirm>
                         </div>
                     </el-option>
-                    <el-input v-if="item.addItem" v-model="addSelectItem" class="option-input" placeholder="請輸入新增分區">
+                    <el-input v-if="item.addItem" v-model="addSelectItem" class="option-input" placeholder="請輸入新增分區" @keydown.enter="addSelectItemFn()">
                         <template #append>
                             <el-button icon="Select" type="success" style="color:var(--el-color-success);padding-top: 5px;" @click="addSelectItemFn()"/>
                         </template>
@@ -60,7 +60,10 @@ let _params = ref(props.formModel)
 watch(() => props.formModel, (value) => {
     clearValidate()
     _params.value = value
-},)
+})
+const _columns = computed(() => {
+    return props.formColumns.filter(item => !item.remove)
+})
 
 function submitJsonForm() {
     formRef.value.validate((valid) => {
@@ -89,7 +92,7 @@ const shopNameList = computed(() => {
 })
 function additionData(data) {
     Object.keys(data).forEach(key => {
-        if (key === 'shopId' && shopNameList.value.length) {
+        if (key === 'shopId' && shopNameList.value.options.length) {
             let target = shopNameList.value.options.find(item => item.value === data.shopId)
             data.shopName = target.label
         }
@@ -101,10 +104,16 @@ function clearValidate() {
     formRef.value.clearValidate()
 }
 
-function resetFields() {
-    Object.key(_params.value).forEach(key => {
-        _params.value[key] = ''
-    })
+function resetFields(keys) {
+    if(keys.length){
+        keys.forEach(key => {
+            _params.value[key] = ''
+        })
+    }else{
+        Object.key(_params.value).forEach(key => {
+            _params.value[key] = ''
+        })
+    }
 }
 
 const addSelectItem = ref('')

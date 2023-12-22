@@ -6,7 +6,7 @@
     </el-card>
     <bandList :dialogVisible="bandListDialogVisible" @closeDialog="manageBandProduct" :shopId="shopId"></bandList>
     <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
-      <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules"
+      <jsonForm ref='JsonFormRef' :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules"
         :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList" @addSelectItem="addSelectItem"></jsonForm>
     </el-drawer>
   </div>
@@ -22,6 +22,7 @@ import { ref, onMounted } from 'vue';
 const shopTypeOptions = dictToOptions(shopType)
 let shopId = ref("")
 const KtableRef = ref()
+const JsonFormRef = ref()
 
 //edit
 let JsonFormComfireCallBack = ref(() => { })
@@ -85,11 +86,13 @@ function getPartitionItems() {
 function deleteSelectItem(partitionId) {
   deletePartitionItem({ id: partitionId }).then(res => {
     if (res.success) {
+      JsonFormRef.value.resetFields(['partition'])
       getPartitionItems()
     }
   })
 }
 function addSelectItem(partitionName) {
+  if(!partitionName)return;
   createPartition({ partitionName }).then(res => {
     if (res.success) {
       getPartitionItems()
