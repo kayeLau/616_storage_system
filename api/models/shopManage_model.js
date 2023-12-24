@@ -21,6 +21,10 @@ function deleteShopItem(shopId) {
     return deleteItem("shop_info", 'shopId', shopId)
 }
 
+function deleteShopProductItem(shopId) {
+    return deleteItem("shop_product_info", 'shopId', shopId)
+}
+
 function deletePartitionItem(id) {
     return deleteItem("partition_info", 'id', id)
 }
@@ -63,4 +67,4 @@ function bindProductTOShop(productList) {
 
 
 module.exports = { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop , 
-    getBandProducts , getPartitionItems , deletePartitionItem , createNewPartition }
+    getBandProducts , getPartitionItems , deletePartitionItem , createNewPartition , deleteShopProductItem }

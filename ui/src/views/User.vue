@@ -85,12 +85,12 @@ function authChange(auth) {
             editFormColumns.value[4].remove = true;
             break
         case '2':
-            editFormColumns.value[3].remove = false;
-            editFormColumns.value[4].remove = true;
+            editFormColumns.value[3].remove = true;
+            editFormColumns.value[4].remove = false;
             break
         default:
             editFormColumns.value[3].remove = false;
-            editFormColumns.value[4].remove = false;
+            editFormColumns.value[4].remove = true;
     }
 }
 
@@ -157,6 +157,7 @@ function createHandle() {
 function editHandle(index, row) {
     editFormModel.value = { ...row, auth: String(row.auth) }
     JsonFormComfireCallBack.value = updateUserInfo
+    authChange(editFormModel.value.auth)
     editFormColumns.value[0].disabled = true
     editFormColumns.value[1].disabled = true
     jsonFormShow.value = !jsonFormShow.value

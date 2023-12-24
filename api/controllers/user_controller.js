@@ -6,20 +6,37 @@ const config = require('../config/development_config')
 const jwt = require('jsonwebtoken')
 
 module.exports = class Member {
+    static setUserInfoByRule(data) {
+        const userInfoRule = {
+            '-1': ['partition','shopId','shopName'],
+            '0': ['partition'],
+            '1': ['partition'],
+            '2': ['shopId','shopName']
+        }
+        const userAuth = userInfoRule[data.auth]
+        userAuth.forEach(key => {
+            delete data[key]
+        });
+        // console.log(data)
+        return data
+    }
+
     // 註冊
     postRegister(req, res, next) {
         const password = hashPassword(req.body.password);
 
-        const memberData = {
+        const memberData = Member.setUserInfoByRule({
             id: generateUUID(),
             name: req.body.name,
             password,
             auth: req.body.auth,
             shopId: req.body.shopId,
             shopName: req.body.shopName,
+            partition: req.body.partition,
             createDate: getCurrentTime(),
             updateDate: getCurrentTime(),
-        }
+        })
+
 
         toRegister(memberData).then(result => {
             res.json(result)
@@ -61,13 +78,14 @@ module.exports = class Member {
 
     // 更改個人資料
     postUpdateUser(req, res, next) {
-        const memberData = {
+        const memberData = Member.setUserInfoByRule({
             // password: hashPassword(req.body.password),
             updateDate: getCurrentTime(),
             auth: req.body.auth,
             shopId: req.body.shopId,
-            shopName: req.body.shopName
-        }
+            shopName: req.body.shopName,
+            partition: req.body.partition,
+        })
 
         const id = req.body.id
         updateUserInformation(id, memberData).then(result => {

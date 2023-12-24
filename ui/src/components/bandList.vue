@@ -15,6 +15,8 @@ import { bindProductToShop , getBindProductList } from '../request/shops';
 import { getProductList } from '../request/products';
 import { freezersNumDict } from '../request/dict';
 import { onMounted , ref , defineProps , computed , defineEmits } from 'vue';
+import { ElMessage } from 'element-plus';
+
 
 const props = defineProps({
     shopId:String,
@@ -61,7 +63,6 @@ function getProducts() {
                     })
                 }
             });
-            console.log(_data)
             data.value = _data.filter(item => item !== null)
         } else {
             data.value = []
@@ -93,7 +94,9 @@ function bindProductListToshop(){
         }
     })
     bindProductToShop({productList}).then(res => {
-        console.log(res)
+        if(res.success){
+            ElMessage({ type: 'success', message: '操作成功：資料已存入數據庫' })
+        }
     })
 }
 

@@ -1,6 +1,6 @@
 const { getCurrentTime } = require('../utils')
 const { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop, getBandProducts , 
-    getPartitionItems , createNewPartition , deletePartitionItem } = require('../models/shopManage_model')
+    getPartitionItems , createNewPartition , deletePartitionItem , deleteShopProductItem } = require('../models/shopManage_model')
 const { generateUUID } = require('../models/encryption');
 
 module.exports = class Shop {
@@ -84,15 +84,17 @@ module.exports = class Shop {
         })
     }
 
-    postDeleteShopItem(req, res, next) {
+    async postDeleteShopItem(req, res, next) {
         const shopId = req.body.shopId
 
-        deleteShopItem(shopId).then(result => {
-            res.json(result)
-        }).catch(err => {
+        try{
+            await deleteShopProductItem(shopId)
+            deleteShopItem(shopId).then(result => {
+                res.json(result)
+            })
+        }catch(err){
             res.json(err)
-        })
-
+        }
     }
 
     postDeletePartitionItem(req, res, next) {
@@ -131,7 +133,6 @@ module.exports = class Shop {
             ]
         })
         bindProductTOShop(productList).then(result => {
-            console.log(result)
             res.json(result)
         }).catch(err => {
             res.json(err)

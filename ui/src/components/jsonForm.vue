@@ -94,7 +94,7 @@ function additionData(data) {
     Object.keys(data).forEach(key => {
         if (key === 'shopId' && shopNameList.value.options.length) {
             let target = shopNameList.value.options.find(item => item.value === data.shopId)
-            data.shopName = target.label
+            data.shopName = target ? target.label : ''
         }
     })
     return data

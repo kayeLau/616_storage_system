@@ -12,11 +12,11 @@
   </div>
 </template>
 <script setup>
-import { getShopList, updateShop, createShop, deleteShop, getPartitionList, createPartition, deletePartitionItem } from '../request/shops'
-import { shopType, dictToOptions } from '../request/dict'
-import bandList from '../components/bandList.vue'
-import Ktable from '../components/table.vue'
-import jsonForm from '../components/jsonForm.vue'
+import { getShopList, updateShop, createShop, deleteShop, getPartitionList, createPartition, deletePartitionItem } from '../request/shops';
+import { shopType, dictToOptions } from '../request/dict';
+import bandList from '../components/bandList.vue';
+import Ktable from '../components/table.vue';
+import jsonForm from '../components/jsonForm.vue';
 import { ref, onMounted } from 'vue';
 
 const shopTypeOptions = dictToOptions(shopType)
