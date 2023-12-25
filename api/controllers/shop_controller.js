@@ -20,7 +20,7 @@ module.exports = class Shop {
 
         getShopItems(options, size, page).then(result => {
             result.resource.forEach(item => {
-                item.partition = partitionDict[item.partition]
+                item.shopPartition = partitionDict[item.shopPartition]
             })
             res.json(result)
         }).catch(err => {
@@ -42,7 +42,7 @@ module.exports = class Shop {
             shopCode: req.body.shopCode,
             shopType: req.body.shopType,
             shopName: req.body.shopName,
-            partition:req.body.partition,
+            shopPartition:req.body.shopPartition,
             createDate: getCurrentTime(),
             updateDate: getCurrentTime()
         }
@@ -73,7 +73,7 @@ module.exports = class Shop {
             shopType: req.body.shopType,
             shopCode: req.body.shopCode,
             shopName: req.body.shopName,
-            partition:req.body.partition,
+            shopPartition:req.body.shopPartition,
             updateDate: getCurrentTime()
         }
 

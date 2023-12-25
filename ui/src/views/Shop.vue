@@ -47,7 +47,7 @@ const editFormColumns = ref([
   },
   {
     type: 'select',
-    prop: 'partition',
+    prop: 'shopPartition',
     label: '所屬分區:',
     options: [],
     icon: 'DeleteFilled',
@@ -66,7 +66,7 @@ const editFormRules = {
   shopName: [
     { required: true, message: '請輸入店舖名稱', trigger: 'blur' },
   ],
-  partition: [
+  shopPartition: [
     { required: true, message: '請選擇所屬分區', trigger: 'blur' },
   ]
 }
@@ -86,7 +86,7 @@ function getPartitionItems() {
 function deleteSelectItem(partitionId) {
   deletePartitionItem({ id: partitionId }).then(res => {
     if (res.success) {
-      JsonFormRef.value.resetFields(['partition'])
+      JsonFormRef.value.resetFields(['shopPartition'])
       getPartitionItems()
     }
   })
@@ -138,7 +138,7 @@ const shopTypeFormatter = (row, column) => {
 const columns = [
   { props: 'shopCode', label: '店舖編號' },
   { props: 'shopName', label: '店舖名稱', width: 250 },
-  { props: 'partition', label: '所屬分區' },
+  { props: 'shopPartition', label: '所屬分區' },
   { props: 'shopType', label: '店舖類型', formatter: shopTypeFormatter },
   // {props:'productCount',label:'產品種類'},
   { props: 'updateDate', label: '修改時間', width: 250 }

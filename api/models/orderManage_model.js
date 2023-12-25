@@ -221,6 +221,7 @@ function getOrderItems(options, size, page) {
         let orderItems = []
         if (res.success) {
             orderItems = res.resource
+            result.total = res.total
         }
         return orderItems
     }).then(async orderItems => {

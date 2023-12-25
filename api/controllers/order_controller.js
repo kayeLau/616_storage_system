@@ -1,17 +1,30 @@
 const { getCurrentTime, getTodayTimeRange } = require('../utils')
 const { generateUUID } = require('../models/encryption');
 const { getOrderItems, createNewOrder, updateOrderInformation, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated } = require('../models/orderManage_model')
+const { getShopItems } = require('../models/shopManage_model')
 
 module.exports = class order {
-    getOrderList(req, res, next) {
-        console.log(req.userInfo)
-        const options = { updateDate: req.body.updateDate, department: req.body.department, orderShopId: req.body.shopId }
+    async getOrderList(req, res, next) {
+        const userInfoAuth = Number(req.userInfo.auth)
+        const orderShopId = userInfoAuth === 0 || userInfoAuth === 1 ?  req.userInfo.shopId : "";
+        const options = { updateDate: req.body.updateDate, department: req.body.department, orderShopId }
         const size = req.body.size
         const page = req.body.page
+
+        if(userInfoAuth === 2){
+            let shopIdList = await getShopItems({shopPartition:req.userInfo.shopPartition}, 999, 1).then(result => {
+                if(result.success){
+                    return result.resource.map(item => item.shopId)
+                }
+            }).catch(err => [])
+            options.orderShopId = shopIdList
+        }
+        console.log(options)
 
         getOrderItems(options, size, page).then(result => {
             res.json(result)
         }).catch(err => {
+            console.log(err)
             res.json(err)
         })
 
@@ -19,7 +32,6 @@ module.exports = class order {
 
     postCheckOrderRepeated(req, res, next) {
         const userInfo = req.userInfo
-        console.log(req.userInfo)
 
         const orderData = {
             orderShopId: userInfo.shopId,

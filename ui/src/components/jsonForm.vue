@@ -88,11 +88,11 @@ function submitJsonForm() {
 }
 
 const shopNameList = computed(() => {
-    return props.formColumns.find(item => item.prop === 'shopId') || []
+    return props.formColumns.find(item => item.prop === 'shopId')
 })
 function additionData(data) {
     Object.keys(data).forEach(key => {
-        if (key === 'shopId' && shopNameList.value.options.length) {
+        if (key === 'shopId' && shopNameList.value) {
             let target = shopNameList.value.options.find(item => item.value === data.shopId)
             data.shopName = target ? target.label : ''
         }

@@ -8,9 +8,9 @@ const jwt = require('jsonwebtoken')
 module.exports = class Member {
     static setUserInfoByRule(data) {
         const userInfoRule = {
-            '-1': ['partition','shopId','shopName'],
-            '0': ['partition'],
-            '1': ['partition'],
+            '-1': ['shopPartition','shopId','shopName'],
+            '0': ['shopPartition'],
+            '1': ['shopPartition'],
             '2': ['shopId','shopName']
         }
         const userAuth = userInfoRule[data.auth]
@@ -32,7 +32,7 @@ module.exports = class Member {
             auth: req.body.auth,
             shopId: req.body.shopId,
             shopName: req.body.shopName,
-            partition: req.body.partition,
+            shopPartition: req.body.shopPartition,
             createDate: getCurrentTime(),
             updateDate: getCurrentTime(),
         })
@@ -84,7 +84,7 @@ module.exports = class Member {
             auth: req.body.auth,
             shopId: req.body.shopId,
             shopName: req.body.shopName,
-            partition: req.body.partition,
+            shopPartition: req.body.shopPartition,
         })
 
         const id = req.body.id

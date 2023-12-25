@@ -46,10 +46,8 @@
       </el-table-column>
       <el-table-column fixed="right" label="操作" width="120">
         <template #default="scope">
-          <el-button v-if='scope.row.mode === "create"' type="success" icon="Coin" plain
-            @click="submitAdditionOrderItem(scope.row)" :disabled="scope.row.disabled">提交</el-button>
-          <el-button v-else type="success" icon="Coin" plain @click="updateAssignQuantity(scope.row)"
-            :disabled="scope.row.disabled">提交</el-button>
+          <el-button v-if='scope.row.mode === "create"' type="success" icon="Coin" plain @click="submitAdditionOrderItem(scope.row)">提交</el-button>
+          <el-button v-else type="success" icon="Coin" plain @click="updateAssignQuantity(scope.row)">提交</el-button>
         </template>
       </el-table-column>
     </el-table>

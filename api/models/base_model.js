@@ -96,12 +96,14 @@ function optionsSQLFromatter(options) {
                 case 'productName':
                     query = `${key} LIKE '%${options[key]}%'`
                     break
+                case 'orderShopId':
+                    query = Array.isArray(options[key]) ? 
+                        options[key].reduce((accumulator, currentValue, index) => index === 0 ? `orderShopId = '${currentValue}'` : `${accumulator} OR orderShopId = '${currentValue}'`, '')
+                        : `${key} = '${options[key]}'`;
+                    break
                 default:
                     query = `${key} = '${options[key]}'`
             }
-            // let query = key === 'updateDate' || key === 'createDate' ? 
-            // `${key} BETWEEN '${options[key][0]}' AND '${options[key][1]}'` 
-            // : `${key} = '${options[key]}'`
 
             if (whereClause === '') {
                 whereClause += ` WHERE ${query}`;

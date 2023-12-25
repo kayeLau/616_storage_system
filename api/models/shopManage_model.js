@@ -46,7 +46,6 @@ function bindProductTOShop(productList) {
     result.success = false
     return new Promise((resolve, reject) => {
         if (Array.isArray(productList) && Array.isArray(productList[0])) {
-            console.log(productList)
             db.query(`INSERT IGNORE INTO shop_product_info (id,shopId, productCode,createDate,updateDate) VALUES ? `, [productList] , (err) => {
                 if (err) {
                     result.msg = "server error,please try again"

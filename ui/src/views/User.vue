@@ -54,7 +54,7 @@ const editFormColumns = ref([
     },
     {
         type: 'select',
-        prop: 'partition',
+        prop: 'shopPartition',
         label: '所屬分區:',
         options: [],
         icon: 'DeleteFilled',
@@ -125,7 +125,7 @@ fatchShopList()
 function deleteSelectItem(partitionId) {
     deletePartitionItem({ id: partitionId }).then(res => {
         if (res.success) {
-            JsonFormRef.value.resetFields(['partition'])
+            JsonFormRef.value.resetFields(['shopPartition'])
             getPartitionItems()
         }
     })

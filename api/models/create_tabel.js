@@ -74,7 +74,7 @@ const sql_tabel = [
             shopType INT(10) NOT NULL COMMENT '0:616 ',
             shopCode VARCHAR(50) NOT NULL COMMENT '店舖編號' COLLATE 'utf8mb4_general_ci',
             shopName VARCHAR(50) NOT NULL COMMENT '店铺名称' COLLATE 'utf8mb4_general_ci',
-            partition INT(10) NULL DEFAULT NULL COMMENT '所屬分區',
+            shopPartition INT(10) NULL DEFAULT NULL COMMENT '所屬分區',
             productCount INT(10) NULL DEFAULT NULL COMMENT '產品種類',
             createDate DATETIME NULL DEFAULT NULL,
             updateDate DATETIME NULL DEFAULT NULL,
