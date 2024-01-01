@@ -1,4 +1,4 @@
-const { getCurrentTime, getTodayTimeRange } = require('../utils')
+const { getCurrentTime , getSettingTimeRange } = require('../utils')
 const { generateUUID } = require('../models/encryption');
 const { getOrderItems, createNewOrder, updateOrderInformation, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated } = require('../models/orderManage_model')
 const { getShopItems } = require('../models/shopManage_model')
@@ -7,7 +7,7 @@ module.exports = class order {
     async getOrderList(req, res, next) {
         const userInfoAuth = Number(req.userInfo.auth)
         const orderShopId = userInfoAuth === 0 || userInfoAuth === 1 ?  req.userInfo.shopId : "";
-        const options = { updateDate: req.body.updateDate, department: req.body.department, orderShopId }
+        const options = { updateDate: req.body.updateDate, orderShopId }
         const size = req.body.size
         const page = req.body.page
 
@@ -19,7 +19,6 @@ module.exports = class order {
             }).catch(err => [])
             options.orderShopId = shopIdList
         }
-        console.log(options)
 
         getOrderItems(options, size, page).then(result => {
             res.json(result)
@@ -30,13 +29,14 @@ module.exports = class order {
 
     }
 
-    postCheckOrderRepeated(req, res, next) {
+    async postCheckOrderRepeated(req, res, next) {
         const userInfo = req.userInfo
+        const createDate = await getSettingTimeRange()
 
         const orderData = {
             orderShopId: userInfo.shopId,
             department: userInfo.auth,
-            createDate: getTodayTimeRange(),
+            createDate,
         }
 
         checkOrderRepeated("order_info", orderData).then(result => {
@@ -46,8 +46,9 @@ module.exports = class order {
         })
     }
 
-    postCreateOrder(req, res, next) {
+    async postCreateOrder(req, res, next) {
         const userInfo = req.userInfo
+        const createDateRange = await getSettingTimeRange()
 
         const orderData = {
             id: generateUUID(),
@@ -57,7 +58,7 @@ module.exports = class order {
             orderUserName: userInfo.name,
             orderShopId: userInfo.shopId,
             department: userInfo.auth,
-            createDateRange: getTodayTimeRange(),
+            createDateRange,
             createDate: getCurrentTime(),
             updateDate: getCurrentTime()
         }

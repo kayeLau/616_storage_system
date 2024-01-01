@@ -51,7 +51,6 @@ const getSettingTimeRange = async () => {
         date.setDate(date.getDate() + 1)
         end = dateFormat(date) + time
     }
-    console.log([start,end])
     return [start,end]
 }
 

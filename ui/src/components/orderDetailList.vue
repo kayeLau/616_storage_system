@@ -44,18 +44,19 @@
           <el-input v-model="_data.children[scope.$index].remark" @change="setSubmitAvailable(scope.$index)" />
         </template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作" width="120">
+      <!-- <el-table-column fixed="right" label="操作" width="120">
         <template #default="scope">
           <el-button v-if='scope.row.mode === "create"' type="success" icon="Coin" plain @click="submitAdditionOrderItem(scope.row)">提交</el-button>
           <el-button v-else type="success" icon="Coin" plain @click="updateAssignQuantity(scope.row)">提交</el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     <!-- pagination -->
     <div class="pagination">
       <div>
         <el-button type="primary" @click="updateAssignQuantity()" icon="Coin" plain>按下單數量分配</el-button>
-        <el-button type="success" @click="insertOrderItem" icon="Coin" plain :disabled="insertBtnDisabled">新增</el-button>
+        <el-button type="success" icon="Coin" plain @click="submitOrderItem">提交</el-button>
+        <el-button type="success" @click="insertOrderItem" icon="CirclePlus" plain>新增</el-button>
       </div>
       <el-pagination background layout="total, prev, pager, next" :total="parseInt(_data.children.length)"
         v-model:current-page="_params.page" :page-size="_params.size" />
@@ -101,44 +102,6 @@ function tableRowClassName({ row }) {
   }
 }
 
-// 新增
-const insertBtnDisabled = computed(() => {
-  return _data.children.find(item => item.mode === 'create')
-})
-function insertOrderItem() {
-  let orderId = _data.id
-  _data.children.unshift({
-    orderId,
-    status: 2,
-    productCode: '',
-    productName: '',
-    orderQuantity: 0,
-    assignQuantity: 0,
-    orderMode: 1,
-    remark: '',
-    updateDate: '-',
-    mode: 'create'
-  })
-}
-
-function submitAdditionOrderItem(row) {
-  if (!row.productCode) {
-    ElMessage({ type: 'warning', message: '新增項目為空' })
-    return
-  }
-  let data = {
-    orderList: [row]
-  }
-  createAdditionOrderItem(data).then(res => {
-    if (res.success) {
-      emit('refreshList')
-      ElMessage({ type: 'success', message: '操作成功：資料已存入數據庫' })
-    } else {
-      ElMessage({ type: 'error', message: '提交失敗' })
-    }
-  })
-}
-
 // 產品列表
 function setOrderItem(row) {
     let productCode = row.productCode
@@ -156,11 +119,47 @@ const productOptions = computed(() => {
     })
 })
 
+// 新增
+function insertOrderItem() {
+  let orderId = _data.id
+  _data.children.unshift({
+    orderId,
+    status: 2,
+    productCode: '',
+    productName: '',
+    orderQuantity: null,
+    assignQuantity: null,
+    orderMode: 1,
+    remark: '',
+    updateDate: '-',
+    mode: 'create'
+  })
+}
+
+async function submitOrderItem(){
+  let createList = _data.children.filter(item => item.mode === 'create' && item.productCode && item.productName 
+  && item.orderQuantity !== null && item.assignQuantity !== null)
+  let updateList = _data.children.filter(item => !item.mode && item.assignQuantity !== null)
+  await addAdditionOrderItem(createList)
+  updateAssignQuantity(updateList)
+}
+
+async function addAdditionOrderItem(orderList) {
+  if (!orderList.length) {return}
+  await createAdditionOrderItem({ orderList }).then(res => {
+    if (res.success) {
+      ElMessage({ type: 'success', message: '操作成功：資料已存入數據庫' })
+    } else {
+      ElMessage({ type: 'error', message: '提交失敗' })
+    }
+  })
+}
+
 // 提交分配數量
 async function updateAssignQuantity(row) {
   let assignQuantitys = generateAssignQuantityParams(row)
   if (!assignQuantitys.length) {
-    ElMessage({ type: 'warning', message: '最少選擇一個產品' })
+    ElMessage({ type: 'warning', message: '訂單分匹值無改變' })
     return
   }
   let orderId = _data.id
@@ -180,18 +179,15 @@ function handleSelectionChange(value) {
   selection.value = value
 }
 
-function generateAssignQuantityParams(row) {
-  let flag = row ? 'signal' : 'muti'
-  if (flag === 'signal') {
-    row = [row]
-  } else {
-    row = selection.value
-    row.forEach(item => {
+function generateAssignQuantityParams(orderList) {
+  if (!orderList.length) {
+    orderList = selection.value
+    orderList.forEach(item => {
       item.assignQuantity = item.orderQuantity
     })
   }
 
-  let assignQuantitys = row.map(item => {
+  let assignQuantitys = orderList.map(item => {
     return {
       id: item.id,
       assignQuantity: item.assignQuantity,

@@ -24,7 +24,7 @@ import orderDetailList from '../components/orderDetailList.vue';
 import { getProductList } from '../request/products';
 import { getShopList } from '../request/shops'
 import { getOrderList } from '../request/orders';
-import { departmentDict, orderStateDict, dictToOptions } from '../request/dict';
+import { departmentDict, orderStateDict } from '../request/dict';
 import { exportExcel } from '../utils/export';
 import Ktable from '../components/table.vue';
 import { ref, onMounted , computed } from 'vue';
@@ -44,14 +44,13 @@ async function fatchShopList() {
       })
     }
   })
-  searchFormColumns.value[2].options = result
+  searchFormColumns.value[1].options = result
 }
 // order tabel
 const KtableRef2 = ref()
-const departmentOptions = dictToOptions(departmentDict)
 const departmentFormatter = (row, column) => {
-  let cell = row[column.property]
-  return departmentDict[cell]
+  let cell = row[column.property].map(item => departmentDict[item]).join(',')
+  return cell
 }
 const orderStateFormatter = (row, column) => {
   let cell = row[column.property]
@@ -62,8 +61,8 @@ const columns = [
   { props: 'status', label: '訂單狀態', formatter: orderStateFormatter },
   { props: 'shopName', label: '落單門店', width: 250 },
   { props: 'department', label: '落單部門', formatter: departmentFormatter },
-  { props: 'orderUserName', label: '落單人' },
-  { props: 'updateDate', label: '落單時間', width: 250 }
+  { props: 'orderUserName', label: '落單人' , width: 220 , formatter: (row, column) => row[column.property].join(',')},
+  { props: 'updateDate', label: '落單時間', width: 200 }
 ]
 const operations = {
   width: 240,
@@ -82,12 +81,6 @@ const searchFormColumns = ref([
     type: 'datePicker',
     prop: 'updateDate',
     label: '下單時間:',
-  },
-  {
-    type: 'select',
-    prop: 'department',
-    label: '落單部門:',
-    options: departmentOptions
   },
   {
     type: 'select',

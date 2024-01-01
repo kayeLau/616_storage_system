@@ -4,14 +4,14 @@ const { optionsSQLFromatter, createNew, updateItem, deleteItem, getItems } = req
 
 function createNewOrder(data) {
     let createDateRange = data.createDateRange
-    return checkOrderRepeated("order_info", { orderShopId: data.orderShopId, createDate: createDateRange , department: data.department})
+    return checkOrderRepeated("order_info", { orderShopId: data.orderShopId, createDate: createDateRange, department: data.department })
         .then(async (res) => {
             const orderId = res.resource ? res.resource.id : data.id
             let orderList = data.orderList.map(item => {
                 return [
                     item.id ? item.id : '',
                     orderId,
-                    item.productCode,  
+                    item.productCode,
                     item.productName,
                     item.orderQuantity,
                     item.unit,
@@ -196,11 +196,9 @@ function setOrderItemStatus(orderId) {
     getItems({ table: "order_detail_info", options: { orderId }, size: 999, page: 1 }).then(res => {
         if (res.success) {
             let orderDetailStatus = res.resource.find(item => item.status === 0 || item.status === null)
-            console.log(res.resource)
             return orderDetailStatus
         }
     }).then(orderDetailStatus => {
-        console.log(orderDetailStatus)
         if (!orderDetailStatus) {
             updateOrderInformation(orderId, { status: 1 })
         } else {
@@ -220,10 +218,20 @@ function getOrderItems(options, size, page) {
     return getItems({ table: "order_info", join: "order_info INNER JOIN shop_info ON orderShopId = shopId", options, size, page }).then(res => {
         let orderItems = []
         if (res.success) {
-            orderItems = res.resource
             result.total = res.total
+            orderItems = res.resource.reduce((group, order) => {
+                let key = order.orderShopId
+                if (group[key]) {
+                    group[key].id.push(order.id)
+                    group[key].orderUserName.push(order.orderUserName)
+                    group[key].department.push(order.department)
+                } else {
+                    group[key] = { ...order , id:[order.id] , orderUserName:[order.orderUserName] , department:[order.department]};
+                }
+                return group;
+            }, {});
         }
-        return orderItems
+        return Object.values(orderItems)
     }).then(async orderItems => {
         const promiseList = orderItems.map((item, index) => {
             return getItems({ table: "order_detail_info", options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
@@ -239,9 +247,11 @@ function getOrderItems(options, size, page) {
         result.resource = orderItems
         result.success = true
         return result
-    }).catch(err => err)
+    }).catch(err => console.log(err))
 }
 
-module.exports = { createNewOrder, updateOrderInformation, deleteOrderItem, 
-    getOrderItems, insertOrderItems, updateOrderDetailAssignQuantity, 
-    setOrderItemStatus, checkOrderRepeated }
+module.exports = {
+    createNewOrder, updateOrderInformation, deleteOrderItem,
+    getOrderItems, insertOrderItems, updateOrderDetailAssignQuantity,
+    setOrderItemStatus, checkOrderRepeated
+}
