@@ -14,6 +14,7 @@ const editFormColumns = ([
     type: 'timeSelect',
     prop: 'lastOrder',
     label: '截單時間:',
+    format:'HH',
   },
 ])
 

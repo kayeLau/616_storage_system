@@ -86,7 +86,8 @@ const searchFormColumns = ref([
     type: 'select',
     prop: 'orderShopId',
     label: '落單門店:',
-    options: []
+    options: [],
+    hide:userInfo.value.auth !== -1
   }
 ])
 fatchShopList()
@@ -183,7 +184,7 @@ let loading = ref(false)
 async function refreshList(){
   loading.value = true
   let result = await KtableRef2.value.fatchList()
-  let target = result.resource.find(item => item.id === currentRow.value.id)
+  let target = result.resource.find(item => item.orderCode === currentRow.value.orderCode)
   target.children.forEach(item => item.disabled = true)
   currentRow.value = target
   loading.value = false

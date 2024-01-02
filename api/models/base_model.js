@@ -162,4 +162,23 @@ function getAllItem(table, options) {
     })
 }
 
-module.exports = { checkRepeated, createNew, updateItem, deleteItem, getItems, getAllItem, optionsSQLFromatter }
+function customQuery(query,options = []){
+    let result = {}
+    return new Promise((resolve, reject) => {
+        db.query(query, options, (err, rows) => {
+            if (err) {
+                console.log(err)
+                result.msg = "server error,please try again"
+                result.success = false
+                reject(result);
+                return
+            }
+            result.msg = "get success"
+            result.resource = rows
+            result.success = true
+            resolve(result);
+        })
+    })
+}
+
+module.exports = { checkRepeated, createNew, updateItem, deleteItem, getItems, getAllItem, optionsSQLFromatter , customQuery }

@@ -121,7 +121,7 @@ const productOptions = computed(() => {
 
 // 新增
 function insertOrderItem() {
-  let orderId = _data.id
+  let orderId = _data.id[0]
   _data.children.unshift({
     orderId,
     status: 2,
@@ -162,7 +162,7 @@ async function updateAssignQuantity(row) {
     ElMessage({ type: 'warning', message: '訂單分匹值無改變' })
     return
   }
-  let orderId = _data.id
+  let orderId = _data.orderCode
   await updateOrderDetailAssignQuantity({ assignQuantitys, orderId }).then(res => {
     if (res.success) {
       ElMessage({ type: 'success', message: '操作成功：資料已存入數據庫' })
@@ -180,13 +180,13 @@ function handleSelectionChange(value) {
 }
 
 function generateAssignQuantityParams(orderList) {
-  if (!orderList.length) {
+  if (!orderList || !orderList.length) {
     orderList = selection.value
     orderList.forEach(item => {
       item.assignQuantity = item.orderQuantity
     })
   }
-
+  // 訂單明細
   let assignQuantitys = orderList.map(item => {
     return {
       id: item.id,

@@ -6,7 +6,7 @@ const { getShopItems } = require('../models/shopManage_model')
 module.exports = class order {
     async getOrderList(req, res, next) {
         const userInfoAuth = Number(req.userInfo.auth)
-        const orderShopId = userInfoAuth === 0 || userInfoAuth === 1 ?  req.userInfo.shopId : "";
+        const orderShopId = userInfoAuth === 0 || userInfoAuth === 1 ?  req.userInfo.shopId : userInfoAuth === -1 ? req.body.orderShopId : "";
         const options = { updateDate: req.body.updateDate, orderShopId }
         const size = req.body.size
         const page = req.body.page
@@ -49,17 +49,18 @@ module.exports = class order {
     async postCreateOrder(req, res, next) {
         const userInfo = req.userInfo
         const createDateRange = await getSettingTimeRange()
+        const dateStr = createDateRange[0].substring(0,10).replaceAll('-','')
 
         const orderData = {
             id: generateUUID(),
-            status: 0,
             orderList: req.body.orderList,
             orderUserId: userInfo.id,
             orderUserName: userInfo.name,
             orderShopId: userInfo.shopId,
             department: userInfo.auth,
             createDateRange,
-            createDate: getCurrentTime(),
+            createDate: createDateRange[0],
+            orderCode:userInfo.shopId + '-' + dateStr,
             updateDate: getCurrentTime()
         }
         createNewOrder(orderData).then(result => {
@@ -72,7 +73,7 @@ module.exports = class order {
     postAdditionOrder(req, res, next) {
         const updateDate = getCurrentTime()
         let orderList = req.body.orderList
-        if (Array.isArray(orderList)) {
+        if (Array.isArray(orderList) && orderList.length) {
             orderList = orderList.map(item => {
                 return [
                     item.orderId,
@@ -83,28 +84,33 @@ module.exports = class order {
                     item.unit,
                     item.standard,
                     updateDate,
-                    item.orderMode
+                    item.orderMode,
+                    1
                 ]
             })
+            insertOrderItems(orderList).then(result => {
+                res.json(result)
+            }).catch(err => {
+                res.json(err)
+            })
+        }else{
+            next()
         }
-
-        insertOrderItems(orderList).then(result => {
-            console.log(result)
-            res.json(result)
-        }).catch(err => {
-            res.json(err)
-        })
     }
 
     postupdateOrderDetailAssignQuantity(req, res, next) {
         const data = req.body.assignQuantitys
         const orderId = req.body.orderId
-        updateOrderDetailAssignQuantity(data, orderId).then(result => {
-            res.json(result)
-        }).catch(err => {
-            console.log(err)
-            res.json(err)
-        })
+        if(Array.isArray(data)){
+            updateOrderDetailAssignQuantity(data, orderId).then(result => {
+                res.json(result)
+            }).catch(err => {
+                console.log(err)
+                res.json(err)
+            })
+        }else{
+            next()
+        }
     }
 
     postUpdateOrder(req, res, next) {
@@ -116,7 +122,6 @@ module.exports = class order {
         }
 
         updateOrderInformation(orderId, orderData).then(result => {
-            console.log(result)
             res.json(result)
         }).catch(err => {
             res.json(err)
@@ -127,7 +132,6 @@ module.exports = class order {
         const orderId = req.body.orderId
 
         deleteOrderItem(orderId).then(result => {
-            console.log(result)
             res.json(result)
         }).catch(err => {
             res.json(err)

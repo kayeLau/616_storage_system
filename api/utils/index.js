@@ -32,25 +32,29 @@ const getTodayTimeRange = () => {
 }
 
 const getSettingTimeRange = async () => {
-    let time = ' 08:00:00'
+    let startTime = ' 08:00:00'
+    let endTime = ' 07:59:59'
     await getSettingItems({name:'lastOrder'},999,1).then(res => {
         if(res.success){
-            time = ' ' + res.resource[0].value + ':00'
+            let timeSetting = res.resource[0].value
+            startTime = ' ' + String(timeSetting) + ':00:00'
+            endTime = ' ' + fillZero(Number(timeSetting) - 1) + ':59:59'
         }
     })
     const date = new Date()
     const currentTime = fillZero(date.getHours()) + ':00:00'
     let start,end
 
-    if (currentTime <= time) {
-        end = dateFormat(date) + time
+    if (currentTime <= startTime) {
+        end = dateFormat(date) + endTime
         date.setDate(date.getDate() - 1)
-        start = dateFormat(date) + time
+        start = dateFormat(date) + startTime
     } else {
-        start = dateFormat(date) + time
+        start = dateFormat(date) + startTime
         date.setDate(date.getDate() + 1)
-        end = dateFormat(date) + time
+        end = dateFormat(date) + endTime
     }
+    console.log([start,end])
     return [start,end]
 }
 

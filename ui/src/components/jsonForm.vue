@@ -32,7 +32,7 @@
                 <el-time-picker v-if='item.type === "timePicker"' v-model="_params[item.prop]" arrow-control
                     placeholder="請選擇時間" clearable />
                 <el-time-select v-if='item.type === "timeSelect"' v-model="_params[item.prop]" start="01:00" step="01:00"
-                    end="24:00" placeholder="請選擇時間" clearable />
+                    end="23:00" placeholder="請選擇時間" clearable :format="item.format"/>
             </el-form-item>
         </el-form>
         <div class="btn-group">

@@ -1,7 +1,7 @@
 <template>
     <div style="height: 100%;">
         <el-form :inline="true" :model="_params" class="form-inline" v-if="searchFormColumns.length">
-            <el-form-item v-for='(item, index) of searchFormColumns' :label="item.label" :key="index">
+            <el-form-item v-for='(item, index) of _searchFormColumns' :label="item.label" :key="index">
                 <el-input v-if='item.type === "input"' v-model="_params[item.prop]" clearable style="width: 150px;" />
                 <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable style="width: 150px;"
                     placeholder="請選擇">
@@ -96,6 +96,7 @@ const props = defineProps({
 let data = ref([])
 let _params = reactive(props.params)
 let _operationsChildren = props.operations.children.filter(item => !item.hide)
+let _searchFormColumns = props.searchFormColumns.filter(item => !item.hide)
 
 
 async function fatchList() {
