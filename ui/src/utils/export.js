@@ -43,7 +43,6 @@ export function exportExcel(sheetNames, jsonData) {
     bookType: 'xlsx',
     type: 'binary'
   })
-  console.log(result)
   FileSaver.saveAs(new Blob([s2ab(result)], { type: 'application/octet-stream' }), `${sheetNames}.xlsx`) // 导出的文件名
   // const result = XLSX.writeFile(workBook, `./${sheetNames}.xlsx`);
 }

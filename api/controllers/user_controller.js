@@ -1,5 +1,6 @@
 const loginCheck = require('../models/login')
 const { toRegister, updateUserInformation, getUsersItems, getUser, deleteUsersItem } = require('../models/register_model')
+const { getPartitionItems } = require('../models/shopManage_model')
 var { getCurrentTime, checkNull } = require('../utils')
 const { generateUUID, hashPassword } = require('../models/encryption');
 const config = require('../config/development_config')
@@ -15,9 +16,8 @@ module.exports = class Member {
         }
         const userAuth = userInfoRule[data.auth]
         userAuth.forEach(key => {
-            delete data[key]
+            data[key] = null
         });
-        // console.log(data)
         return data
     }
 
@@ -40,6 +40,8 @@ module.exports = class Member {
 
         toRegister(memberData).then(result => {
             res.json(result)
+        }).catch(err => {
+            next(err)
         })
     }
 
@@ -72,7 +74,7 @@ module.exports = class Member {
                 })
             }
         }).catch(err => {
-            console.log(err)
+            next(err)
         })
     }
 
@@ -91,7 +93,7 @@ module.exports = class Member {
         updateUserInformation(id, memberData).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 
@@ -102,20 +104,31 @@ module.exports = class Member {
         deleteUsersItem(id).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
 
     }
 
-    getUsersList(req, res, next) {
-        const options = { auth: req.body.auth }
+    async getUsersList(req, res, next) {
+        const options = { auth: req.body.auth , shopId: req.body.shopId}
         const size = parseInt(req.body.size)
         const page = parseInt(req.body.page)
+        let partitionDict = {}
+        await getPartitionItems({}, 999, 1).then(result => {
+            if(result.success){
+                result.resource.forEach(item => {
+                    partitionDict[item.id] = item.partitionName
+                });
+            }
+        })
 
         getUsersItems(options, size, page).then(result => {
+            result.resource.forEach(item => {
+                item.shopPartitionName = partitionDict[item.shopPartition]
+            })
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 
@@ -123,7 +136,7 @@ module.exports = class Member {
         getUser(tokenResult.data).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 }

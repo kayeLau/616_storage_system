@@ -50,7 +50,6 @@ function bindProductTOShop(productList) {
                 if (err) {
                     result.msg = "server error,please try again"
                     reject(result)
-                    console.log(err)
                     return
                 }
                 result.msg = "success"

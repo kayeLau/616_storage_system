@@ -93,9 +93,10 @@ const searchFormColumns = ref([
 fatchShopList()
 
 function exportOrderExcel(index, row) {
-  const today = new Date().toLocaleDateString()
+  const date = new Date()
+  const today = String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear()
   const shipping = [
-    [row.shopCode,row.shopName,today],
+    [row.shopCode,row.shopName,'',today],
     ['貨品編號', '貨品名稱', '數量/重量', '單位','包裝規格'],
     // assuming `row.children` is an array of objects
     ...row.children.map(item => [

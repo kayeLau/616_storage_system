@@ -10,7 +10,7 @@ module.exports = class Shop {
         getSettingItems(options, size, page).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
 
     }
@@ -25,7 +25,7 @@ module.exports = class Shop {
         updateSettingInformation(name, data).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 }

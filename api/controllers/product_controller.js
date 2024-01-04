@@ -1,5 +1,4 @@
 const { getCurrentTime } = require('../utils')
-// const { generateUUID } = require('../models/encryption');
 const { getProductItems, createNewProduct, updateProductInformation, deleteProductItem } = require('../models/productManage_model')
 const { getBandProducts } = require('../models/shopManage_model')
 const { verifyToken } = require('../models/verification')
@@ -37,7 +36,7 @@ module.exports = class product {
                 res.json(result)
             })
         } catch (err) {
-            res.json(err)
+            next(err)
         }
 
     }
@@ -57,7 +56,7 @@ module.exports = class product {
         createNewProduct(productData).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 
@@ -76,7 +75,7 @@ module.exports = class product {
         updateProductInformation(productCode, productData).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 
@@ -86,7 +85,7 @@ module.exports = class product {
         deleteProductItem(productCode).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 }

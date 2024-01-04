@@ -60,39 +60,40 @@ const menus = [
         name: "訂單管理",
         path:'order',
         icon:'Tickets',
-        whiteList:true
+        auth:[-1,1,0,2]
     },
     {
         name: "產品管理",
         path:'product',
         icon:'Goods',
-        whiteList:false
+        whiteList:false,
+        auth:[-1]
     },
     {
         name: "用戶管理",
         path:'user',
         icon:'Avatar',
-        whiteList:false
+        auth:[-1]
     },
     {
         name: "店舖管理",
         path:'shop',
         icon:'OfficeBuilding',
-        whiteList:false
+        auth:[-1]
     },
     {
         name: "落單",
         path:'appOrder',
         icon:'Iphone',
-        whiteList:true
+        auth:[0,1]
     },
     {
         name: "設定",
         path:'setting',
         icon:'Setting',
-        whiteList:false
+        auth:[-1]
     },
-    ].filter(item => userInfo.value.auth === -1 ? true : item.whiteList)
+    ].filter(item => item.auth.includes(userInfo.value.auth))
 
     let avatarDetailShow = ref(false)
 </script>

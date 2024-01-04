@@ -24,7 +24,7 @@ const authOptions = dictToOptions(authDict)
 const KtableRef = ref()
 const JsonFormRef = ref()
 
-//edit
+//#region edit
 let JsonFormComfireCallBack = ref(() => { })
 let jsonFormShow = ref(false)
 let editFormModel = ref({})
@@ -93,35 +93,6 @@ function authChange(auth) {
             editFormColumns.value[4].remove = true;
     }
 }
-
-// 獲取分區分店字典
-async function getPartitionItems() {
-    await getPartitionList().then(res => {
-        if (res.success) {
-            editFormColumns.value[4].options = res.resource.map(item => {
-                return {
-                    label: item.partitionName,
-                    value: item.id
-                }
-            })
-        }
-    })
-}
-getPartitionItems()
-async function fatchShopList() {
-    await getShopList({ size: 999, page: 1 }).then(res => {
-        if (res.success) {
-            editFormColumns.value[3].options = res.resource.map(item => {
-                return {
-                    label: item.shopName,
-                    value: item.shopId
-                }
-            })
-        }
-    })
-}
-fatchShopList()
-
 function deleteSelectItem(partitionId) {
     deletePartitionItem({ id: partitionId }).then(res => {
         if (res.success) {
@@ -139,8 +110,60 @@ function addSelectItem(partitionName) {
         }
     })
 }
+// #endregion
 
-// 增刪查改
+//#region table
+const authFormatter = (row, column) => {
+    let cell = row[column.property]
+    return authDict[cell]
+}
+
+const columns = [
+    { props: 'name', label: '用戶名稱' },
+    // { props: 'password', label: '用戶密碼' },
+    { props: 'auth', label: '用戶角色', formatter: authFormatter },
+    { props: 'shopPartitionName', label: '所屬分區' },
+    { props: 'shopName', label: '所屬分店', width: 250 },
+    { props: 'updateDate', label: '修改時間', width: 250 }
+]
+const operations = {
+    width: 200,
+    size: "small",
+    children: [
+        { type: "primary", name: "編輯", onClick: editHandle, icon: 'Edit' },
+        { type: "danger", name: "删除", icon: 'Delete', onClick: deleteHandle, }
+    ]
+}
+const params = {
+    size: 10,
+    page: 1
+}
+const searchFormColumns = ref([
+    {
+        type: 'select',
+        prop: 'auth',
+        label: '用戶角色:',
+        options: authOptions
+    },
+    {
+        type: 'select',
+        prop: 'shopId',
+        label: '所屬分店:',
+        options: []
+    }
+])
+
+const customBtn = [
+    {
+        type: 'success',
+        label: '新增',
+        icon: 'CirclePlus',
+        onClick: createHandle
+    }
+]
+//#endregion
+
+//#region 增刪查改
 function refreshList() {
     KtableRef.value.fatchList()
     jsonFormShow.value = !jsonFormShow.value
@@ -170,48 +193,38 @@ function deleteHandle(index, row) {
         }
     })
 }
+//#endregion
 
-// table
-const authFormatter = (row, column) => {
-    let cell = row[column.property]
-    return authDict[cell]
+//#region dict
+// 獲取分區分店字典
+async function getPartitionItems() {
+    await getPartitionList().then(res => {
+        if (res.success) {
+            editFormColumns.value[4].options = res.resource.map(item => {
+                return {
+                    label: item.partitionName,
+                    value: item.id
+                }
+            })
+        }
+    })
 }
-
-const columns = [
-    { props: 'name', label: '用戶名稱' },
-    { props: 'password', label: '用戶密碼' },
-    { props: 'auth', label: '用戶角色', formatter: authFormatter },
-    // { props: 'shopCode', label: '商店編號' },
-    { props: 'shopName', label: '所屬分店', width: 250 },
-    { props: 'updateDate', label: '修改時間', width: 250 }
-]
-const operations = {
-    width: 200,
-    size: "small",
-    children: [
-        { type: "primary", name: "編輯", onClick: editHandle, icon: 'Edit' },
-        { type: "danger", name: "删除", icon: 'Delete', onClick: deleteHandle, }
-    ]
+getPartitionItems()
+// 獲取分店分店字典
+async function fatchShopList() {
+    await getShopList({ size: 999, page: 1 }).then(res => {
+        if (res.success) {
+            const dict = res.resource.map(item => {
+                return {
+                    label: item.shopName,
+                    value: item.shopId
+                }
+            })
+            editFormColumns.value[3].options = dict
+            searchFormColumns.value[1].options = dict
+        }
+    })
 }
-const params = {
-    size: 10,
-    page: 1
-}
-const searchFormColumns = [
-    {
-        type: 'select',
-        prop: 'auth',
-        label: '用戶角色:',
-        options: authOptions
-    }
-]
-const customBtn = [
-    {
-        type: 'success',
-        label: '新增',
-        icon: 'CirclePlus',
-        onClick: createHandle
-    }
-]
-
+fatchShopList()
+//#endregion
 </script>

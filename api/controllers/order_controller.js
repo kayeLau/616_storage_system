@@ -16,15 +16,14 @@ module.exports = class order {
                 if(result.success){
                     return result.resource.map(item => item.shopId)
                 }
-            }).catch(err => [])
+            }).catch(() => [])
             options.orderShopId = shopIdList
         }
 
         getOrderItems(options, size, page).then(result => {
             res.json(result)
         }).catch(err => {
-            console.log(err)
-            res.json(err)
+            next(err)
         })
 
     }
@@ -42,7 +41,7 @@ module.exports = class order {
         checkOrderRepeated("order_info", orderData).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 
@@ -66,7 +65,7 @@ module.exports = class order {
         createNewOrder(orderData).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 
@@ -91,7 +90,7 @@ module.exports = class order {
             insertOrderItems(orderList).then(result => {
                 res.json(result)
             }).catch(err => {
-                res.json(err)
+                next(err)
             })
         }else{
             next()
@@ -105,11 +104,10 @@ module.exports = class order {
             updateOrderDetailAssignQuantity(data, orderId).then(result => {
                 res.json(result)
             }).catch(err => {
-                console.log(err)
-                res.json(err)
+                next(err)
             })
         }else{
-            next()
+            next(new Error('voild input'))
         }
     }
 
@@ -124,7 +122,7 @@ module.exports = class order {
         updateOrderInformation(orderId, orderData).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 
@@ -134,7 +132,7 @@ module.exports = class order {
         deleteOrderItem(orderId).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 

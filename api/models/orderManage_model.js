@@ -85,12 +85,11 @@ function createNewOrderItems(list) {
 function checkOrderRepeated(table, options) {
     let result = {}
     return new Promise((resolve, reject) => {
-        let optionsSQL = optionsSQLFromatter(options)
+        let optionsSQL = optionsSQLFromatter(options,table)
         db.query(`SELECT * FROM ${table} ${optionsSQL}`, (err, row) => {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
-                console.log(err)
                 reject(result)
                 return
             }

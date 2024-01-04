@@ -24,7 +24,7 @@ module.exports = class Shop {
             })
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 
@@ -32,7 +32,7 @@ module.exports = class Shop {
         getPartitionItems({}, 999, 1).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 
@@ -50,7 +50,7 @@ module.exports = class Shop {
         createNewShop(shopData).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 
@@ -63,7 +63,7 @@ module.exports = class Shop {
         createNewPartition(partitionData).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 
@@ -80,7 +80,7 @@ module.exports = class Shop {
         updateShopInformation(shopId, shopData).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
     }
 
@@ -93,7 +93,7 @@ module.exports = class Shop {
                 res.json(result)
             })
         }catch(err){
-            res.json(err)
+            next(err)
         }
     }
 
@@ -103,7 +103,7 @@ module.exports = class Shop {
         deletePartitionItem(id).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
 
     }
@@ -116,7 +116,7 @@ module.exports = class Shop {
         getBandProducts(options, size, page).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
 
     }
@@ -135,7 +135,7 @@ module.exports = class Shop {
         bindProductTOShop(productList).then(result => {
             res.json(result)
         }).catch(err => {
-            res.json(err)
+            next(err)
         })
 
     }

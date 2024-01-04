@@ -8,7 +8,6 @@ function checkRepeated(table, key, value) {
                 result.msg = "server error,please try again"
                 result.success = false
                 reject(result)
-                console.log(err)
                 return
             }
 
@@ -32,7 +31,6 @@ function createNew(table, data) {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
-                console.log(err)
                 reject(result)
                 return
             }
@@ -50,7 +48,6 @@ function updateItem(table, data, key, value) {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
-                console.log(err)
                 reject(result);
                 return
             }
@@ -68,7 +65,6 @@ function deleteItem(table, key, value) {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
-                console.log(err)
                 reject(result);
                 return
             }
@@ -80,7 +76,7 @@ function deleteItem(table, key, value) {
 }
 
 // @params
-function optionsSQLFromatter(options) {
+function optionsSQLFromatter(options,table) {
     let whereClause = ''
     for (const key in options) {
         if (options.hasOwnProperty(key)) {
@@ -88,13 +84,13 @@ function optionsSQLFromatter(options) {
             let query
             switch (key) {
                 case 'updateDate':
-                    query = `${key} BETWEEN '${options[key][0]}' AND '${options[key][1]}'`
+                    query = `${table}.${key} BETWEEN '${options[key][0]}' AND '${options[key][1]}'`
                     break
                 case 'createDate':
-                    query = `${key} BETWEEN '${options[key][0]}' AND '${options[key][1]}'`
+                    query = `${table}.${key} BETWEEN '${options[key][0]}' AND '${options[key][1]}'`
                     break
                 case 'productName':
-                    query = `${key} LIKE '%${options[key]}%'`
+                    query = `${table}.${key} LIKE '%${options[key]}%'`
                     break
                 default:
                     query = Array.isArray(options[key]) ? 
@@ -102,7 +98,6 @@ function optionsSQLFromatter(options) {
                     : `${key} = '${options[key]}'`;
                 break
             }
-
             if (whereClause === '') {
                 whereClause += ` WHERE ${query}`;
             } else {
@@ -116,7 +111,7 @@ function optionsSQLFromatter(options) {
 function getItems({ table, options, size, page, orderby = 'updateDate', sort = 'DESC', join }) {
     let result = {}
     return new Promise((resolve, reject) => {
-        let optionsSQL = optionsSQLFromatter(options)
+        let optionsSQL = optionsSQLFromatter(options,table)
         db.query(`SELECT COUNT(*) AS total FROM ${table} ${optionsSQL}`, (err, rows) => {
             if (err) {
                 result.msg = "server error, please try again";
@@ -132,7 +127,6 @@ function getItems({ table, options, size, page, orderby = 'updateDate', sort = '
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
-                console.log(err)
                 reject(result);
                 return
             }
@@ -167,7 +161,6 @@ function customQuery(query,options = []){
     return new Promise((resolve, reject) => {
         db.query(query, options, (err, rows) => {
             if (err) {
-                console.log(err)
                 result.msg = "server error,please try again"
                 result.success = false
                 reject(result);
