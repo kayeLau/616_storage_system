@@ -56,9 +56,9 @@ export function deleteOrder(data){
     });
 }
 
-export function exportExcel(data){
+export function postExportDailyMeetSummary(data){
   return request({
-      url: '/orders/postExportExcel',
+      url: '/orders/exportDailyMeetSummary',
       method: 'post',
       data,
     });

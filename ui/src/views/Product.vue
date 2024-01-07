@@ -10,14 +10,14 @@
 </template>
 <script setup>
 import { getProductList , updateProduct , createProduct , deleteProduct} from '../request/products'
-import { freezersNumDict , departmentDict , dictToOptions , productDisable} from '../request/dict'
+import { freezersNumDict , departmentDict , dictToOptions , productDisable , productSummary } from '../request/dict'
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
 import { ref } from 'vue';
 
 const KtableRef = ref()
 
-//edit
+//#region edit
 let JsonFormComfireCallBack = ref(() => { })
 let jsonFormShow = ref(false)
 const editFormModel = ref({})
@@ -59,6 +59,12 @@ const editFormColumns = ref([
     prop: 'disable',
     label: '狀態:',
     options:dictToOptions(productDisable)
+  },
+  {
+    type: 'select',
+    prop: 'summary',
+    label: '肉類匯總:',
+    options:dictToOptions(productSummary)
   }
 ])
 const editFormRules = {
@@ -81,7 +87,10 @@ const editFormRules = {
     { required: true, message: '請輸入單位', trigger: 'blur' },
   ],
   disable: [
-    { required: true, message: '請選擇狀態', trigger: 'blur' },
+    { required: true, message: '請選擇展示狀態', trigger: 'blur' },
+  ],
+  summary: [
+    { required: true, message: '請選擇匯總狀態', trigger: 'blur' },
   ],
 }
 
@@ -98,7 +107,7 @@ function createHandle() {
 }
 
 function editHandle(index, row) {
-    editFormModel.value = { ...row , freezersNum:String(row.freezersNum) , department:String(row.department) , disable:String(row.disable)}
+    editFormModel.value = { ...row , freezersNum:String(row.freezersNum) , department:String(row.department) , disable:String(row.disable) , summary:String(row.summary)}
     JsonFormComfireCallBack.value = updateProduct
     editFormColumns.value[0].disabled = true
     jsonFormShow.value = !jsonFormShow.value
@@ -111,8 +120,9 @@ function deleteHandle(index, row){
     }
   })
 }
+//#endregion
 
-// tabel
+//#region tabel
 const freezersNumFormatter = (row , column)=>{
     let cell = row[column.property]
     return freezersNumDict[cell]
@@ -121,6 +131,11 @@ const freezersNumFormatter = (row , column)=>{
 const departmentFormatter = (row , column)=>{
     let cell = row[column.property]
     return departmentDict[cell]
+}
+
+const summaryFormatter = (row , column)=>{
+    let cell = row[column.property]
+    return productSummary[cell]
 }
 
 const productDisableFormatter = (row , column)=>{
@@ -132,12 +147,13 @@ const productDisableFormatter = (row , column)=>{
 const columns = [
   {props:'disable',label:'狀態',formatter:productDisableFormatter},
   {props:'productCode',label:'產品編號'},
-  {props:'productName',label:'產品名稱'},
+  {props:'productName',label:'產品名稱',width:130},
   {props:'freezersNum',label:'雪房號碼',formatter:freezersNumFormatter},
   {props:'department',label:'負責部門',formatter:departmentFormatter},
-  {props:'standard',label:'單位'},
+  {props:'standard',label:'單位', width:120},
   {props:'unit',label:'規格'},
-  {props:'updateDate',label:'修改時間',width:250}
+  {props:'summary',label:'匯總',formatter:summaryFormatter},
+  {props:'updateDate',label:'修改時間',width:200}
 ]
 const operations = {
   width:200,
@@ -178,5 +194,5 @@ const customBtn = [
       onClick:createHandle
   }
 ]
-
+//#endregion
 </script>

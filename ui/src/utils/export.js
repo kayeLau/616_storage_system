@@ -1,15 +1,18 @@
 import FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import XLSXStyle from 'xlsx-style-medalsoft'
+import JSZip from 'jszip';
 
 
-export function exportExcel(sheetNames, jsonData) {
-  let jsonWorkSheet = XLSX.utils.json_to_sheet(jsonData, { skipHeader: true });
-  autoWidth(jsonWorkSheet)
-  
-  for (let cell in jsonWorkSheet) {
-    if (cell[0] === '!') continue;
-    let isBold = cell[1] === '2' ? true : false;
+export function exportExcel(exportDate) {
+  let zip = new JSZip();
+  exportDate.forEach(item => {
+    let jsonWorkSheet = XLSX.utils.json_to_sheet(item.jsonData, { skipHeader: true });
+    autoWidth(jsonWorkSheet)
+
+    for (let cell in jsonWorkSheet) {
+      if (cell[0] === '!') continue;
+      let isBold = cell[1] === '2' ? true : false;
       jsonWorkSheet[cell].s = {
         font: {
           name: "Calibri",
@@ -27,23 +30,29 @@ export function exportExcel(sheetNames, jsonData) {
           right: { style: "thin", color: { rgb: "00000000" } }
         }
       }
-  }
-  
-  
-  // 构造workBook
-  let workBook = {
-    SheetNames: ['sheet1'],
-    Sheets: {
-      ['sheet1']: jsonWorkSheet,
     }
-  };
 
-  // 将workBook写入文件
-  let result = XLSXStyle.write(workBook, {
-    bookType: 'xlsx',
-    type: 'binary'
-  })
-  FileSaver.saveAs(new Blob([s2ab(result)], { type: 'application/octet-stream' }), `${sheetNames}.xlsx`) // 导出的文件名
+
+    // 构造workBook
+    let workBook = {
+      SheetNames: ['sheet1'],
+      Sheets: {
+        ['sheet1']: jsonWorkSheet,
+      }
+    };
+
+    // 将workBook写入文件
+    let result = XLSXStyle.write(workBook, {
+      bookType: 'xlsx',
+      type: 'binary'
+    })
+    let fileData = new Blob([s2ab(result)], { type: 'application/octet-stream' })
+    zip.file(`${item.sheetNames}.xlsx`, fileData,{binary: true});
+  });
+
+  zip.generateAsync({ type: "blob" }).then(function (blob) {
+    FileSaver.saveAs(blob, "WorkBooks.zip");
+  });
   // const result = XLSX.writeFile(workBook, `./${sheetNames}.xlsx`);
 }
 
@@ -59,7 +68,7 @@ function autoWidth(worksheet) {
   worksheet['!cols'] = Object.keys(maxWidth).map(col => ({ wch: maxWidth[col] * 2.5 }));
 }
 
-function s2ab (s) {
+function s2ab(s) {
   var buf = new ArrayBuffer(s.length)
   var view = new Uint8Array(buf)
   for (var i = 0; i !== s.length; ++i) {

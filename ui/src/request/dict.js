@@ -45,6 +45,11 @@ export const productDisable = {
     1:'隱藏',
 }
 
+export const productSummary = {
+    0:'不需要',
+    1:'需要',
+}
+
 export function dictToOptions(dict){
     let res = []
     Object.keys(dict).forEach(key => {

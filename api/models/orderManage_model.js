@@ -85,7 +85,7 @@ function createNewOrderItems(list) {
 function checkOrderRepeated(table, options) {
     let result = {}
     return new Promise((resolve, reject) => {
-        let optionsSQL = optionsSQLFromatter(options,table)
+        let optionsSQL = optionsSQLFromatter(options, table)
         db.query(`SELECT * FROM ${table} ${optionsSQL}`, (err, row) => {
             if (err) {
                 result.msg = "server error,please try again"
@@ -161,6 +161,7 @@ function getOrderItems(options, size, page) {
         let orderItems = []
         if (res.success) {
             result.total = res.total
+            // 根據orderCode groupby
             orderItems = res.resource.reduce((group, order) => {
                 let key = order.orderCode
                 if (group[key]) {
@@ -175,6 +176,7 @@ function getOrderItems(options, size, page) {
         }
         return Object.values(orderItems)
     }).then(async orderItems => {
+        let summary = []
         const promiseList = orderItems.map((item, index) => {
             return getItems({ table: "order_detail_info", options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
                 if (res.success) {
@@ -185,13 +187,46 @@ function getOrderItems(options, size, page) {
             })
         })
         await Promise.all(promiseList)
-        return orderItems
+        return isSummary ? summary : orderItems
     }).then(orderItems => {
         result.msg = "get success"
         result.resource = orderItems
         result.success = true
         return result
-    }).catch(err => console.log(err))
+    }).catch(err => { console.log(err) })
+}
+
+function getOrderExportList(options, size, page) {
+    const result = {}
+    return getItems({ table: "order_info", join: "order_info INNER JOIN shop_info ON orderShopId = shopId", options, size, page }).then(res => {
+        let orderItems = []
+        if (res.success) {
+            orderItems = res.resource
+        }
+        return orderItems
+    }).then(async orderItems => {
+        let summary = []
+        const promiseList = orderItems.map((item, index) => {
+            return getItems({ table: "order_detail_info", options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
+                if (res.success) {
+                    if (isSummary) {
+                        summary = summary.concat(res.resource)
+                    } else {
+                        let status = res.resource.find(item => item.status === 0)
+                        orderItems[index].status = status ? 0 : 1
+                        orderItems[index].children = res.resource
+                    }
+                }
+            })
+        })
+        await Promise.all(promiseList)
+        return isSummary ? summary : orderItems
+    }).then(orderItems => {
+        result.msg = "get success"
+        result.resource = orderItems
+        result.success = true
+        return result
+    }).catch(err => { console.log(err) })
 }
 
 module.exports = {

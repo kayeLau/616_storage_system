@@ -49,6 +49,8 @@ module.exports = class product {
             department: req.body.department,
             standard: req.body.standard,
             unit: req.body.unit,
+            disable: req.body.disable,
+            summary:req.body.summary,
             createDate: getCurrentTime(),
             updateDate: getCurrentTime()
         }
@@ -69,6 +71,7 @@ module.exports = class product {
             standard: req.body.standard,
             unit: req.body.unit,
             disable: req.body.disable,
+            summary:req.body.summary,
             updateDate: getCurrentTime()
         }
 

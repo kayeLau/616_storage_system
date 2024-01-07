@@ -19,5 +19,7 @@ router.post('/updateOrderDetailAssignQuantity',orderModifyMethod.postupdateOrder
 
 router.post('/checkOrderRepeated',orderModifyMethod.postCheckOrderRepeated)
 
+router.post('/exportDailyMeetSummary',orderModifyMethod.postExportDailyMeetSummary)
+
 
 module.exports = router;

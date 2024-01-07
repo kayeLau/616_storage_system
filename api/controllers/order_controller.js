@@ -1,6 +1,7 @@
 const { getCurrentTime , getSettingTimeRange } = require('../utils')
 const { generateUUID } = require('../models/encryption');
 const { getOrderItems, createNewOrder, updateOrderInformation, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated } = require('../models/orderManage_model')
+const { getProductItems} = require('../models/productManage_model')
 const { getShopItems } = require('../models/shopManage_model')
 
 module.exports = class order {
@@ -134,6 +135,20 @@ module.exports = class order {
         }).catch(err => {
             next(err)
         })
+    }
+
+    async postExportDailyMeetSummary(req, res, next){
+        let summaryProductCodes = []
+        await getProductItems({summary:1}, 999, 1).then(result => {
+            if(result.success){
+                summaryProductCodes = result.resource.map(item => item.productCode)
+            }
+        })
+        const createDateRange = await getSettingTimeRange()
+        await getOrderItems({createDate: createDateRange}, 999, 1 , true).then(result => {
+            console.log(result)
+        })
+
     }
 
 }
