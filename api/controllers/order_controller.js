@@ -1,6 +1,6 @@
 const { getCurrentTime , getSettingTimeRange } = require('../utils')
 const { generateUUID } = require('../models/encryption');
-const { getOrderItems, createNewOrder, updateOrderInformation, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated } = require('../models/orderManage_model')
+const { getOrderItems, createNewOrder, updateOrderInformation, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated , getOrderExportList } = require('../models/orderManage_model')
 const { getProductItems} = require('../models/productManage_model')
 const { getShopItems } = require('../models/shopManage_model')
 
@@ -138,15 +138,24 @@ module.exports = class order {
     }
 
     async postExportDailyMeetSummary(req, res, next){
-        let summaryProductCodes = []
+        let summaryProductCodesMap = {}
         await getProductItems({summary:1}, 999, 1).then(result => {
             if(result.success){
-                summaryProductCodes = result.resource.map(item => item.productCode)
+                result.resource.forEach(item => 
+                    summaryProductCodesMap[item.productCode] = item.productName
+                )
             }
+        }).catch(err => {
+            next(err)
         })
-        const createDateRange = await getSettingTimeRange()
-        await getOrderItems({createDate: createDateRange}, 999, 1 , true).then(result => {
-            console.log(result)
+
+        const createDate = await getSettingTimeRange()
+        await getOrderExportList({createDate}, 999, 1 , summaryProductCodesMap).then(result => {
+            if(result.success){
+                res.json(result)
+            }
+        }).catch(err => {
+            next(err)
         })
 
     }

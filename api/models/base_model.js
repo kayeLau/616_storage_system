@@ -76,7 +76,7 @@ function deleteItem(table, key, value) {
 }
 
 // @params
-function optionsSQLFromatter(options,table) {
+function optionsSQLFromatter(options, table) {
     let whereClause = ''
     for (const key in options) {
         if (options.hasOwnProperty(key)) {
@@ -93,10 +93,10 @@ function optionsSQLFromatter(options,table) {
                     query = `${table}.${key} LIKE '%${options[key]}%'`
                     break
                 default:
-                    query = Array.isArray(options[key]) ? 
-                    options[key].reduce((accumulator, currentValue, index) => index === 0 ? `${key} = '${currentValue}'` : `${accumulator} OR ${key} = '${currentValue}'`, '')
-                    : `${key} = '${options[key]}'`;
-                break
+                    query = Array.isArray(options[key]) ?
+                        options[key].reduce((accumulator, currentValue, index) => index === 0 ? `${key} = '${currentValue}'` : `${accumulator} OR ${key} = '${currentValue}'`, '')
+                        : `${key} = '${options[key]}'`;
+                    break
             }
             if (whereClause === '') {
                 whereClause += ` WHERE ${query}`;
@@ -111,9 +111,10 @@ function optionsSQLFromatter(options,table) {
 function getItems({ table, options, size, page, orderby = 'updateDate', sort = 'DESC', join }) {
     let result = {}
     return new Promise((resolve, reject) => {
-        let optionsSQL = optionsSQLFromatter(options,table)
+        let optionsSQL = optionsSQLFromatter(options, table)
         db.query(`SELECT COUNT(*) AS total FROM ${table} ${optionsSQL}`, (err, rows) => {
             if (err) {
+                console.log(err)
                 result.msg = "server error, please try again";
                 result.success = false;
                 reject(result);
@@ -121,7 +122,7 @@ function getItems({ table, options, size, page, orderby = 'updateDate', sort = '
             }
             result.total = rows[0].total || 0;
         })
-        db.query(`SELECT * , DATE_FORMAT(${table}.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate 
+        db.query(`SELECT * , DATE_FORMAT(${table}.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate
         FROM ${join ? join : table} ${optionsSQL} ORDER BY ${table}.${orderby} ${sort} 
         LIMIT ${size} OFFSET ${(page - 1) * size}`, (err, rows) => {
             if (err) {
@@ -156,7 +157,7 @@ function getAllItem(table, options) {
     })
 }
 
-function customQuery(query,options = []){
+function customQuery(query, options = []) {
     let result = {}
     return new Promise((resolve, reject) => {
         db.query(query, options, (err, rows) => {
@@ -174,4 +175,4 @@ function customQuery(query,options = []){
     })
 }
 
-module.exports = { checkRepeated, createNew, updateItem, deleteItem, getItems, getAllItem, optionsSQLFromatter , customQuery }
+module.exports = { checkRepeated, createNew, updateItem, deleteItem, getItems, getAllItem, optionsSQLFromatter, customQuery }

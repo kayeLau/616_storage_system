@@ -2,7 +2,7 @@
   <div>
     <el-card class="Ktable-container">
       <Ktable ref='KtableRef2' isExpand :columns="columns" :operations="operations" :params="params"
-        :getList="getOrderList" :searchFormColumns="searchFormColumns" :customBtn="[]" :expandHeader="{}"
+        :getList="getOrderList" :searchFormColumns="searchFormColumns" :customBtn="customBtn" :expandHeader="{}"
         :expandColumns="{}" :products="products"></Ktable>
     </el-card>
     <el-dialog v-model="orderDetailShow" title="訂單明細" width="90%" style="height:80vh;position: relative;" top="10vh">
@@ -24,7 +24,7 @@
 import orderDetailList from '../components/orderDetailList.vue';
 import { getProductList } from '../request/products';
 import { getShopList } from '../request/shops'
-import { getOrderList , postExportDailyMeetSummary } from '../request/orders';
+import { getOrderList, postExportDailyMeetSummary } from '../request/orders';
 import { departmentDict, orderStateDict } from '../request/dict';
 import { exportExcel } from '../utils/export';
 import Ktable from '../components/table.vue';
@@ -47,7 +47,7 @@ async function fatchShopList() {
   })
   searchFormColumns.value[1].options = result
 }
-// order tabel
+//#region order tabel
 const KtableRef2 = ref()
 const departmentFormatter = (row, column) => {
   let cell = row[column.property].map(item => departmentDict[item]).join(',')
@@ -70,9 +70,17 @@ const operations = {
   size: "small",
   children: [
     { type: "primary", name: '編輯', onClick: showDetailHandle, icon: 'Edit', hide: userInfo.value.auth !== -1 },
-    { type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Edit', disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1 }
+    { type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer', disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1 }
   ]
 }
+const customBtn = [
+  {
+    type: 'success',
+    label: '導出肉類匯總表',
+    icon: 'Printer',
+    onClick: exportDailyMeetSummary
+  }
+]
 const params = {
   size: 20,
   page: 1,
@@ -94,9 +102,6 @@ const searchFormColumns = ref([
 fatchShopList()
 
 function exportOrderExcel(index, row) {
-  postExportDailyMeetSummary().then(res => {
-    console.log(res)
-  })
   const date = new Date()
   const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
   const shipping = {
@@ -129,10 +134,40 @@ function exportOrderExcel(index, row) {
       ])
     ]
   }
-  exportExcel([shipping, delivery])
+  exportExcel([shipping, delivery], true , String(today + row.shopName))
 }
 
-// order detail tabel
+function exportDailyMeetSummary() {
+  postExportDailyMeetSummary().then(res => {
+    if (res.success) {
+      const date = new Date()
+      const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
+      let shopName = res.resource.shopName
+      let productCode = res.resource.productCode
+      let orderItems = res.resource.orderItems
+      let jsonData = productCode.map((productCode, rowIndex) => {
+        let summary = 0
+        let row = shopName.map((item, columnIndex) => {
+          let target = orderItems[columnIndex][rowIndex]
+          summary += target.assignQuantity
+          return target.assignQuantity + target.unit
+        })
+        return [productCode, ...row , productCode , summary]
+      })
+      jsonData.unshift(['產品名稱', ...shopName,'產品名稱','出貨總數'])
+      console.log(jsonData)
+
+      const dailyMeetSummary = {
+        sheetNames: today + '工埸廚房鮮肉表',
+        jsonData
+      }
+      exportExcel([dailyMeetSummary])
+    }
+  })
+}
+//#endregion
+
+//#region order detail tabel
 let currentRow = ref({})
 
 const ODparams = {
@@ -150,8 +185,9 @@ function showDetailHandle(index, row) {
     currentRow.value = row
   }
 }
+//#endregion
 
-// jsonForm
+//#region jsonForm
 const editFormModel = ref({})
 const editFormColumns = ref([
   {
@@ -225,7 +261,7 @@ function getProducts() {
     }
   })
 }
-
+//#endregion
 onMounted(() => {
   getProducts()
 })
@@ -248,4 +284,5 @@ onMounted(() => {
   font-weight: bold;
   cursor: pointer;
   color: var(--el-color-primary);
-}</style>
+}
+</style>

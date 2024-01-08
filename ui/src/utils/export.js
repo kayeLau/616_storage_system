@@ -4,7 +4,7 @@ import XLSXStyle from 'xlsx-style-medalsoft'
 import JSZip from 'jszip';
 
 
-export function exportExcel(exportDate) {
+export function exportExcel(exportDate,usezip = false, zipFileName ) {
   let zip = new JSZip();
   exportDate.forEach(item => {
     let jsonWorkSheet = XLSX.utils.json_to_sheet(item.jsonData, { skipHeader: true });
@@ -47,13 +47,17 @@ export function exportExcel(exportDate) {
       type: 'binary'
     })
     let fileData = new Blob([s2ab(result)], { type: 'application/octet-stream' })
-    zip.file(`${item.sheetNames}.xlsx`, fileData,{binary: true});
+    if(usezip){
+      zip.file(`${item.sheetNames}.xlsx`, fileData,{binary: true});
+    }else{
+      FileSaver.saveAs(fileData, `${item.sheetNames}.xlsx`);
+    }
   });
-
-  zip.generateAsync({ type: "blob" }).then(function (blob) {
-    FileSaver.saveAs(blob, "WorkBooks.zip");
-  });
-  // const result = XLSX.writeFile(workBook, `./${sheetNames}.xlsx`);
+  if(usezip){
+    zip.generateAsync({ type: "blob" }).then(function (blob) {
+      FileSaver.saveAs(blob, `${zipFileName}.zip`);
+    });
+  }
 }
 
 function autoWidth(worksheet) {
