@@ -8,7 +8,7 @@
                     <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value" />
                 </el-select>
                 <el-date-picker v-if='item.type === "datePicker"' v-model="_params[item.prop]" type="daterange"
-                    style="width: 250px;" range-separator="至" start-placeholder="Start date" end-placeholder="End date"
+                    style="width: 250px;" range-separator="至" start-placeholder="開始時間" end-placeholder="結束時間"
                     clearable />
             </el-form-item>
             <el-form-item>
@@ -54,7 +54,7 @@
         <!-- pagination -->
         <div class="pagination">
             <div>
-                <el-button v-for="(item, index) of customBtn" :type="item.type" :key="index" @click="item.onClick()"
+                <el-button v-for="(item, index) of _customBtn" :type="item.type" :key="index" @click="item.onClick()"
                     :icon="item.icon" plain>{{ item.label }}</el-button>
             </div>
             <el-pagination background layout="total, prev, pager, next" :total="parseInt(_params.total)"
@@ -97,6 +97,7 @@ let data = ref([])
 let _params = reactive(props.params)
 let _operationsChildren = props.operations.children.filter(item => !item.hide)
 let _searchFormColumns = props.searchFormColumns.filter(item => !item.hide)
+let _customBtn = props.customBtn.filter(item => !item.hide)
 
 
 async function fatchList() {

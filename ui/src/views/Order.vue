@@ -78,6 +78,7 @@ const customBtn = [
     type: 'success',
     label: '導出肉類匯總表',
     icon: 'Printer',
+    disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1,
     onClick: exportDailyMeetSummary
   }
 ]

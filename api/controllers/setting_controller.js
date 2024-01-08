@@ -1,4 +1,5 @@
 const { updateSettingInformation, getSettingItems } = require('../models/settingManage_model')
+const { getCurrentTime } = require('../utils')
 
 module.exports = class Shop {
 
@@ -20,6 +21,7 @@ module.exports = class Shop {
         const data = {
             name: req.body.name,
             value: req.body.value,
+            updateDate: getCurrentTime()
         }
 
         updateSettingInformation(name, data).then(result => {

@@ -184,6 +184,12 @@ const searchFormColumns = [
       prop:'disable',
       label:'狀態:',
       options:dictToOptions(productDisable)
+  },
+  {
+      type:'select',
+      prop:'summary',
+      label:'匯總:',
+      options:dictToOptions(productSummary)
   }
 ]
 const customBtn = [

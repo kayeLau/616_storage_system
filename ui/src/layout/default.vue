@@ -17,8 +17,8 @@
             </el-header>
 
             <el-container>
-                <el-aside width="250px" style="padding-right: 8px;">
-                    <el-menu default-active="1" class="el-menu-vertical-demo" router background-color="#f2f6fc">
+                <el-aside width="180px" style="padding-right: 8px;">
+                    <el-menu default-active="1" class="el-menu-vertical-demo" router background-color="#f2f6fc" >
                         <component v-for='(item, index) of menus' :key='index' :index="item.path" :is='item.childen ? "el-sub-menu" : "el-menu-item"'>
                             <template #title>
                                 <el-icon>
@@ -98,14 +98,14 @@ const menus = [
     let avatarDetailShow = ref(false)
 </script>
 <style>
- @media only screen and (max-width: 960px) {
+ /* @media only screen and (max-width: 760px) {
     .el-main {
         --el-main-padding:0
     }
     .el-aside{
         display: none;
     }
- }
+ } */
 .header-bar{
     padding: 8px 20px;
     display: flex;
