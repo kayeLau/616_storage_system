@@ -155,7 +155,8 @@ const searchFormColumns = ref([
 
 const customBtn = [
     {
-        type: 'success',
+        type:'button',
+        btnType: 'success',
         label: '新增',
         icon: 'CirclePlus',
         onClick: createHandle

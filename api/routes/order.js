@@ -21,5 +21,7 @@ router.post('/checkOrderRepeated',orderModifyMethod.postCheckOrderRepeated)
 
 router.post('/exportDailyMeetSummary',orderModifyMethod.postExportDailyMeetSummary)
 
+router.post('/getDailyOrderStatus',orderModifyMethod.getDailyOrderStatus)
+
 
 module.exports = router;

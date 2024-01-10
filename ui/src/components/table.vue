@@ -8,8 +8,9 @@
                     <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value" />
                 </el-select>
                 <el-date-picker v-if='item.type === "datePicker"' v-model="_params[item.prop]" type="daterange"
-                    style="width: 250px;" range-separator="至" start-placeholder="開始時間" end-placeholder="結束時間"
-                    clearable />
+                    style="width: 250px;" range-separator="至" start-placeholder="開始時間" end-placeholder="結束時間" clearable
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                    :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" size="small" @click="fatchList">查詢</el-button>
@@ -53,9 +54,15 @@
         </el-table>
         <!-- pagination -->
         <div class="pagination">
-            <div>
-                <el-button v-for="(item, index) of _customBtn" :type="item.type" :key="index" @click="item.onClick()"
-                    :icon="item.icon" plain>{{ item.label }}</el-button>
+            <div class="pagination-btn-group">
+                <template v-for="(item, index) of _customBtn" :key="index">
+                    <el-button v-if="item.type === 'button'" :type="item.btnType" @click="item.onClick()" :icon="item.icon" plain>{{ item.label }}</el-button>
+                    <el-tag v-if="item.type === 'tag'" class="ml-2" :size="item.size" :type="item.tagType">{{ item.value }}</el-tag>
+                    <el-progress v-if="item.type === 'progress'" :style='{width:item.width}' :stroke-width="24" :percentage="item.percentage" 
+                     status="success" :duration="10">
+                        <div text class="progress-label">{{ item.label }}</div>
+                    </el-progress>
+                </template>
             </div>
             <el-pagination background layout="total, prev, pager, next" :total="parseInt(_params.total)"
                 v-model:current-page="_params.page" :page-size="_params.size" @size-change="fatchList"
@@ -150,6 +157,17 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     padding-top: 10px;
+}
+
+.pagination-btn-group {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.progress-label{
+    font-size: 14px;
+    color: #000;
+    padding-left: 5px;
 }
 
 .el-form--inline .el-form-item {

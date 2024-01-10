@@ -63,3 +63,11 @@ export function postExportDailyMeetSummary(data){
       data,
     });
 }
+
+export function getDailyOrderStatus(data){
+  return request({
+      url: '/orders/getDailyOrderStatus',
+      method: 'post',
+      data,
+    });
+}

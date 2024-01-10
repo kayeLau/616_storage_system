@@ -24,7 +24,7 @@
 import orderDetailList from '../components/orderDetailList.vue';
 import { getProductList } from '../request/products';
 import { getShopList } from '../request/shops'
-import { getOrderList, postExportDailyMeetSummary } from '../request/orders';
+import { getOrderList , postExportDailyMeetSummary , getDailyOrderStatus } from '../request/orders';
 import { departmentDict, orderStateDict } from '../request/dict';
 import { exportExcel } from '../utils/export';
 import Ktable from '../components/table.vue';
@@ -73,15 +73,23 @@ const operations = {
     { type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer', disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1 }
   ]
 }
-const customBtn = [
+const customBtn = ref([
   {
-    type: 'success',
+    type:'button',
+    btnType: 'success',
     label: '導出肉類匯總表',
     icon: 'Printer',
     disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1,
     onClick: exportDailyMeetSummary
+  },
+  {
+    type:'progress',
+    width:'250px',
+    percentage:0,
+    disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1,
+    label:'本日已下單門店'
   }
-]
+])
 const params = {
   size: 20,
   page: 1,
@@ -163,6 +171,16 @@ function exportDailyMeetSummary() {
         jsonData
       }
       exportExcel([dailyMeetSummary])
+    }
+  })
+}
+
+function fetchDailyOrderStatus(){
+  getDailyOrderStatus().then(res => {
+    if(res.success){
+      let total = searchFormColumns.value[1].options.length
+      let current = res.total
+      customBtn.value[1].percentage = (current / total) * 100
     }
   })
 }
@@ -265,6 +283,7 @@ function getProducts() {
 //#endregion
 onMounted(() => {
   getProducts()
+  fetchDailyOrderStatus()
 })
 
 </script>

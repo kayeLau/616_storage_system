@@ -162,6 +162,7 @@ function customQuery(query, options = []) {
     return new Promise((resolve, reject) => {
         db.query(query, options, (err, rows) => {
             if (err) {
+                console.log(err)
                 result.msg = "server error,please try again"
                 result.success = false
                 reject(result);

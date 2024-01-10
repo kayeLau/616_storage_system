@@ -157,15 +157,7 @@ function deleteOrderItem(shopId) {
 // 獲取訂單
 function getOrderItems(options, size, page) {
     const result = {}
-    return getItems({ table: "order_info", join: "order_info INNER JOIN shop_info ON orderShopId = shopId", options, size, page }).then(res => {
-        let orderItems = []
-        if (res.success) {
-            result.total = res.total
-            // 根據orderCode groupby
-            orderItems = groupby(res.resource)
-        }
-        return Object.values(orderItems)
-    }).then(async orderItems => {
+    return getOrderAndgroupby(options, size, page).then(async orderItems => {
         const promiseList = orderItems.map((item, index) => {
             return getItems({ table: "order_detail_info", options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
                 if (res.success) {
@@ -174,6 +166,11 @@ function getOrderItems(options, size, page) {
                     orderItems[index].children = res.resource
                 }
             })
+        })
+        await customQuery('SELECT COUNT(*) AS total FROM ( SELECT COUNT(*) AS total FROM order_info GROUP BY orderCode) AS total').then(res => {
+            if(res.success){
+                result.total = res.resource[0].total || 0;
+            }
         })
         await Promise.all(promiseList)
         result.msg = "get success"
@@ -186,13 +183,7 @@ function getOrderItems(options, size, page) {
 // 導出肉類總表
 function getOrderExportList(options, size, page, summaryProductCodesMap) {
     const result = {}
-    return getItems({ table: "order_info", join: "order_info INNER JOIN shop_info ON orderShopId = shopId", options, size, page }).then(res => {
-        let orderItems = []
-        if (res.success) {
-            orderItems = groupby(res.resource)
-        }
-        return Object.values(orderItems)
-    }).then(async orderItems => {
+    return getOrderAndgroupby(options, size, page).then(async orderItems => {
         const shopName = []
         const promiseList = orderItems.map((item, index) => {
             return getItems({ table: "order_detail_info", options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
@@ -216,23 +207,29 @@ function getOrderExportList(options, size, page, summaryProductCodesMap) {
     }).catch(err => { console.log(err) })
 }
 
-function groupby(resource) {
-    // 根據orderCode groupby
-    return resource.reduce((group, order) => {
-        let key = order.orderCode
-        if (group[key]) {
-            group[key].id.push(order.id)
-            group[key].orderUserName.push(order.orderUserName)
-            group[key].department.push(order.department)
-        } else {
-            group[key] = { ...order, id: [order.id], orderUserName: [order.orderUserName], department: [order.department] };
+// 根據orderCode groupby
+function getOrderAndgroupby(options, size, page) {
+    return getItems({ table: "order_info", join: "order_info INNER JOIN shop_info ON orderShopId = shopId", options, size, page }).then(res => {
+        let orderItems = []
+        if (res.success) {
+            orderItems = res.resource.reduce((group, order) => {
+                let key = order.orderCode
+                if (group[key]) {
+                    group[key].id.push(order.id)
+                    group[key].orderUserName.push(order.orderUserName)
+                    group[key].department.push(order.department)
+                } else {
+                    group[key] = { ...order, id: [order.id], orderUserName: [order.orderUserName], department: [order.department] };
+                }
+                return group;
+            }, {});
         }
-        return group;
-    }, {});
+        return Object.values(orderItems)
+    })
 }
 
 module.exports = {
-    getOrderExportList,
+    getOrderExportList, getOrderAndgroupby,
     createNewOrder, updateOrderInformation, deleteOrderItem,
     getOrderItems, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated
 }

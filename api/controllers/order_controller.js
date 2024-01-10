@@ -1,20 +1,20 @@
-const { getCurrentTime , getSettingTimeRange } = require('../utils')
+const { getCurrentTime, getSettingTimeRange } = require('../utils')
 const { generateUUID } = require('../models/encryption');
-const { getOrderItems, createNewOrder, updateOrderInformation, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated , getOrderExportList } = require('../models/orderManage_model')
-const { getProductItems} = require('../models/productManage_model')
+const { getOrderItems, createNewOrder, updateOrderInformation, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated, getOrderExportList, getOrderAndgroupby } = require('../models/orderManage_model')
+const { getProductItems } = require('../models/productManage_model')
 const { getShopItems } = require('../models/shopManage_model')
 
 module.exports = class order {
     async getOrderList(req, res, next) {
         const userInfoAuth = Number(req.userInfo.auth)
-        const orderShopId = userInfoAuth === 0 || userInfoAuth === 1 ?  req.userInfo.shopId : userInfoAuth === -1 ? req.body.orderShopId : "";
+        const orderShopId = userInfoAuth === 0 || userInfoAuth === 1 ? req.userInfo.shopId : userInfoAuth === -1 ? req.body.orderShopId : "";
         const options = { updateDate: req.body.updateDate, orderShopId }
         const size = req.body.size
         const page = req.body.page
 
-        if(userInfoAuth === 2){
-            let shopIdList = await getShopItems({shopPartition:req.userInfo.shopPartition}, 999, 1).then(result => {
-                if(result.success){
+        if (userInfoAuth === 2) {
+            let shopIdList = await getShopItems({ shopPartition: req.userInfo.shopPartition }, 999, 1).then(result => {
+                if (result.success) {
                     return result.resource.map(item => item.shopId)
                 }
             }).catch(() => [])
@@ -49,7 +49,7 @@ module.exports = class order {
     async postCreateOrder(req, res, next) {
         const userInfo = req.userInfo
         const createDateRange = await getSettingTimeRange()
-        const dateStr = createDateRange[0].substring(0,10).replaceAll('-','')
+        const dateStr = createDateRange[0].substring(0, 10).replaceAll('-', '')
 
         const orderData = {
             id: generateUUID(),
@@ -60,7 +60,7 @@ module.exports = class order {
             department: userInfo.auth,
             createDateRange,
             createDate: createDateRange[0],
-            orderCode:userInfo.shopId + '-' + dateStr,
+            orderCode: userInfo.shopId + '-' + dateStr,
             updateDate: getCurrentTime()
         }
         createNewOrder(orderData).then(result => {
@@ -93,7 +93,7 @@ module.exports = class order {
             }).catch(err => {
                 next(err)
             })
-        }else{
+        } else {
             next()
         }
     }
@@ -101,13 +101,13 @@ module.exports = class order {
     postupdateOrderDetailAssignQuantity(req, res, next) {
         const data = req.body.assignQuantitys
         const orderId = req.body.orderId
-        if(Array.isArray(data)){
+        if (Array.isArray(data)) {
             updateOrderDetailAssignQuantity(data, orderId).then(result => {
                 res.json(result)
             }).catch(err => {
                 next(err)
             })
-        }else{
+        } else {
             next(new Error('voild input'))
         }
     }
@@ -137,11 +137,32 @@ module.exports = class order {
         })
     }
 
-    async postExportDailyMeetSummary(req, res, next){
+    async getDailyOrderStatus(req, res, next) {
+        let result = {}
+        try {
+            const createDate = await getSettingTimeRange()
+            const dailyOrderList = await getOrderAndgroupby({ createDate }, 999, 1).then(result => {
+                return result
+            })
+
+            // const shopIdList = await getShopItems({}, 999, 1).then(result => {
+            //     if (result.success) {
+            //         return result.resource.map(item => item.shopId)
+            //     }
+            // })
+            result.success = true
+            result.total = dailyOrderList.length
+            res.json(result)
+        } catch (err) {
+            next(err)
+        }
+    }
+
+    async postExportDailyMeetSummary(req, res, next) {
         let summaryProductCodesMap = {}
-        await getProductItems({summary:1}, 999, 1).then(result => {
-            if(result.success){
-                result.resource.forEach(item => 
+        await getProductItems({ summary: 1 }, 999, 1).then(result => {
+            if (result.success) {
+                result.resource.forEach(item =>
                     summaryProductCodesMap[item.productCode] = item.productName
                 )
             }
@@ -150,8 +171,8 @@ module.exports = class order {
         })
 
         const createDate = await getSettingTimeRange()
-        await getOrderExportList({createDate}, 999, 1 , summaryProductCodesMap).then(result => {
-            if(result.success){
+        await getOrderExportList({ createDate }, 999, 1, summaryProductCodesMap).then(result => {
+            if (result.success) {
                 res.json(result)
             }
         }).catch(err => {
