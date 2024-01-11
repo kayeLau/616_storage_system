@@ -57,11 +57,16 @@
             <div class="pagination-btn-group">
                 <template v-for="(item, index) of _customBtn" :key="index">
                     <el-button v-if="item.type === 'button'" :type="item.btnType" @click="item.onClick()" :icon="item.icon" plain>{{ item.label }}</el-button>
-                    <el-tag v-if="item.type === 'tag'" class="ml-2" :size="item.size" :type="item.tagType">{{ item.value }}</el-tag>
                     <el-progress v-if="item.type === 'progress'" :style='{width:item.width}' :stroke-width="24" :percentage="item.percentage" 
                      status="success" :duration="10">
-                        <div text class="progress-label">{{ item.label }}</div>
+                        <div text class="progress-label" @click="item.onClick()">{{ item.label }}</div>
                     </el-progress>
+                    <el-popover v-if="item.type === 'popover'" placement="top" :width="300" trigger="click">
+                      <template #reference>
+                        <el-button :type="item.btnType" :icon="item.icon" plain>{{ item.label }}</el-button>
+                      </template>
+                        <component :is="item.render(h)" />
+                    </el-popover>
                 </template>
             </div>
             <el-pagination background layout="total, prev, pager, next" :total="parseInt(_params.total)"

@@ -31,7 +31,7 @@ const getTodayTimeRange = () => {
     return [start,end]
 }
 
-const getSettingTimeRange = async () => {
+const getSettingTimeRange = async (dateStr) => {
     let startTime = ' 08:00:00'
     let endTime = ' 07:59:59'
     await getSettingItems({name:'lastOrder'},999,1).then(res => {
@@ -41,8 +41,8 @@ const getSettingTimeRange = async () => {
             endTime = ' ' + fillZero(Number(timeSetting) - 1) + ':59:59'
         }
     })
-    const date = new Date()
-    const currentTime = fillZero(date.getHours()) + ':00:00'
+    const date = dateStr ? new Date(dateStr) : new Date();
+    const currentTime = fillZero(new Date().getHours()) + ':00:00'
     let start,end
 
     if (currentTime <= startTime) {

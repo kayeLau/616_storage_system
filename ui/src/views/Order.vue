@@ -5,6 +5,7 @@
         :getList="getOrderList" :searchFormColumns="searchFormColumns" :customBtn="customBtn" :expandHeader="{}"
         :expandColumns="{}" :products="products"></Ktable>
     </el-card>
+
     <el-dialog v-model="orderDetailShow" title="訂單明細" width="90%" style="height:80vh;position: relative;" top="10vh">
       <template #header="{ titleId, titleClass }">
         <div class="my-header">
@@ -18,18 +19,20 @@
       <orderDetailList :data="currentRow" :params="ODparams" @refreshList="refreshList" :products="products">
       </orderDetailList>
     </el-dialog>
+
   </div>
 </template>
 <script setup>
 import orderDetailList from '../components/orderDetailList.vue';
 import { getProductList } from '../request/products';
 import { getShopList } from '../request/shops'
-import { getOrderList , postExportDailyMeetSummary , getDailyOrderStatus } from '../request/orders';
+import { getOrderList, getDailyOrderStatus, postExportDailyMeetSummary } from '../request/orders';
 import { departmentDict, orderStateDict } from '../request/dict';
 import { exportExcel } from '../utils/export';
 import Ktable from '../components/table.vue';
 import { ref, onMounted, computed } from 'vue';
 import { getStorge } from '../utils/auth'
+import { ElButton, ElDatePicker } from 'element-plus'
 
 const userInfo = computed(() => {
   let user = getStorge('userInfo')
@@ -58,6 +61,7 @@ const orderStateFormatter = (row, column) => {
   let color = cell === 0 ? 'var(--el-color-danger)' : 'var(--el-color-success)'
   return `<span style='color:${color}'>${orderStateDict[cell]}<span>`
 }
+
 const columns = [
   { props: 'status', label: '訂單狀態', formatter: orderStateFormatter },
   { props: 'shopName', label: '落單門店', width: 250 },
@@ -65,6 +69,7 @@ const columns = [
   { props: 'orderUserName', label: '落單人', width: 220, formatter: (row, column) => row[column.property].join(',') },
   { props: 'updateDate', label: '落單時間', width: 200 }
 ]
+
 const operations = {
   width: 240,
   size: "small",
@@ -73,43 +78,41 @@ const operations = {
     { type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer', disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1 }
   ]
 }
+
+const exportDate = ref(new Date())
+const _exportDate = computed(() => {
+  let date = exportDate.value
+  date.setDate(date.getDate() - 1)
+  return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
+})
 const customBtn = ref([
   {
-    type:'button',
+    type: 'popover',
     btnType: 'success',
     label: '導出肉類匯總表',
     icon: 'Printer',
     disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1,
-    onClick: exportDailyMeetSummary
+    render: (h) => {
+      return h('div', { style: { display: 'flex', gap: '5px' } }, [
+        h(ElDatePicker, {
+          teleported: false, modelValue: exportDate.value,
+          ['onUpdate:modelValue']: (value) => {
+            exportDate.value = value
+            fetchDailyOrderStatus()
+          }, type: "date"
+        }),
+        h(ElButton, { onclick: exportDailyMeetSummary, type: 'success', plain: true }, '確定')
+      ])
+    },
   },
   {
-    type:'progress',
-    width:'250px',
-    percentage:0,
+    type: 'progress',
+    width: '250px',
+    percentage: 0,
     disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1,
-    label:'本日已下單門店'
+    label: '已分配門店'
   }
 ])
-const params = {
-  size: 20,
-  page: 1,
-}
-const searchFormColumns = ref([
-  {
-    type: 'datePicker',
-    prop: 'updateDate',
-    label: '下單時間:',
-  },
-  {
-    type: 'select',
-    prop: 'orderShopId',
-    label: '落單門店:',
-    options: [],
-    hide: userInfo.value.auth !== -1
-  }
-])
-fatchShopList()
-
 function exportOrderExcel(index, row) {
   const date = new Date()
   const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
@@ -143,11 +146,11 @@ function exportOrderExcel(index, row) {
       ])
     ]
   }
-  exportExcel([shipping, delivery], true , String(today + row.shopName))
+  exportExcel([shipping, delivery], true, String(today + row.shopName))
 }
 
 function exportDailyMeetSummary() {
-  postExportDailyMeetSummary().then(res => {
+  postExportDailyMeetSummary({ exportDate:_exportDate.value }).then(res => {
     if (res.success) {
       const date = new Date()
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
@@ -161,9 +164,9 @@ function exportDailyMeetSummary() {
           summary += target.assignQuantity
           return target.assignQuantity + target.unit
         })
-        return [productCode, ...row , productCode , summary]
+        return [productCode, ...row, productCode, summary]
       })
-      jsonData.unshift(['產品名稱', ...shopName,'產品名稱','出貨總數'])
+      jsonData.unshift(['產品名稱', ...shopName, '產品名稱', '出貨總數'])
       console.log(jsonData)
 
       const dailyMeetSummary = {
@@ -175,15 +178,44 @@ function exportDailyMeetSummary() {
   })
 }
 
-function fetchDailyOrderStatus(){
-  getDailyOrderStatus().then(res => {
-    if(res.success){
+function fetchDailyOrderStatus() {
+  getDailyOrderStatus({ exportDate:_exportDate.value }).then(res => {
+    if (res.success) {
       let total = searchFormColumns.value[1].options.length
       let current = res.total
       customBtn.value[1].percentage = (current / total) * 100
     }
   })
 }
+
+const defaultDateRange = computed(() => {
+  let date = new Date()
+  let endDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0') + ' 23:59:59'
+  date.setDate(date.getDate() - 1)
+  let startDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0') + ' 00:00:00'
+  return [startDate, endDate]
+})
+
+const params = {
+  size: 20,
+  page: 1,
+  updateDate: defaultDateRange.value
+}
+
+const searchFormColumns = ref([
+  {
+    type: 'datePicker',
+    prop: 'updateDate',
+    label: '下單時間:',
+  },
+  {
+    type: 'select',
+    prop: 'orderShopId',
+    label: '落單門店:',
+    options: [],
+    hide: userInfo.value.auth !== -1
+  }
+])
 //#endregion
 
 //#region order detail tabel
@@ -283,6 +315,7 @@ function getProducts() {
 //#endregion
 onMounted(() => {
   getProducts()
+  fatchShopList()
   fetchDailyOrderStatus()
 })
 

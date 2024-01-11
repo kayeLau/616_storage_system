@@ -167,8 +167,9 @@ function getOrderItems(options, size, page) {
                 }
             })
         })
-        await customQuery('SELECT COUNT(*) AS total FROM ( SELECT COUNT(*) AS total FROM order_info GROUP BY orderCode) AS total').then(res => {
-            if(res.success){
+        let optionsSQL = optionsSQLFromatter(options, 'order_info')
+        await customQuery(`SELECT COUNT(*) AS total FROM ( SELECT COUNT(*) AS total FROM order_info ${optionsSQL} GROUP BY orderCode) AS total`).then(res => {
+            if (res.success) {
                 result.total = res.resource[0].total || 0;
             }
         })
@@ -181,19 +182,24 @@ function getOrderItems(options, size, page) {
 }
 
 // 導出肉類總表
-function getOrderExportList(options, size, page, summaryProductCodesMap) {
+function getOrderExportList(options, size, page, summaryProductCodesMap, shopsList) {
     const result = {}
-    return getOrderAndgroupby(options, size, page).then(async orderItems => {
-        const shopName = []
-        const promiseList = orderItems.map((item, index) => {
+
+    return getOrderAndgroupby(options, size, page).then(async group => {
+        const summaryProductCodes = Object.keys(summaryProductCodesMap)
+        let orderItems = new Array(shopsList.length).fill(0).map(() => {
+            return new Array(summaryProductCodes.length).fill(0).map(() => { return { assignQuantity: 0, unit: '' } })
+        })
+        const promiseList = group.map((item) => {
             return getItems({ table: "order_detail_info", options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
                 if (res.success) {
-                    shopName.push(item.shopName)
-                    orderItems[index] = Object.keys(summaryProductCodesMap).map(summaryProductCode => {
+                    let index = shopsList.indexOf(item.shopName)
+                    // 查product并賦值
+                    orderItems[index] = summaryProductCodes.map(summaryProductCode => {
                         let target = res.resource.find(item => item.productCode === summaryProductCode)
                         return {
-                            assignQuantity:target ? target.assignQuantity : 0,
-                            unit:target ? target.unit : ''
+                            assignQuantity: target ? target.assignQuantity : 0,
+                            unit: target ? target.unit : ''
                         }
                     })
                 }
@@ -201,7 +207,7 @@ function getOrderExportList(options, size, page, summaryProductCodesMap) {
         })
         await Promise.all(promiseList)
         result.msg = "get success"
-        result.resource = { orderItems, productCode: Object.values(summaryProductCodesMap) , shopName}
+        result.resource = { orderItems, productCode: Object.values(summaryProductCodesMap), shopName: shopsList }
         result.success = true
         return result
     }).catch(err => { console.log(err) })

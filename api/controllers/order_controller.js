@@ -140,16 +140,13 @@ module.exports = class order {
     async getDailyOrderStatus(req, res, next) {
         let result = {}
         try {
-            const createDate = await getSettingTimeRange()
-            const dailyOrderList = await getOrderAndgroupby({ createDate }, 999, 1).then(result => {
-                return result
+            let exportDate = req.body.exportDate
+            const createDate = await getSettingTimeRange(exportDate)
+            const dailyOrderList = await getOrderItems({ createDate }, 999, 1).then(result => {
+                if (result.success) {
+                    return result.resource.filter(item => item.status === 1)
+                }
             })
-
-            // const shopIdList = await getShopItems({}, 999, 1).then(result => {
-            //     if (result.success) {
-            //         return result.resource.map(item => item.shopId)
-            //     }
-            // })
             result.success = true
             result.total = dailyOrderList.length
             res.json(result)
@@ -160,6 +157,7 @@ module.exports = class order {
 
     async postExportDailyMeetSummary(req, res, next) {
         let summaryProductCodesMap = {}
+        let exportDate = req.body.exportDate
         await getProductItems({ summary: 1 }, 999, 1).then(result => {
             if (result.success) {
                 result.resource.forEach(item =>
@@ -170,8 +168,16 @@ module.exports = class order {
             next(err)
         })
 
-        const createDate = await getSettingTimeRange()
-        await getOrderExportList({ createDate }, 999, 1, summaryProductCodesMap).then(result => {
+        const shopsList = await getShopItems({ shopPartition: req.userInfo.shopPartition }, 999, 1).then(result => {
+            if (result.success) {
+                return result.resource.map(item => item.shopName)
+            }
+        }).catch(err => {
+            next(err)
+        })
+
+        const createDate = await getSettingTimeRange(exportDate)
+        await getOrderExportList({ createDate }, 999, 1, summaryProductCodesMap, shopsList).then(result => {
             if (result.success) {
                 res.json(result)
             }
