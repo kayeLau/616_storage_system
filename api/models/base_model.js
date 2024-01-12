@@ -93,9 +93,11 @@ function optionsSQLFromatter(options, table) {
                     query = `${table}.${key} LIKE '%${options[key]}%'`
                     break
                 default:
-                    query = Array.isArray(options[key]) ?
-                        options[key].reduce((accumulator, currentValue, index) => index === 0 ? `${key} = '${currentValue}'` : `${accumulator} OR ${key} = '${currentValue}'`, '')
-                        : `${key} = '${options[key]}'`;
+                    if(Array.isArray(options[key])){
+                        query = '(' + options[key].reduce((accumulator, currentValue, index) => index === 0 ? `${key} = '${currentValue}'` : `${accumulator} OR ${key} = '${currentValue}'`, '') + ')'
+                    }else{
+                        query = `${key} = '${options[key]}'`
+                    }
                     break
             }
             if (whereClause === '') {
@@ -108,7 +110,7 @@ function optionsSQLFromatter(options, table) {
     return whereClause
 }
 
-function getItems({ table, options, size, page, orderby = 'updateDate', sort = 'DESC', join }) {
+function getItems({ table, options, size, page, orderby = 'updateDate', sort = 'DESC', join , columns }) {
     let result = {}
     return new Promise((resolve, reject) => {
         let optionsSQL = optionsSQLFromatter(options, table)
@@ -122,10 +124,12 @@ function getItems({ table, options, size, page, orderby = 'updateDate', sort = '
             }
             result.total = rows[0].total || 0;
         })
-        db.query(`SELECT * , DATE_FORMAT(${table}.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate
+        let defaultColumns = `* , DATE_FORMAT(${table}.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate`
+        db.query(`SELECT ${ columns ? columns : defaultColumns }
         FROM ${join ? join : table} ${optionsSQL} ORDER BY ${table}.${orderby} ${sort} 
         LIMIT ${size} OFFSET ${(page - 1) * size}`, (err, rows) => {
             if (err) {
+                console.log(err)
                 result.msg = "server error,please try again"
                 result.success = false
                 reject(result);

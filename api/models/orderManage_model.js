@@ -1,5 +1,5 @@
 const db = require('./connection_db')
-const { getCurrentTime } = require('../utils')
+const { getCurrentTime , getSettingTimeRange } = require('../utils')
 const { optionsSQLFromatter, createNew, updateItem, deleteItem, getItems, customQuery } = require('./base_model')
 
 // 如有修改訂單,沒有則創建訂單
@@ -50,36 +50,16 @@ function insertOrderItems(list) {
 }
 
 function createNewOrderItems(list) {
-    let result = {}
-    result.success = false
-    return new Promise((resolve, reject) => {
-        // 需要用二維數組插入
-        if (Array.isArray(list) && Array.isArray(list[0])) {
-            db.query(`INSERT IGNORE INTO order_detail_info (
-                id,
-                orderId,
-                productCode,
-                productName,
-                orderQuantity,
-                unit,
-                standard,
-                updateDate,
-                orderMode) VALUES ? `, [list], (err) => {
-                if (err) {
-                    result.msg = "server error,please try again"
-                    reject(result)
-                    console.log(err)
-                    return
-                }
-                result.msg = "success"
-                result.success = true
-                resolve(result)
-            })
-        } else {
-            result.msg = "wrong input"
-            reject(result)
-        }
-    })
+    return customQuery(`INSERT IGNORE INTO order_detail_info (
+        id,
+        orderId,
+        productCode,
+        productName,
+        orderQuantity,
+        unit,
+        standard,
+        updateDate,
+        orderMode) VALUES ? `, [list])
 }
 
 function checkOrderRepeated(table, options) {
@@ -214,8 +194,17 @@ function getOrderExportList(options, size, page, summaryProductCodesMap, shopsLi
 }
 
 // 根據orderCode groupby
-function getOrderAndgroupby(options, size, page) {
-    return getItems({ table: "order_info", join: "order_info INNER JOIN shop_info ON orderShopId = shopId", options, size, page }).then(res => {
+async function getOrderAndgroupby(options, size, page) {
+    const createDate = await getSettingTimeRange()
+    const query = { 
+        table: "order_info", 
+        join: "order_info INNER JOIN shop_info ON orderShopId = shopId", 
+        columns:` * , DATE_FORMAT(order_info.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate , DATE_FORMAT(order_info.createDate,'%Y-%m-%d %H:%i:%S') AS createDate , IF(order_info.createDate BETWEEN '${createDate[0]}' AND '${createDate[1]}',1,0) AS isToday`,
+        options, 
+        size, 
+        page 
+    }
+    return getItems(query).then(res => {
         let orderItems = []
         if (res.success) {
             orderItems = res.resource.reduce((group, order) => {
@@ -225,7 +214,12 @@ function getOrderAndgroupby(options, size, page) {
                     group[key].orderUserName.push(order.orderUserName)
                     group[key].department.push(order.department)
                 } else {
-                    group[key] = { ...order, id: [order.id], orderUserName: [order.orderUserName], department: [order.department] };
+                    group[key] = { 
+                        ...order, 
+                        id: [order.id], 
+                        orderUserName: [order.orderUserName], 
+                        department: [order.department]
+                    };
                 }
                 return group;
             }, {});

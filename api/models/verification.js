@@ -6,7 +6,7 @@ const { getAllItem } = require('../models/base_model')
 // getUser 是否需要取得用戶資料
 function verifyToken(token,getUser = false){
     let tokenResult = {
-        status: "token verify fail",
+        msg: "token verify fail",
         success: false
     }
     const time = Math.floor(Date.now() / 1000);
@@ -17,7 +17,7 @@ function verifyToken(token,getUser = false){
                 if(!err && decode.exp > time){
                     tokenResult = {
                         data:decode.data,
-                        status: "token verify success",
+                        msg: "token verify success",
                         success: true
                     }
                 }
@@ -25,7 +25,7 @@ function verifyToken(token,getUser = false){
             })
         }else{
             resolve({
-                status: "token not exist",
+                msg: "token not exist",
                 success: false
             });
         }

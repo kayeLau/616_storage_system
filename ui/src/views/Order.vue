@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-card class="Ktable-container">
-      <Ktable ref='KtableRef2' isExpand :columns="columns" :operations="operations" :params="params"
+      <Ktable ref='KtableRef2' isExpand :columns="columns" :operations="operations" :params="params" :tableRowClassName="tableRowClassName"
         :getList="getOrderList" :searchFormColumns="searchFormColumns" :customBtn="customBtn" :expandHeader="{}"
         :expandColumns="{}" :products="products"></Ktable>
     </el-card>
@@ -62,6 +62,13 @@ const orderStateFormatter = (row, column) => {
   return `<span style='color:${color}'>${orderStateDict[cell]}<span>`
 }
 
+// 表格顏色
+function tableRowClassName({ row }) {
+if (row.isToday === 1) {
+    return 'warning-row'
+  }
+}
+
 const columns = [
   { props: 'status', label: '訂單狀態', formatter: orderStateFormatter },
   { props: 'shopName', label: '落單門店', width: 250 },
@@ -74,14 +81,14 @@ const operations = {
   width: 240,
   size: "small",
   children: [
-    { type: "primary", name: '編輯', onClick: showDetailHandle, icon: 'Edit', hide: userInfo.value.auth !== -1 },
+    { type: "primary", name: '編輯', onClick: showDetailHandle, icon: 'Edit' },
     { type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer', disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1 }
   ]
 }
 
 const exportDate = ref(new Date())
 const _exportDate = computed(() => {
-  let date = exportDate.value
+  let date = new Date(Date.parse(exportDate.value))
   date.setDate(date.getDate() - 1)
   return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
 })

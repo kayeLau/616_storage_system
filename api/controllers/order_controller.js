@@ -63,6 +63,11 @@ module.exports = class order {
             orderCode: userInfo.shopId + '-' + dateStr,
             updateDate: getCurrentTime()
         }
+
+        if(!orderData.orderList.length){
+            res.json({msg: "wrong input",success: false})
+        }
+
         createNewOrder(orderData).then(result => {
             res.json(result)
         }).catch(err => {

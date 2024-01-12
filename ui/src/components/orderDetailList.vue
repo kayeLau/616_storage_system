@@ -32,7 +32,7 @@
         <template #default="scope">
           <div class="flex-row-center">
             <el-input-number v-model="_data.children[scope.$index].assignQuantity" :min="0" :controls="false"
-              @change="setSubmitAvailable(scope.$index)" />
+              @change="setSubmitAvailable(scope.$index)" :disabled="userInfo.auth !== -1"/>
             <span>{{ scope.row.unit }}</span>
           </div>
         </template>
@@ -41,22 +41,18 @@
       <el-table-column prop="updateDate" label="修改時間" width="180" />
       <el-table-column prop="remark" label="備注" width="200">
         <template #default="scope">
-          <el-input v-model="_data.children[scope.$index].remark" @change="setSubmitAvailable(scope.$index)" />
+          <el-input v-model="_data.children[scope.$index].remark" @change="setSubmitAvailable(scope.$index)" :disabled="userInfo.auth !== -1"/>
         </template>
       </el-table-column>
-      <!-- <el-table-column fixed="right" label="操作" width="120">
-        <template #default="scope">
-          <el-button v-if='scope.row.mode === "create"' type="success" icon="Coin" plain @click="submitAdditionOrderItem(scope.row)">提交</el-button>
-          <el-button v-else type="success" icon="Coin" plain @click="updateAssignQuantity(scope.row)">提交</el-button>
-        </template>
-      </el-table-column> -->
     </el-table>
     <!-- pagination -->
     <div class="pagination">
       <div>
-        <el-button type="primary" @click="updateAssignQuantity()" icon="Coin" plain>按下單數量分配</el-button>
-        <el-button type="success" icon="Coin" plain @click="submitOrderItem">提交</el-button>
-        <el-button type="success" @click="insertOrderItem" icon="CirclePlus" plain>新增</el-button>
+        <div v-if="userInfo.auth === -1">
+          <el-button type="primary" @click="updateAssignQuantity()" icon="Coin" plain>按下單數量分配</el-button>
+          <el-button type="success" icon="Coin" plain @click="submitOrderItem">提交</el-button>
+          <el-button type="success" @click="insertOrderItem" icon="CirclePlus" plain>新增</el-button>
+        </div>
       </div>
       <el-pagination background layout="total, prev, pager, next" :total="parseInt(_data.children.length)"
         v-model:current-page="_params.page" :page-size="_params.size" />
@@ -68,10 +64,16 @@ import { defineProps, reactive, ref, watch, defineEmits , computed } from 'vue';
 import { updateOrderDetailAssignQuantity, createAdditionOrderItem } from '../request/orders';
 import { orderStateDict, orderMode, orderStateColor } from '../request/dict';
 import { ElMessage } from 'element-plus'
+import { getStorge } from '../utils/auth'
 const props = defineProps({
   data: Object,
   params: Object,
   products: Array
+})
+
+const userInfo = computed(() => {
+  let user = getStorge('userInfo')
+  return user ? JSON.parse(user) : {}
 })
 
 let _data = reactive(props.data)

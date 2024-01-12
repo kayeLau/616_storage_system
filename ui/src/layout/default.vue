@@ -7,7 +7,7 @@
                         <!-- <span>Kaye</span> -->
                         <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
                         <el-card class="avatar-detail" v-show="avatarDetailShow">
-                            <div>
+                            <div class="avatar-detail-info">
                                 <span>{{ authDict[userInfo.auth] }}</span>
                                 <span>{{ userInfo.name }}</span>
                             </div>
@@ -134,6 +134,11 @@ const menus = [
     background-color: #fff;
     top: 100%;
     right: 10px;
+}
+.avatar-detail-info{
+    padding: 20px 0;
+    display: flex;
+    justify-content: space-between;
 }
 .avatar-detail > p{
     padding-bottom: 5px;

@@ -17,7 +17,7 @@
             </el-form-item>
         </el-form>
         <!-- tabel -->
-        <el-table :data="data" class="table" highlight-current-row header-cell-class-name="table-header"
+        <el-table :data="data" class="table" header-cell-class-name="table-header"
             :row-class-name="tableRowClassName" @selection-change="handleSelectionChange">
             <el-table-column v-if="isExpand" type="expand">
                 <template v-slot="props">
@@ -44,7 +44,7 @@
                 </template>
             </el-table-column>
             <el-table-column v-if='operations && _operationsChildren.length' fixed="right" label="操作"
-                :width="operations.width">
+                :width="operations.width" align="center">
                 <template #default="scope">
                     <el-button v-for="(item, index) of _operationsChildren" :type="item.type" :key="index" :icon="item.icon"
                         plain @click="item.onClick(scope.$index, scope.row)"
@@ -189,5 +189,9 @@ onMounted(() => {
 
 .el-table .success-row {
     --el-table-tr-bg-color: var(--el-color-success-light-9);
+}
+
+.el-table .warning-row {
+    --el-table-tr-bg-color: var(--el-color-warning-light-9);
 }
 </style>
