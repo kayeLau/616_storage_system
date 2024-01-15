@@ -36,7 +36,7 @@ module.exports = class order {
         const orderData = {
             orderShopId: userInfo.shopId,
             department: userInfo.auth,
-            orderDate:orderDateRange[0].substring(0, 10),
+            orderDate: orderDateRange[0].substring(0, 10),
         }
 
         await checkOrderRepeated("order_info", orderData).then(result => {
@@ -65,12 +65,12 @@ module.exports = class order {
             updateDate: getCurrentTime()
         }
 
-        if(!orderData.orderList.length){
-            res.json({msg: "wrong input",success: false})
+        if (!orderData.orderList.length) {
+            res.json({ msg: "wrong input", success: false })
         }
 
         createNewOrder(orderData).then(result => {
-            res.json(result)
+            res.json({ success: result.success, msg: result.msg })
         }).catch(err => {
             next(err)
         })
@@ -147,7 +147,7 @@ module.exports = class order {
         let result = {}
         try {
             let exportDate = req.body.exportDate
-            const dailyOrderList = await getOrderItems({ orderDate:exportDate }, 999, 1).then(result => {
+            const dailyOrderList = await getOrderItems({ orderDate: exportDate }, 999, 1).then(result => {
                 if (result.success) {
                     return result.resource.filter(item => item.status === 1)
                 }
@@ -181,7 +181,7 @@ module.exports = class order {
             next(err)
         })
 
-        await getOrderExportList({ orderDate:exportDate }, 999, 1, summaryProductCodesMap, shopsList).then(result => {
+        await getOrderExportList({ orderDate: exportDate }, 999, 1, summaryProductCodesMap, shopsList).then(result => {
             if (result.success) {
                 res.json(result)
             }

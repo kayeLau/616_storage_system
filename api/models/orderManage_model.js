@@ -1,11 +1,11 @@
-const { getCurrentTime , getSettingTimeRange } = require('../utils')
-const { optionsSQLFromatter, createNew, updateItem, deleteItem, getItems, customQuery , checkRepeated } = require('./base_model')
+const { getCurrentTime, getSettingTimeRange } = require('../utils')
+const { optionsSQLFromatter, createNew, updateItem, deleteItem, getItems, customQuery, checkRepeated } = require('./base_model')
 
 // 如有修改訂單,沒有則創建訂單
 function createNewOrder(data) {
-    return checkRepeated("order_info", { orderShopId: data.orderShopId, orderDate: data.orderDate, department: data.department })
+    return checkRepeated("order_info", { orderShopId: data.orderShopId, orderDate: data.orderDate, department: data.department }, true)
         .then(async (res) => {
-            const orderId = res.resource ? res.resource.id : data.id
+            const orderId = res.resource.length ? res.resource[0].id : data.id
             let orderList = data.orderList.map(item => {
                 return [
                     item.id ? item.id : '',
@@ -19,7 +19,7 @@ function createNewOrder(data) {
                     item.orderMode
                 ]
             })
-            if (!res.resource) {
+            if (!res.resource.length) {
                 delete data.orderList
                 createNew("order_info", data) // 訂單
             } else {
@@ -61,24 +61,25 @@ function createNewOrderItems(list) {
 
 
 function checkOrderRepeated(table, options) {
-    return checkRepeated(table,options,true).then(async res => {
-            if (res.resource.length >= 1) {
-                let resource = res.resource[0]
-                let params = {
-                    table: "order_detail_info",
-                    options: { orderId: resource.id },
-                    size: 999,
-                    page: 1
-                }
-                await getItems(params).then(res => {
-                    if (res.success) {
-                        resource.children = res.resource
-                    }
-                })
-                res.resource = resource
+    return checkRepeated(table, options, true).then(async res => {
+        let resource = {}
+        if (res.resource.length >= 1) {
+            resource = res.resource[0]
+            let params = {
+                table: "order_detail_info",
+                options: { orderId: resource.id },
+                size: 999,
+                page: 1
             }
-            return res
-        })
+            await getItems(params).then(res => {
+                if (res.success) {
+                    resource.children = res.resource
+                }
+            })
+        }
+        res.resource = resource
+        return res
+    })
 }
 
 function updateOrderDetailAssignQuantity(list) {
@@ -178,13 +179,13 @@ function getOrderExportList(options, size, page, summaryProductCodesMap, shopsLi
 async function getOrderAndgroupby(options, size, page) {
     const orderDateRange = await getSettingTimeRange()
     const orderDateStr = orderDateRange[0].substring(0, 10)
-    const query = { 
-        table: "order_info", 
-        join: "order_info INNER JOIN shop_info ON orderShopId = shopId", 
-        columns:` * , DATE_FORMAT(order_info.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate , DATE_FORMAT(order_info.createDate,'%Y-%m-%d') AS createDate , IF(order_info.orderDate = '${orderDateStr}',1,0) AS isToday`,
-        options, 
-        size, 
-        page 
+    const query = {
+        table: "order_info",
+        join: "order_info INNER JOIN shop_info ON orderShopId = shopId",
+        columns: ` * , DATE_FORMAT(order_info.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate , DATE_FORMAT(order_info.createDate,'%Y-%m-%d') AS createDate , IF(order_info.orderDate = '${orderDateStr}',1,0) AS isToday`,
+        options,
+        size,
+        page
     }
     return getItems(query).then(res => {
         let orderItems = []
@@ -196,10 +197,10 @@ async function getOrderAndgroupby(options, size, page) {
                     group[key].orderUserName.push(order.orderUserName)
                     group[key].department.push(order.department)
                 } else {
-                    group[key] = { 
-                        ...order, 
-                        id: [order.id], 
-                        orderUserName: [order.orderUserName], 
+                    group[key] = {
+                        ...order,
+                        id: [order.id],
+                        orderUserName: [order.orderUserName],
                         department: [order.department]
                     };
                 }

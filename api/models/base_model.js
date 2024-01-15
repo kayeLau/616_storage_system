@@ -55,6 +55,7 @@ function updateItem(table, data, key, value) {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
+                logger.info(err);
                 reject(result);
                 return
             }
@@ -72,6 +73,7 @@ function deleteItem(table, key, value) {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
+                logger.info(err);
                 reject(result);
                 return
             }
@@ -126,6 +128,7 @@ function getItems({ table, options, size, page, orderby = 'updateDate', sort = '
                 console.log(err)
                 result.msg = "server error, please try again";
                 result.success = false;
+                logger.info(err);
                 reject(result);
                 return;
             }
@@ -139,6 +142,7 @@ function getItems({ table, options, size, page, orderby = 'updateDate', sort = '
                 console.log(err)
                 result.msg = "server error,please try again"
                 result.success = false
+                logger.info(err);
                 reject(result);
                 return
             }
@@ -157,6 +161,7 @@ function getAllItem(table, options) {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
+                logger.info(err);
                 reject(result);
                 return
             }
@@ -176,6 +181,7 @@ function customQuery(query, options = []) {
                 console.log(err)
                 result.msg = "server error,please try again"
                 result.success = false
+                logger.info(err);
                 reject(result);
                 return
             }
