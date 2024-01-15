@@ -31,7 +31,7 @@ const getTodayTimeRange = () => {
     return [start,end]
 }
 
-const getSettingTimeRange = async (dateStr) => {
+const getSettingTimeRange = async () => {
     let startTime = ' 08:00:00'
     let endTime = ' 07:59:59'
     await getSettingItems({name:'lastOrder'},999,1).then(res => {
@@ -41,7 +41,7 @@ const getSettingTimeRange = async (dateStr) => {
             endTime = ' ' + fillZero(Number(timeSetting) - 1) + ':59:59'
         }
     })
-    const date = dateStr ? new Date(dateStr) : new Date();
+    const date = new Date();
     const currentTime = fillZero(new Date().getHours()) + ':00:00'
     let start,end
 
@@ -57,6 +57,24 @@ const getSettingTimeRange = async (dateStr) => {
     return [start,end]
 }
 
+const getExportTimeRange = async (dateStr) => {
+    let startTime = ' 08:00:00'
+    let endTime = ' 07:59:59'
+    await getSettingItems({name:'lastOrder'},999,1).then(res => {
+        if(res.success){
+            let timeSetting = res.resource[0].value
+            startTime = ' ' + String(timeSetting) + ':00:00'
+            endTime = ' ' + fillZero(Number(timeSetting) - 1) + ':59:59'
+        }
+    })
+
+    const date = new Date(dateStr);
+    let end = dateFormat(date) + startTime
+    date.setDate(date.getDate() - 1)
+    let start = dateFormat(date) + endTime
+    return [start,end]
+}
+
 const dateFormat = (date)=>{
     const yy = date.getFullYear()
     const mm = fillZero(date.getMonth() + 1)
@@ -65,4 +83,4 @@ const dateFormat = (date)=>{
 }
 
 
-module.exports = { getCurrentTime , checkNull , getTodayTimeRange , getSettingTimeRange }
+module.exports = { getCurrentTime , checkNull , getTodayTimeRange , getSettingTimeRange , getExportTimeRange }

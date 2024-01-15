@@ -1,14 +1,14 @@
 const db = require('./connection_db')
-const { checkRepeated, createNew, updateItem, deleteItem, getItems } = require('./base_model')
+const { checkRepeated, createNew, updateItem, deleteItem, getItems , customQuery } = require('./base_model')
 
 function createNewShop(data) {
-    return checkRepeated("shop_info", "shopName", data.shopName)
+    return checkRepeated("shop_info", {shopName:data.shopName})
         .then(() => createNew("shop_info", data))
         .catch(err => err)
 }
 
 function createNewPartition(data) {
-    return checkRepeated("partition_info", "partitionName", data.partitionName)
+    return checkRepeated("partition_info", {partitionName:data.partitionName})
         .then(() => createNew("partition_info", data))
         .catch(err => err)
 }
@@ -42,25 +42,7 @@ function getBandProducts(options, size, page) {
 }
 
 function bindProductTOShop(productList) {
-    let result = {}
-    result.success = false
-    return new Promise((resolve, reject) => {
-        if (Array.isArray(productList) && Array.isArray(productList[0])) {
-            db.query(`INSERT IGNORE INTO shop_product_info (id,shopId, productCode,createDate,updateDate) VALUES ? `, [productList] , (err) => {
-                if (err) {
-                    result.msg = "server error,please try again"
-                    reject(result)
-                    return
-                }
-                result.msg = "success"
-                result.success = true
-                resolve(result)
-            })
-        }else{
-            result.msg = "unexp"
-            reject(result)
-        }
-    })
+    return customQuery(`INSERT IGNORE INTO shop_product_info (id,shopId, productCode,createDate,updateDate) VALUES ? `, [productList])
 }
 
 

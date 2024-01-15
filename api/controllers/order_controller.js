@@ -1,6 +1,6 @@
 const { getCurrentTime, getSettingTimeRange } = require('../utils')
 const { generateUUID } = require('../models/encryption');
-const { getOrderItems, createNewOrder, updateOrderInformation, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated, getOrderExportList, getOrderAndgroupby } = require('../models/orderManage_model')
+const { getOrderItems, createNewOrder, updateOrderInformation, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated, getOrderExportList } = require('../models/orderManage_model')
 const { getProductItems } = require('../models/productManage_model')
 const { getShopItems } = require('../models/shopManage_model')
 
@@ -31,25 +31,26 @@ module.exports = class order {
 
     async postCheckOrderRepeated(req, res, next) {
         const userInfo = req.userInfo
-        const createDate = await getSettingTimeRange()
+        const orderDateRange = await getSettingTimeRange()
 
         const orderData = {
             orderShopId: userInfo.shopId,
             department: userInfo.auth,
-            createDate,
+            orderDate:orderDateRange[0].substring(0, 10),
         }
 
-        checkOrderRepeated("order_info", orderData).then(result => {
+        await checkOrderRepeated("order_info", orderData).then(result => {
             res.json(result)
         }).catch(err => {
+            console.log(err)
             next(err)
         })
     }
 
     async postCreateOrder(req, res, next) {
         const userInfo = req.userInfo
-        const createDateRange = await getSettingTimeRange()
-        const dateStr = createDateRange[0].substring(0, 10).replaceAll('-', '')
+        const orderDateRange = await getSettingTimeRange()
+        const dateStr = orderDateRange[0].substring(0, 10).replaceAll('-', '')
 
         const orderData = {
             id: generateUUID(),
@@ -58,9 +59,9 @@ module.exports = class order {
             orderUserName: userInfo.name,
             orderShopId: userInfo.shopId,
             department: userInfo.auth,
-            createDateRange,
-            createDate: createDateRange[0],
+            orderDate: orderDateRange[0].substring(0, 10),
             orderCode: userInfo.shopId + '-' + dateStr,
+            createDate: getCurrentTime(),
             updateDate: getCurrentTime()
         }
 
@@ -146,8 +147,7 @@ module.exports = class order {
         let result = {}
         try {
             let exportDate = req.body.exportDate
-            const createDate = await getSettingTimeRange(exportDate)
-            const dailyOrderList = await getOrderItems({ createDate }, 999, 1).then(result => {
+            const dailyOrderList = await getOrderItems({ orderDate:exportDate }, 999, 1).then(result => {
                 if (result.success) {
                     return result.resource.filter(item => item.status === 1)
                 }
@@ -181,8 +181,7 @@ module.exports = class order {
             next(err)
         })
 
-        const createDate = await getSettingTimeRange(exportDate)
-        await getOrderExportList({ createDate }, 999, 1, summaryProductCodesMap, shopsList).then(result => {
+        await getOrderExportList({ orderDate:exportDate }, 999, 1, summaryProductCodesMap, shopsList).then(result => {
             if (result.success) {
                 res.json(result)
             }

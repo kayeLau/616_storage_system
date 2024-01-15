@@ -86,12 +86,13 @@ const operations = {
   ]
 }
 
-const exportDate = ref(new Date())
-const _exportDate = computed(() => {
+const defaultExportDate = computed(() => {
   let date = new Date(Date.parse(exportDate.value))
   date.setDate(date.getDate() - 1)
   return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
 })
+const exportDate = ref(new Date())
+
 const customBtn = ref([
   {
     type: 'popover',
@@ -120,6 +121,46 @@ const customBtn = ref([
     label: '已分配門店'
   }
 ])
+
+function exportDailyMeetSummary() {
+  postExportDailyMeetSummary({ exportDate:defaultExportDate.value }).then(res => {
+    if (res.success) {
+      const date = new Date()
+      const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
+      let shopName = res.resource.shopName
+      let productCode = res.resource.productCode
+      let orderItems = res.resource.orderItems
+      let jsonData = productCode.map((productCode, rowIndex) => {
+        let summary = 0
+        let row = shopName.map((item, columnIndex) => {
+          let target = orderItems[columnIndex][rowIndex]
+          summary += target.assignQuantity
+          return target.assignQuantity + target.unit
+        })
+        return [productCode, ...row, productCode, summary]
+      })
+      jsonData.unshift(['產品名稱', ...shopName, '產品名稱', '出貨總數'])
+      console.log(jsonData)
+
+      const dailyMeetSummary = {
+        sheetNames: today + '工埸廚房鮮肉表',
+        jsonData
+      }
+      exportExcel([dailyMeetSummary])
+    }
+  })
+}
+
+function fetchDailyOrderStatus() {
+  getDailyOrderStatus({ exportDate:defaultExportDate.value }).then(res => {
+    if (res.success) {
+      let total = searchFormColumns.value[1].options.length
+      let current = res.total
+      customBtn.value[1].percentage = (current / total) * 100
+    }
+  })
+}
+
 function exportOrderExcel(index, row) {
   const date = new Date()
   const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
@@ -155,46 +196,6 @@ function exportOrderExcel(index, row) {
   }
   exportExcel([shipping, delivery], true, String(today + row.shopName))
 }
-
-function exportDailyMeetSummary() {
-  postExportDailyMeetSummary({ exportDate:_exportDate.value }).then(res => {
-    if (res.success) {
-      const date = new Date()
-      const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
-      let shopName = res.resource.shopName
-      let productCode = res.resource.productCode
-      let orderItems = res.resource.orderItems
-      let jsonData = productCode.map((productCode, rowIndex) => {
-        let summary = 0
-        let row = shopName.map((item, columnIndex) => {
-          let target = orderItems[columnIndex][rowIndex]
-          summary += target.assignQuantity
-          return target.assignQuantity + target.unit
-        })
-        return [productCode, ...row, productCode, summary]
-      })
-      jsonData.unshift(['產品名稱', ...shopName, '產品名稱', '出貨總數'])
-      console.log(jsonData)
-
-      const dailyMeetSummary = {
-        sheetNames: today + '工埸廚房鮮肉表',
-        jsonData
-      }
-      exportExcel([dailyMeetSummary])
-    }
-  })
-}
-
-function fetchDailyOrderStatus() {
-  getDailyOrderStatus({ exportDate:_exportDate.value }).then(res => {
-    if (res.success) {
-      let total = searchFormColumns.value[1].options.length
-      let current = res.total
-      customBtn.value[1].percentage = (current / total) * 100
-    }
-  })
-}
-
 const defaultDateRange = computed(() => {
   let date = new Date()
   let endDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0') + ' 23:59:59'

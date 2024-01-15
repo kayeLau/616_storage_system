@@ -1,11 +1,9 @@
-const db = require('./connection_db')
 const { getCurrentTime , getSettingTimeRange } = require('../utils')
-const { optionsSQLFromatter, createNew, updateItem, deleteItem, getItems, customQuery } = require('./base_model')
+const { optionsSQLFromatter, createNew, updateItem, deleteItem, getItems, customQuery , checkRepeated } = require('./base_model')
 
 // 如有修改訂單,沒有則創建訂單
 function createNewOrder(data) {
-    let createDateRange = data.createDateRange
-    return checkOrderRepeated("order_info", { orderShopId: data.orderShopId, createDate: createDateRange, department: data.department })
+    return checkRepeated("order_info", { orderShopId: data.orderShopId, orderDate: data.orderDate, department: data.department })
         .then(async (res) => {
             const orderId = res.resource ? res.resource.id : data.id
             let orderList = data.orderList.map(item => {
@@ -23,7 +21,6 @@ function createNewOrder(data) {
             })
             if (!res.resource) {
                 delete data.orderList
-                delete data.createDateRange
                 createNew("order_info", data) // 訂單
             } else {
                 await deleteItem("order_detail_info", 'orderId', orderId)
@@ -62,45 +59,29 @@ function createNewOrderItems(list) {
         orderMode) VALUES ? `, [list])
 }
 
+
 function checkOrderRepeated(table, options) {
-    let result = {}
-    return new Promise((resolve, reject) => {
-        let optionsSQL = optionsSQLFromatter(options, table)
-        db.query(`SELECT * FROM ${table} ${optionsSQL}`, (err, row) => {
-            if (err) {
-                result.msg = "server error,please try again"
-                result.success = false
-                reject(result)
-                return
-            }
-            if (row.length >= 1) {
-                result.msg = row.length + " item have find"
-                result.success = true
-                result.resource = row[0]
+    return checkRepeated(table,options,true).then(async res => {
+            if (res.resource.length >= 1) {
+                let resource = res.resource[0]
                 let params = {
                     table: "order_detail_info",
-                    options: { orderId: result.resource.id },
+                    options: { orderId: resource.id },
                     size: 999,
                     page: 1
                 }
-                getItems(params).then(res => {
+                await getItems(params).then(res => {
                     if (res.success) {
-                        result.resource.children = res.resource
+                        resource.children = res.resource
                     }
-                    resolve(result)
                 })
-            } else {
-                result.msg = "success"
-                result.success = true
-                resolve(result)
+                res.resource = resource
             }
+            return res
         })
-    })
 }
 
-function updateOrderDetailAssignQuantity(list, orderId) {
-    let result = {}
-    result.success = false
+function updateOrderDetailAssignQuantity(list) {
     let assignQuantity = ''
     let status = ''
     let remark = ''
@@ -158,7 +139,7 @@ function getOrderItems(options, size, page) {
         result.resource = orderItems
         result.success = true
         return result
-    }).catch(err => { console.log(err) })
+    })
 }
 
 // 導出肉類總表
@@ -190,16 +171,17 @@ function getOrderExportList(options, size, page, summaryProductCodesMap, shopsLi
         result.resource = { orderItems, productCode: Object.values(summaryProductCodesMap), shopName: shopsList }
         result.success = true
         return result
-    }).catch(err => { console.log(err) })
+    })
 }
 
 // 根據orderCode groupby
 async function getOrderAndgroupby(options, size, page) {
-    const createDate = await getSettingTimeRange()
+    const orderDateRange = await getSettingTimeRange()
+    const orderDateStr = orderDateRange[0].substring(0, 10)
     const query = { 
         table: "order_info", 
         join: "order_info INNER JOIN shop_info ON orderShopId = shopId", 
-        columns:` * , DATE_FORMAT(order_info.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate , DATE_FORMAT(order_info.createDate,'%Y-%m-%d %H:%i:%S') AS createDate , IF(order_info.createDate BETWEEN '${createDate[0]}' AND '${createDate[1]}',1,0) AS isToday`,
+        columns:` * , DATE_FORMAT(order_info.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate , DATE_FORMAT(order_info.createDate,'%Y-%m-%d') AS createDate , IF(order_info.orderDate = '${orderDateStr}',1,0) AS isToday`,
         options, 
         size, 
         page 
@@ -229,7 +211,7 @@ async function getOrderAndgroupby(options, size, page) {
 }
 
 module.exports = {
-    getOrderExportList, getOrderAndgroupby,
+    getOrderExportList,
     createNewOrder, updateOrderInformation, deleteOrderItem,
     getOrderItems, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated
 }

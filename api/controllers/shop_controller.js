@@ -132,11 +132,14 @@ module.exports = class Shop {
                 getCurrentTime()
             ]
         })
-        bindProductTOShop(productList).then(result => {
-            res.json(result)
-        }).catch(err => {
-            next(err)
-        })
-
+        if (Array.isArray(productList) && Array.isArray(productList[0])){
+            bindProductTOShop(productList).then(result => {
+                res.json(result)
+            }).catch(err => {
+                next(err)
+            })
+        }else{
+            next(new Error('voild input'))
+        }
     }
 }

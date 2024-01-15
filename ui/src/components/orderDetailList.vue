@@ -143,7 +143,11 @@ async function submitOrderItem(){
   && item.orderQuantity !== null && item.assignQuantity !== null)
   let updateList = _data.children.filter(item => !item.mode && item.assignQuantity !== null)
   await addAdditionOrderItem(createList)
-  updateAssignQuantity(updateList)
+  if (updateList.length) {
+    updateAssignQuantity(updateList)
+  }else{
+    emit('refreshList')
+  }
 }
 
 async function addAdditionOrderItem(orderList) {
@@ -161,7 +165,7 @@ async function addAdditionOrderItem(orderList) {
 async function updateAssignQuantity(row) {
   let assignQuantitys = generateAssignQuantityParams(row)
   if (!assignQuantitys.length) {
-    ElMessage({ type: 'warning', message: '訂單分匹值無改變' })
+    ElMessage({ type: 'warning', message: '請至少選擇一個目標' })
     return
   }
   let orderId = _data.orderCode

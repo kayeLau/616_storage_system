@@ -1,8 +1,7 @@
-const db = require('./connection_db')
 const { checkRepeated, createNew , updateItem , getItems , getAllItem , deleteItem } = require('./base_model')
 
 function toRegister(memberData) {
-    return checkRepeated("member_info","name",memberData.name)
+    return checkRepeated("member_info",{name:memberData.name})
         .then(() => createNew("member_info",memberData))
         .catch(err => err)
 }

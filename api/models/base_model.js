@@ -1,23 +1,29 @@
 const db = require('./connection_db')
+const logger = require("../utils/log");
 
-function checkRepeated(table, key, value) {
+// @params
+// getRepeat 是否需要取出重复项，如果是重复项不会被拦截
+function checkRepeated(table, options , getRepeat = false) {
     let result = {}
+    let optionsSQL = optionsSQLFromatter(options, table)
     return new Promise((resolve, reject) => {
-        db.query(`SELECT * FROM ${table} where ${key} = ?`, [value], (err, row) => {
+        db.query(`SELECT * FROM ${table} ${optionsSQL}`, (err, row) => {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
+                logger.info(err);
                 reject(result)
                 return
             }
-
             if (row.length >= 1) {
-                result.msg = key + " always exist"
-                result.success = false
-                reject(result)
+                result.msg = "創建項已存在"
+                result.success = getRepeat
+                result.resource = row
+                getRepeat ? resolve(result) : reject(result);
             } else {
                 result.msg = "success"
                 result.success = true
+                result.resource = []
                 resolve(result)
             }
         })
@@ -31,6 +37,7 @@ function createNew(table, data) {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
+                logger.info(err)
                 reject(result)
                 return
             }
@@ -96,7 +103,7 @@ function optionsSQLFromatter(options, table) {
                     if(Array.isArray(options[key])){
                         query = '(' + options[key].reduce((accumulator, currentValue, index) => index === 0 ? `${key} = '${currentValue}'` : `${accumulator} OR ${key} = '${currentValue}'`, '') + ')'
                     }else{
-                        query = `${key} = '${options[key]}'`
+                        query = `${table}.${key} = '${options[key]}'`
                     }
                     break
             }

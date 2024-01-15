@@ -27,12 +27,9 @@ service.interceptors.response.use(
     response => {
       const res = response.data ? response.data : response
       if (!res.success || res.success === false) {
-        const msg = res.msg || '登录失效，请重新登录！'
-        if (res.status === "token verify fail") {
+        const msg = '登录失效，请重新登录！'
+        if (res.msg === "token verify fail") {
           ElMessage ({ type: 'error', message: msg })
-          // if (store.getters.token) {
-          //   ElMessage ({ type: 'error', message: msg + " " + res.code,  duration: 5 * 1000 })
-          // }
           setTimeout(() => {
             removeToken()
             location.reload()
