@@ -150,7 +150,7 @@ function getOrderExportList(options, size, page, summaryProductCodesMap, shopsLi
     return getOrderAndgroupby(options, size, page).then(async group => {
         const summaryProductCodes = Object.keys(summaryProductCodesMap)
         let orderItems = new Array(shopsList.length).fill(0).map(() => {
-            return new Array(summaryProductCodes.length).fill(0).map(() => { return { assignQuantity: 0, unit: '' } })
+            return new Array(summaryProductCodes.length).fill(0).map(() => { return { orderQuantity: 0, unit: '' } })
         })
         const promiseList = group.map((item) => {
             return getItems({ table: "order_detail_info", options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
@@ -160,7 +160,7 @@ function getOrderExportList(options, size, page, summaryProductCodesMap, shopsLi
                     orderItems[index] = summaryProductCodes.map(summaryProductCode => {
                         let target = res.resource.find(item => item.productCode === summaryProductCode)
                         return {
-                            assignQuantity: target ? target.assignQuantity : 0,
+                            orderQuantity: target ? target.orderQuantity : 0,
                             unit: target ? target.unit : ''
                         }
                     })

@@ -163,7 +163,8 @@ module.exports = class order {
     async postExportDailyMeetSummary(req, res, next) {
         let summaryProductCodesMap = {}
         let exportDate = req.body.exportDate
-        await getProductItems({ summary: 1 }, 999, 1).then(result => {
+        let exportType = req.body.exportType
+        await getProductItems({ summary: exportType }, 999, 1).then(result => {
             if (result.success) {
                 result.resource.forEach(item =>
                     summaryProductCodesMap[item.productCode] = item.productName

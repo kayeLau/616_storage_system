@@ -97,6 +97,25 @@ const customBtn = ref([
   {
     type: 'popover',
     btnType: 'success',
+    label: '導出匯總表',
+    icon: 'Printer',
+    disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1,
+    render: (h) => {
+      return h('div', { style: { display: 'flex', gap: '5px' } }, [
+        h(ElDatePicker, {
+          teleported: false, modelValue: exportDate.value,
+          ['onUpdate:modelValue']: (value) => {
+            exportDate.value = value
+            fetchDailyOrderStatus()
+          }, type: "date"
+        }),
+        h(ElButton, { onclick: exportDailyAllSummary, type: 'success', plain: true }, '確定')
+      ])
+    },
+  },
+  {
+    type: 'popover',
+    btnType: 'success',
     label: '導出肉類匯總表',
     icon: 'Printer',
     disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1,
@@ -109,7 +128,7 @@ const customBtn = ref([
             fetchDailyOrderStatus()
           }, type: "date"
         }),
-        h(ElButton, { onclick: exportDailyMeetSummary, type: 'success', plain: true }, '確定')
+        h(ElButton, { style:{ margin:'0px' }, onclick: exportDailyMeetSummary, type: 'success', plain: true }, '確定')
       ])
     },
   },
@@ -123,7 +142,7 @@ const customBtn = ref([
 ])
 
 function exportDailyMeetSummary() {
-  postExportDailyMeetSummary({ exportDate:defaultExportDate.value }).then(res => {
+  postExportDailyMeetSummary({ exportDate:defaultExportDate.value , exportType:1 }).then(res => {
     if (res.success) {
       const date = new Date()
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
@@ -134,8 +153,36 @@ function exportDailyMeetSummary() {
         let summary = 0
         let row = shopName.map((item, columnIndex) => {
           let target = orderItems[columnIndex][rowIndex]
-          summary += target.assignQuantity
-          return target.assignQuantity + target.unit
+          summary += target.orderQuantity
+          return target.orderQuantity + target.unit
+        })
+        return [productCode, ...row, productCode, summary]
+      })
+      jsonData.unshift(['產品名稱', ...shopName, '產品名稱', '出貨總數'])
+
+      const dailyMeetSummary = {
+        sheetNames: today + '工埸鮮肉匯總表',
+        jsonData
+      }
+      exportExcel([dailyMeetSummary])
+    }
+  })
+}
+
+function exportDailyAllSummary() {
+  postExportDailyMeetSummary({ exportDate:defaultExportDate.value , exportType:0 }).then(res => {
+    if (res.success) {
+      const date = new Date()
+      const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
+      let shopName = res.resource.shopName
+      let productCode = res.resource.productCode
+      let orderItems = res.resource.orderItems
+      let jsonData = productCode.map((productCode, rowIndex) => {
+        let summary = 0
+        let row = shopName.map((item, columnIndex) => {
+          let target = orderItems[columnIndex][rowIndex]
+          summary += target.orderQuantity
+          return target.orderQuantity + target.unit
         })
         return [productCode, ...row, productCode, summary]
       })
@@ -143,7 +190,7 @@ function exportDailyMeetSummary() {
       console.log(jsonData)
 
       const dailyMeetSummary = {
-        sheetNames: today + '工埸廚房鮮肉表',
+        sheetNames: today + '出貨匯總表',
         jsonData
       }
       exportExcel([dailyMeetSummary])
