@@ -148,12 +148,18 @@ function getOrderExportList(options, size, page, summaryProductCodesMap, shopsLi
     const result = {}
 
     return getOrderAndgroupby(options, size, page).then(async group => {
+        console.log(summaryProductCodesMap)
         const summaryProductCodes = Object.keys(summaryProductCodesMap)
         let orderItems = new Array(shopsList.length).fill(0).map(() => {
             return new Array(summaryProductCodes.length).fill(0).map(() => { return { orderQuantity: 0, unit: '' } })
         })
         const promiseList = group.map((item) => {
-            return getItems({ table: "order_detail_info", options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
+            return getItems({ 
+            table: "order_detail_info", 
+            options: { orderId: item.id }, 
+            size: 999, 
+            page: 1 
+        }).then(res => {
                 if (res.success) {
                     let index = shopsList.indexOf(item.shopName)
                     // 查product并賦值
@@ -161,7 +167,7 @@ function getOrderExportList(options, size, page, summaryProductCodesMap, shopsLi
                         let target = res.resource.find(item => item.productCode === summaryProductCode)
                         return {
                             orderQuantity: target ? target.orderQuantity : 0,
-                            unit: target ? target.unit : ''
+                            unit: target ? target.unit : '',
                         }
                     })
                 }
@@ -169,7 +175,7 @@ function getOrderExportList(options, size, page, summaryProductCodesMap, shopsLi
         })
         await Promise.all(promiseList)
         result.msg = "get success"
-        result.resource = { orderItems, productCode: Object.values(summaryProductCodesMap), shopName: shopsList }
+        result.resource = { orderItems, products: Object.values(summaryProductCodesMap), shopName: shopsList }
         result.success = true
         return result
     })

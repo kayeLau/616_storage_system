@@ -4,11 +4,16 @@ import XLSXStyle from 'xlsx-style-medalsoft'
 import JSZip from 'jszip';
 
 
-export function exportExcel(exportDate,usezip = false, zipFileName ) {
+export function exportExcel(exportDate, usezip = false, zipFileName , hpt ) {
   let zip = new JSZip();
   exportDate.forEach(item => {
     let jsonWorkSheet = XLSX.utils.json_to_sheet(item.jsonData, { skipHeader: true });
     autoWidth(jsonWorkSheet)
+    if(hpt){
+      let height = new Array(99).fill(0).map(() => { return { hpt } })
+      console.log(height)
+      jsonWorkSheet['!rows'] = height
+    }
 
     for (let cell in jsonWorkSheet) {
       if (cell[0] === '!') continue;
@@ -47,13 +52,13 @@ export function exportExcel(exportDate,usezip = false, zipFileName ) {
       type: 'binary'
     })
     let fileData = new Blob([s2ab(result)], { type: 'application/octet-stream' })
-    if(usezip){
-      zip.file(`${item.sheetNames}.xlsx`, fileData,{binary: true});
-    }else{
+    if (usezip) {
+      zip.file(`${item.sheetNames}.xlsx`, fileData, { binary: true });
+    } else {
       FileSaver.saveAs(fileData, `${item.sheetNames}.xlsx`);
     }
   });
-  if(usezip){
+  if (usezip) {
     zip.generateAsync({ type: "blob" }).then(function (blob) {
       FileSaver.saveAs(blob, `${zipFileName}.zip`);
     });
@@ -69,7 +74,7 @@ function autoWidth(worksheet) {
     maxWidth[col] = Math.max(maxWidth[col] || 0, typeof value === 'string' ? value.length : (value.toString()).length);
   }
 
-  worksheet['!cols'] = Object.keys(maxWidth).map(col => ({ wch: maxWidth[col] * 2.5 }));
+  worksheet['!cols'] = Object.keys(maxWidth).map(col => ({ wch: maxWidth[col] * 2.2 }));
 }
 
 function s2ab(s) {

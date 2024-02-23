@@ -166,8 +166,10 @@ module.exports = class order {
         let exportType = req.body.exportType
         await getProductItems({ summary: exportType }, 999, 1).then(result => {
             if (result.success) {
-                result.resource.forEach(item =>
-                    summaryProductCodesMap[item.productCode] = item.productName
+                result.resource
+                .sort((a,b) => a.freezersNum - b.freezersNum)
+                .forEach(item =>
+                    summaryProductCodesMap[item.productCode] = {productName:item.productName , freezersNum:item.freezersNum }
                 )
             }
         }).catch(err => {

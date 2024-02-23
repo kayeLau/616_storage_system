@@ -1,9 +1,9 @@
 <template>
   <div>
     <el-card class="Ktable-container">
-      <Ktable ref='KtableRef2' isExpand :columns="columns" :operations="operations" :params="params" :tableRowClassName="tableRowClassName"
-        :getList="getOrderList" :searchFormColumns="searchFormColumns" :customBtn="customBtn" :expandHeader="{}"
-        :expandColumns="{}" :products="products"></Ktable>
+      <Ktable ref='KtableRef2' isExpand :columns="columns" :operations="operations" :params="params"
+        :tableRowClassName="tableRowClassName" :getList="getOrderList" :searchFormColumns="searchFormColumns"
+        :customBtn="customBtn" :expandHeader="{}" :expandColumns="{}" :products="products"></Ktable>
     </el-card>
 
     <el-dialog v-model="orderDetailShow" title="訂單明細" width="90%" style="height:80vh;position: relative;" top="10vh">
@@ -64,7 +64,7 @@ const orderStateFormatter = (row, column) => {
 
 // 表格顏色
 function tableRowClassName({ row }) {
-if (row.isToday === 1) {
+  if (row.isToday === 1) {
     return 'warning-row'
   }
 }
@@ -128,7 +128,7 @@ const customBtn = ref([
             fetchDailyOrderStatus()
           }, type: "date"
         }),
-        h(ElButton, { style:{ margin:'0px' }, onclick: exportDailyMeetSummary, type: 'success', plain: true }, '確定')
+        h(ElButton, { style: { margin: '0px' }, onclick: exportDailyMeetSummary, type: 'success', plain: true }, '確定')
       ])
     },
   },
@@ -142,21 +142,21 @@ const customBtn = ref([
 ])
 
 function exportDailyMeetSummary() {
-  postExportDailyMeetSummary({ exportDate:defaultExportDate.value , exportType:1 }).then(res => {
+  postExportDailyMeetSummary({ exportDate: defaultExportDate.value, exportType: 1 }).then(res => {
     if (res.success) {
       const date = new Date()
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
-      let shopName = res.resource.shopName
-      let productCode = res.resource.productCode
+      let shopName = res.resource.shopName.map(item => item.match(/（.*）/g)[0])
+      let products = res.resource.products
       let orderItems = res.resource.orderItems
-      let jsonData = productCode.map((productCode, rowIndex) => {
+      let jsonData = products.map((product, rowIndex) => {
         let summary = 0
         let row = shopName.map((item, columnIndex) => {
           let target = orderItems[columnIndex][rowIndex]
           summary += target.orderQuantity
           return target.orderQuantity + target.unit
         })
-        return [productCode, ...row, productCode, summary]
+        return [product.productName, ...row, product.productName, summary]
       })
       jsonData.unshift(['產品名稱', ...shopName, '產品名稱', '出貨總數'])
 
@@ -164,30 +164,39 @@ function exportDailyMeetSummary() {
         sheetNames: today + '工埸鮮肉匯總表',
         jsonData
       }
-      exportExcel([dailyMeetSummary])
+      exportExcel([dailyMeetSummary], false, '', 40)
     }
   })
 }
 
 function exportDailyAllSummary() {
-  postExportDailyMeetSummary({ exportDate:defaultExportDate.value , exportType:0 }).then(res => {
+  postExportDailyMeetSummary({ exportDate: defaultExportDate.value, exportType: 0 }).then(res => {
     if (res.success) {
       const date = new Date()
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
-      let shopName = res.resource.shopName
-      let productCode = res.resource.productCode
-      let orderItems = res.resource.orderItems
-      let jsonData = productCode.map((productCode, rowIndex) => {
+      const shopName = res.resource.shopName
+      const products = res.resource.products
+      const orderItems = res.resource.orderItems
+      let jsonData = []
+      const splitNum = Math.floor(products.length / 2)
+      // 產品
+      products.map((product, rowIndex) => {
         let summary = 0
-        let row = shopName.map((item, columnIndex) => {
+        // 分店中的產品細項
+        shopName.forEach((item, columnIndex) => {
           let target = orderItems[columnIndex][rowIndex]
           summary += target.orderQuantity
-          return target.orderQuantity + target.unit
         })
-        return [productCode, ...row, productCode, summary]
+        let freezersNum = product.freezersNum === 0 ? '乾貨' : product.freezersNum
+        let jIndex = rowIndex > splitNum ? rowIndex - splitNum - 1 : rowIndex
+        if (rowIndex > splitNum) {
+          jsonData[jIndex] = [...jsonData[jIndex], product.productName, freezersNum, summary]
+        } else {
+          jsonData[jIndex] = [product.productName, freezersNum, summary, ' ']
+        }
       })
-      jsonData.unshift(['產品名稱', ...shopName, '產品名稱', '出貨總數'])
-      console.log(jsonData)
+
+      jsonData.unshift(['產品名稱', '雪房編號', '出貨總數', ' ', '產品名稱', '雪房編號', '出貨總數'])
 
       const dailyMeetSummary = {
         sheetNames: today + '出貨匯總表',
@@ -199,7 +208,7 @@ function exportDailyAllSummary() {
 }
 
 function fetchDailyOrderStatus() {
-  getDailyOrderStatus({ exportDate:defaultExportDate.value }).then(res => {
+  getDailyOrderStatus({ exportDate: defaultExportDate.value }).then(res => {
     if (res.success) {
       let total = searchFormColumns.value[1].options.length
       let current = res.total
@@ -211,10 +220,11 @@ function fetchDailyOrderStatus() {
 function exportOrderExcel(index, row) {
   const date = new Date()
   const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
+  const todayF = String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear()
   const shipping = {
     sheetNames: today + row.shopName + '出貨表',
     jsonData: [
-      [row.shopCode, row.shopName, '', today],
+      [row.shopCode, row.shopName, '', todayF],
       ['貨品編號', '貨品名稱', '數量/重量', '單位', '包裝規格'],
       // assuming `row.children` is an array of objects
       ...row.children.map(item => [
@@ -230,7 +240,7 @@ function exportOrderExcel(index, row) {
   const delivery = {
     sheetNames: today + row.shopName + '送貨單',
     jsonData: [
-      ['落單門店:' + row.shopName, '落單人:' + row.orderUserName, '', '落單時間:' + row.updateDate],
+      [row.shopName, row.orderUserName, '', row.updateDate],
       ['貨品名稱', '數量/重量', '單位', '備注'],
       // assuming `row.children` is an array of objects
       ...row.children.map(item => [
