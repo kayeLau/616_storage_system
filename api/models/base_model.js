@@ -50,11 +50,13 @@ function createNew(table, data) {
 
 function updateItem(table, data, key, value) {
     let result = {}
+    const _data = removeVoilParams(data)
     return new Promise((resolve, reject) => {
-        db.query(`UPDATE ${table} SET ? where ${key} = ?`, [data, value], (err) => {
+        db.query(`UPDATE ${table} SET ? where ${key} = ?`, [_data, value], (err) => {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
+                console.log(err)
                 logger.info(err);
                 reject(result);
                 return
@@ -191,6 +193,16 @@ function customQuery(query, options = []) {
             resolve(result);
         })
     })
+}
+
+function removeVoilParams(params){
+    const _params = {}
+    Object.keys(params).forEach(key => {
+        if(params[key] !== undefined){
+            _params[key] = params[key]
+        }
+    })
+    return _params
 }
 
 module.exports = { checkRepeated, createNew, updateItem, deleteItem, getItems, getAllItem, optionsSQLFromatter, customQuery }

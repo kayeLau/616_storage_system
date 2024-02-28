@@ -149,15 +149,6 @@ onMounted(() => {
     --el-table-header-bg-color: var(--el-color-primary-light-3);
     color: #fff;
 }
-
-.form-inline {
-    padding-left: 8px;
-}
-
-.el-form-item__label {
-    font-weight: bold;
-}
-
 .pagination {
     display: flex;
     justify-content: space-between;
@@ -178,20 +169,7 @@ onMounted(() => {
 .el-form--inline .el-form-item {
     margin-right: 20px;
 }
-
-.el-table .danger-row {
-    --el-table-tr-bg-color: var(--el-color-danger-light-9);
-}
-
-.el-table .warning-row {
-    --el-table-tr-bg-color: var(--el-color-warning-light-9);
-}
-
-.el-table .success-row {
-    --el-table-tr-bg-color: var(--el-color-success-light-9);
-}
-
-.el-table .warning-row {
-    --el-table-tr-bg-color: var(--el-color-warning-light-9);
+.form-inline {
+    padding-left: 8px;
 }
 </style>

@@ -26,6 +26,7 @@ import { setToken , setStorge} from '../utils/auth'
 import { login } from '../request/users'
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus'
 const router = useRouter()
 
 const loginInfo = reactive({
@@ -43,9 +44,11 @@ function toLogin() {
             setToken(res.token)
             setStorge('userInfo',res.userInfo)
             toHome()
+        }else{
+            ElMessage({ type: 'error', message: res.msg })
         }
-    }).catch(err => {
-        console.log(err)
+    }).catch(() => {
+        ElMessage({ type: 'error', message: '服務器錯誤' })
     })
 }
 

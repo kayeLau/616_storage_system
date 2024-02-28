@@ -2,7 +2,7 @@
     <div style="position: relative;">
         <div class="tool-bar"></div>
         <el-tabs v-model="tabName" class="product-tabs" type="border-card">
-            <el-tab-pane v-for="(item,index) of products" :label="item.label" :name="item.name" :key="index">
+            <el-tab-pane v-for="(item, index) of products" :label="item.label" :name="item.name" :key="index">
                 <el-skeleton :loading="loading" animated>
                     <template #template>
                         <div class="product-list">
@@ -12,10 +12,12 @@
                     </template>
                     <template #default>
                         <div class="product-list">
-                            <div v-for="(product,sIndex) of Object.values(item.children)" :key="sIndex" class="product-li">
+                            <div v-for="(product, sIndex) of Object.values(item.children)" :key="sIndex" class="product-li">
                                 <div class="product-name">{{ product.productName }}</div>
                                 <div class="order-quantity">
-                                    <el-input-number v-model="product.orderQuantity" :min="0" @change="setOrderMap(product)"/><span style="padding-left: 10px;">{{ product.unit }}</span>
+                                    <el-input-number v-model="product.orderQuantity" :min="0"
+                                        @change="setOrderMap(product)" /><span style="padding-left: 10px;">{{ product.unit
+                                        }}</span>
                                 </div>
                                 <!-- <div>{{ product.standard }}</div> -->
                             </div>
@@ -36,6 +38,11 @@ const tabName = ref('dry')
 let loading = ref(true)
 let orderMap = ref({})
 const products = ref([
+    {
+        name: 'mustOrder',
+        label: '必點項目',
+        children: {}
+    },
     {
         name: 'dry',
         label: '干貨',
@@ -63,24 +70,28 @@ const products = ref([
     },
 ])
 
-function orderDetailChange(product){
+function orderDetailChange(product) {
     setOrderMap(product)
     setProductListView(product)
 }
 
-function setOrderMap(product){
-    let productCode = product.productCode
+function setOrderMap(product) {
+    const productCode = product.productCode
     orderMap.value[productCode] = product
 }
 
-function setProductListView(product){
-    for(let i = 0;i < products.value.length;i++){
-        // let target = products.value[i].children[product.productCode]
-        if(products.value[i].children[product.productCode]){
-            products.value[i].children[product.productCode] = product
-        }
-        
+function setProductListView(product) {
+    const freezersNum = product.freezersNum < 2 ? product.freezersNum + 1 : product.freezersNum;
+    const promptNum = 0
+    products.value[freezersNum].children[product.productCode] = product
+    if(product.prompt){
+        products.value[promptNum].children[product.productCode] = product
     }
+    // for (let i = 0; i < products.value.length; i++) {
+    //     if (products.value[i].children[product.productCode]) {
+    //         products.value[i].children[product.productCode] = product
+    //     }
+    // }
 }
 
 // 獲取產品列表
@@ -92,21 +103,31 @@ async function getProducts() {
     await getProductList(params).then(res => {
         if (res.success) {
             res.resource.forEach(item => {
-                let freezersNum = item.freezersNum > 2 ? item.freezersNum - 1 : item.freezersNum;
-                products.value[freezersNum].children[item.productCode] = {
-                    ...item,
-                    orderQuantity:0,
-                    orderMode:0
+                let freezersNum = item.freezersNum < 2 ? item.freezersNum + 1 : item.freezersNum;
+                if (item.prompt) {
+                    products.value[0].children[item.productCode] = {
+                        ...item,
+                        orderQuantity: 0,
+                        orderMode: 0
+                    }
+                }else{
+                    products.value[freezersNum].children[item.productCode] = {
+                        ...item,
+                        orderQuantity: 0,
+                        orderMode: 0
+                    }
                 }
             });
+            products.value = products.value.filter(item => Object.keys(item.children).length)
+
         }
         loading.value = false
     })
 }
 
-function checkExistOrder(){
+function checkExistOrder() {
     checkOrderRepeated().then(res => {
-        if(res.success && res.resource.children){
+        if (res.success && res.resource.children) {
             res.resource.children.forEach(item => {
                 setOrderMap(item)
                 setProductListView(item)
@@ -122,33 +143,38 @@ onMounted(async () => {
 
 </script>
 <style>
- @media only screen and (max-width: 960px) {
+@media only screen and (max-width: 960px) {
     .product-list {
         height: calc(100vh - 130px) !important;
     }
+
     .product-list::-webkit-scrollbar {
         width: 0 !important;
     }
- }
- .product-name{
+}
+
+.product-name {
     font-weight: 500;
- }
- .product-tabs{
+}
+
+.product-tabs {
     height: 100%;
- }
-.product-li{
+}
+
+.product-li {
     padding: 10px;
     height: 65px;
     background-color: #fff;
-    border-bottom: rgba(0,0,0,0.1) 1px solid;
+    border-bottom: rgba(0, 0, 0, 0.1) 1px solid;
 }
-.product-list{
+
+.product-list {
     padding-right: 10px;
     width: 100%;
     height: calc(100vh - 180px);
     overflow-y: scroll;
 }
-.order-quantity{
+
+.order-quantity {
     float: right;
-}
-</style>
+}</style>

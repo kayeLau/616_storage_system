@@ -72,6 +72,7 @@ module.exports = class product {
             unit: req.body.unit,
             disable: req.body.disable,
             summary:req.body.summary,
+            prompt:req.body.prompt,
             updateDate: getCurrentTime()
         }
 

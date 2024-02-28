@@ -29,7 +29,7 @@
         <el-drawer v-model="drawerSwitch" direction="ltr" :z-index="120" :withHeader="false" size="100%"
             style="background: linear-gradient(var(--el-color-primary) 0%, #fff 40%);">
             <div class="order-comfirm">
-                <div><el-icon @click="drawerSwitch = !drawerSwitch"><Document /></el-icon></div>
+                <div class="arrow-left" @click="drawerSwitch = !drawerSwitch"><el-icon><ArrowLeftBold /></el-icon>返回</div>
                 <el-card>
                     <h1>{{ userInfo.shopName }}</h1>
                     <div>{{ userInfo.name }}</div>
@@ -198,5 +198,11 @@ function comfireOrder(){
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+.arrow-left{
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
 }
 </style>
