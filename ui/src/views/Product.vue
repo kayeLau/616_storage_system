@@ -1,16 +1,18 @@
 <template>
   <div>
-      <el-card class="Ktable-container">
-          <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params" :getList="getProductList" :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
-      </el-card>
-      <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
-        <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules" :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList"></jsonForm>
+    <el-card class="Ktable-container">
+      <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params" :getList="getProductList"
+        :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
+    </el-card>
+    <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
+      <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules"
+        :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList"></jsonForm>
     </el-drawer>
   </div>
 </template>
 <script setup>
-import { getProductList , updateProduct , createProduct , deleteProduct} from '../request/products'
-import { freezersNumDict , departmentDict , dictToOptions , productDisable , productSummary } from '../request/dict'
+import { getProductList, updateProduct, createProduct, deleteProduct } from '../request/products'
+import { freezersNumDict, classifyDict, departmentDict, dictToOptions, productDisable, productSummary } from '../request/dict'
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
 import { ref } from 'vue';
@@ -34,15 +36,21 @@ const editFormColumns = ref([
   },
   {
     type: 'select',
+    prop: 'classify',
+    label: '分類:',
+    options: dictToOptions(classifyDict)
+  },
+  {
+    type: 'select',
     prop: 'freezersNum',
     label: '雪房號碼:',
-    options:dictToOptions(freezersNumDict)
+    options: dictToOptions(freezersNumDict)
   },
   {
     type: 'select',
     prop: 'department',
     label: '負責部門:',
-    options:dictToOptions(departmentDict)
+    options: dictToOptions(departmentDict)
   },
   {
     type: 'input',
@@ -58,13 +66,13 @@ const editFormColumns = ref([
     type: 'select',
     prop: 'disable',
     label: '狀態:',
-    options:dictToOptions(productDisable)
+    options: dictToOptions(productDisable)
   },
   {
     type: 'select',
     prop: 'summary',
     label: '肉類匯總:',
-    options:dictToOptions(productSummary)
+    options: dictToOptions(productSummary)
   }
 ])
 const editFormRules = {
@@ -76,6 +84,9 @@ const editFormRules = {
   ],
   freezersNum: [
     { required: true, message: '請選擇雪房號碼', trigger: 'blur' },
+  ],
+  classify: [
+    { required: true, message: '請選擇分類', trigger: 'blur' },
   ],
   department: [
     { required: true, message: '請選擇負責部門', trigger: 'blur' },
@@ -94,28 +105,35 @@ const editFormRules = {
   ],
 }
 
-function refreshList(){
+function refreshList() {
   KtableRef.value.fatchList()
   jsonFormShow.value = !jsonFormShow.value
 }
 
 function createHandle() {
-    editFormModel.value = {}
-    JsonFormComfireCallBack.value = createProduct
-    editFormColumns.value[0].disabled = false
-    jsonFormShow.value = !jsonFormShow.value
+  editFormModel.value = {}
+  JsonFormComfireCallBack.value = createProduct
+  editFormColumns.value[0].disabled = false
+  jsonFormShow.value = !jsonFormShow.value
 }
 
 function editHandle(index, row) {
-    editFormModel.value = { ...row , freezersNum:String(row.freezersNum) , department:String(row.department) , disable:String(row.disable) , summary:String(row.summary)}
-    JsonFormComfireCallBack.value = updateProduct
-    editFormColumns.value[0].disabled = true
-    jsonFormShow.value = !jsonFormShow.value
+  editFormModel.value = {
+    ...row,
+    freezersNum: String(row.freezersNum),
+    classify: String(row.classify),
+    department: String(row.department),
+    disable: String(row.disable),
+    summary: String(row.summary)
+  }
+  JsonFormComfireCallBack.value = updateProduct
+  editFormColumns.value[0].disabled = true
+  jsonFormShow.value = !jsonFormShow.value
 }
 
-function deleteHandle(index, row){
-  deleteProduct({productCode:row.productCode}).then(res => {
-    if(res.success){
+function deleteHandle(index, row) {
+  deleteProduct({ id: row.id }).then(res => {
+    if (res.success) {
       KtableRef.value.fatchList()
     }
   })
@@ -123,82 +141,88 @@ function deleteHandle(index, row){
 //#endregion
 
 //#region tabel
-const freezersNumFormatter = (row , column)=>{
-    let cell = row[column.property]
-    return freezersNumDict[cell]
+const freezersNumFormatter = (row, column) => {
+  let cell = row[column.property]
+  return freezersNumDict[cell]
 }
 
-const departmentFormatter = (row , column)=>{
-    let cell = row[column.property]
-    return departmentDict[cell]
+const classifyFormatter = (row, column) => {
+  let cell = row[column.property]
+  return classifyDict[cell]
 }
 
-const summaryFormatter = (row , column)=>{
-    let cell = row[column.property]
-    return productSummary[cell]
+const departmentFormatter = (row, column) => {
+  let cell = row[column.property]
+  return departmentDict[cell]
 }
 
-const productDisableFormatter = (row , column)=>{
-    let cell = row[column.property]
-    let color = cell === 1 ? 'var(--el-color-danger)' : 'var(--el-color-success)'
-    return `<span style='color:${color}'>${productDisable[cell]}<span>`
+const summaryFormatter = (row, column) => {
+  let cell = row[column.property]
+  return productSummary[cell]
+}
+
+const productDisableFormatter = (row, column) => {
+  let cell = row[column.property]
+  let color = cell === 1 ? 'var(--el-color-danger)' : 'var(--el-color-success)'
+  return `<span style='color:${color}'>${productDisable[cell]}<span>`
 }
 
 const columns = [
-  {props:'disable',label:'狀態',formatter:productDisableFormatter},
-  {props:'productCode',label:'產品編號'},
-  {props:'productName',label:'產品名稱',width:130},
-  {props:'freezersNum',label:'雪房號碼',formatter:freezersNumFormatter},
-  {props:'department',label:'負責部門',formatter:departmentFormatter},
-  {props:'standard',label:'單位', width:120},
-  {props:'unit',label:'規格'},
-  {props:'summary',label:'匯總',formatter:summaryFormatter},
-  {props:'updateDate',label:'修改時間',width:200}
+  { props: 'disable', label: '狀態', formatter: productDisableFormatter , width: 60},
+  { props: 'productCode', label: '產品編號' , width: 80},
+  { props: 'productName', label: '產品名稱', width: 130 },
+  { props: 'classify', label: '分類', formatter: classifyFormatter },
+  { props: 'freezersNum', label: '雪房號碼', formatter: freezersNumFormatter },
+  { props: 'department', label: '負責部門', formatter: departmentFormatter },
+  { props: 'standard', label: '單位', width: 120 },
+  { props: 'unit', label: '規格' },
+  { props: 'summary', label: '匯總', formatter: summaryFormatter },
+  { props: 'updateDate', label: '修改時間', width: 200 }
 ]
 const operations = {
-  width:200,
-  size:"small",
-  children:[
-      {type:"primary",name:'編輯',icon:'Edit' , onClick:editHandle},
-      {type:"danger",name:'删除',icon:'Delete' , onClick:deleteHandle}
+  width: 200,
+  size: "small",
+  children: [
+    { type: "primary", name: '編輯', icon: 'Edit', onClick: editHandle },
+    { type: "danger", name: '删除', icon: 'Delete', onClick: deleteHandle }
   ]
 }
 const params = {
-  size:20,
-  page:1
+  size: 20,
+  page: 1
 }
 const searchFormColumns = [
   {
-      type:'input',
-      prop:'productName',
-      label:'產品名稱:',
+    type: 'input',
+    prop: 'productName',
+    label: '產品名稱:',
   },
   {
-      type:'select',
-      prop:'freezersNum',
-      label:'雪房號碼:',
-      options:dictToOptions(freezersNumDict)
+    type: 'select',
+    prop: 'freezersNum',
+    label: '雪房號碼:',
+    options: dictToOptions(freezersNumDict)
   },
   {
-      type:'select',
-      prop:'disable',
-      label:'狀態:',
-      options:dictToOptions(productDisable)
+    type: 'select',
+    prop: 'disable',
+    label: '狀態:',
+    options: dictToOptions(productDisable)
   },
   {
-      type:'select',
-      prop:'summary',
-      label:'匯總:',
-      options:dictToOptions(productSummary)
+    type: 'select',
+    prop: 'summary',
+    label: '匯總:',
+    options: dictToOptions(productSummary)
   }
 ]
 const customBtn = [
   {
-      type:'button',
-      btnType:'success',
-      label:'新增',
-      icon:'CirclePlus',
-      onClick:createHandle
+    type: 'button',
+    btnType: 'success',
+    label: '新增',
+    icon: 'CirclePlus',
+    onClick: createHandle
   }
 ]
 //#endregion

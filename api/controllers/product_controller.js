@@ -45,12 +45,14 @@ module.exports = class product {
         const productData = {
             productCode: req.body.productCode,
             productName: req.body.productName,
+            classify:req.body.classify,
             freezersNum: req.body.freezersNum,
             department: req.body.department,
             standard: req.body.standard,
             unit: req.body.unit,
             disable: req.body.disable,
             summary:req.body.summary,
+            prompt:0,
             createDate: getCurrentTime(),
             updateDate: getCurrentTime()
         }
@@ -63,8 +65,9 @@ module.exports = class product {
     }
 
     postUpdateProduct(req, res, next) {
-        const productCode = req.body.productCode
+        const id = req.body.id
         const productData = {
+            classify:req.body.classify,
             productName: req.body.productName,
             freezersNum: req.body.freezersNum,
             department: req.body.department,
@@ -76,7 +79,7 @@ module.exports = class product {
             updateDate: getCurrentTime()
         }
 
-        updateProductInformation(productCode, productData).then(result => {
+        updateProductInformation(id, productData).then(result => {
             res.json(result)
         }).catch(err => {
             next(err)
@@ -84,9 +87,9 @@ module.exports = class product {
     }
 
     postDeleteProduct(req, res, next) {
-        const productCode = req.body.productCode
+        const id = req.body.id
 
-        deleteProductItem(productCode).then(result => {
+        deleteProductItem(id).then(result => {
             res.json(result)
         }).catch(err => {
             next(err)

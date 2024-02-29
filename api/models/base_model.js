@@ -11,7 +11,7 @@ function checkRepeated(table, options , getRepeat = false) {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
-                logger.info(err);
+                logger.info(JSON.stringify(err))
                 reject(result)
                 return
             }
@@ -37,7 +37,8 @@ function createNew(table, data) {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
-                logger.info(err)
+                console.log(err)
+                logger.info(JSON.stringify(err))
                 reject(result)
                 return
             }
@@ -57,7 +58,7 @@ function updateItem(table, data, key, value) {
                 result.msg = "server error,please try again"
                 result.success = false
                 console.log(err)
-                logger.info(err);
+                logger.info(JSON.stringify(err))
                 reject(result);
                 return
             }
@@ -75,7 +76,8 @@ function deleteItem(table, key, value) {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
-                logger.info(err);
+                console.log(err)
+                logger.info(JSON.stringify(err))
                 reject(result);
                 return
             }

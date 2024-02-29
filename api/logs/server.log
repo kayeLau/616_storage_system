@@ -12,3 +12,11 @@ info: Feb-27-2024 22:33:55: 	undefined
 info: Feb-27-2024 22:34:07: 	undefined
 info: Feb-27-2024 22:34:16: 	undefined
 info: Feb-27-2024 22:34:29: 	undefined
+info: Feb-29-2024 16:53:28: 	undefined
+info: Feb-29-2024 17:10:34: 	undefined
+info: Feb-29-2024 17:11:06: 	{"code":"ER_NO_DEFAULT_FOR_FIELD","errno":1364,"sqlMessage":"Field 'classify' doesn't have a default value","sqlState":"HY000","index":0,"sql":"INSERT INTO product_info SET `productCode` = '88', `productName` = '88', `freezersNum` = '0', `department` = '0', `standard` = '555', `unit` = '5555', `disable` = '0', `summary` = '0', `createDate` = '2024-02-29 17:11:06', `updateDate` = '2024-02-29 17:11:06'"}
+info: Feb-29-2024 17:35:48: 	{"code":"ER_NO_DEFAULT_FOR_FIELD","errno":1364,"sqlMessage":"Field 'prompt' doesn't have a default value","sqlState":"HY000","index":0,"sql":"INSERT INTO product_info SET `productCode` = '88', `productName` = '88', `freezersNum` = '1', `department` = '0', `standard` = '888', `unit` = '88', `disable` = '0', `summary` = '1', `classify` = '1', `createDate` = '2024-02-29 17:35:48', `updateDate` = '2024-02-29 17:35:48'"}
+info: Feb-29-2024 17:36:38: 	{"code":"ER_BAD_NULL_ERROR","errno":1048,"sqlMessage":"Column 'prompt' cannot be null","sqlState":"23000","index":0,"sql":"INSERT INTO product_info SET `productCode` = '88', `productName` = '88', `classify` = '1', `freezersNum` = '1', `department` = '0', `standard` = '888', `unit` = '88', `disable` = '0', `summary` = '1', `prompt` = NULL, `createDate` = '2024-02-29 17:36:38', `updateDate` = '2024-02-29 17:36:38'"}
+info: Feb-29-2024 17:39:06: 	undefined
+info: Feb-29-2024 17:39:09: 	undefined
+info: Feb-29-2024 17:39:57: 	{"code":"ER_TRUNCATED_WRONG_VALUE","errno":1292,"sqlMessage":"Truncated incorrect DOUBLE value: 'H1007'","sqlState":"22007","index":0,"sql":"DELETE FROM product_info where productCode = 246"}
