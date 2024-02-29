@@ -34,41 +34,10 @@ import cart from '../components/cart.vue'
 import { ref, onMounted } from 'vue';
 import { getProductList } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
-const tabName = ref('dry')
+import { classifyDict } from '../request/dict';
 let loading = ref(true)
 let orderMap = ref({})
-const products = ref([
-    {
-        name: 'mustOrder',
-        label: '必點項目',
-        children: {}
-    },
-    {
-        name: 'dry',
-        label: '干貨',
-        children: {}
-    },
-    {
-        name: 'freeseFirst',
-        label: '一號雪房',
-        children: {}
-    },
-    {
-        name: 'freeseThree',
-        label: '三號雪房',
-        children: {}
-    },
-    {
-        name: 'freeseFour',
-        label: '四號雪房',
-        children: {}
-    },
-    {
-        name: 'freeseFive',
-        label: '五號雪房',
-        children: {}
-    },
-])
+const products = ref([])
 
 function orderDetailChange(product) {
     setOrderMap(product)
@@ -76,22 +45,18 @@ function orderDetailChange(product) {
 }
 
 function setOrderMap(product) {
-    const productCode = product.productCode
-    orderMap.value[productCode] = product
+    const productId = product.productId
+    orderMap.value[productId] = product
 }
 
 function setProductListView(product) {
-    const freezersNum = product.freezersNum < 2 ? product.freezersNum + 1 : product.freezersNum;
+    const target = products.value.find(item => item.name === product.classify);
+    target.children[product.productId] = product
+
     const promptNum = 0
-    products.value[freezersNum].children[product.productCode] = product
-    if(product.prompt){
-        products.value[promptNum].children[product.productCode] = product
+    if (product.prompt) {
+        products.value[promptNum].children[product.productId] = product
     }
-    // for (let i = 0; i < products.value.length; i++) {
-    //     if (products.value[i].children[product.productCode]) {
-    //         products.value[i].children[product.productCode] = product
-    //     }
-    // }
 }
 
 // 獲取產品列表
@@ -103,15 +68,23 @@ async function getProducts() {
     await getProductList(params).then(res => {
         if (res.success) {
             res.resource.forEach(item => {
-                let freezersNum = item.freezersNum < 2 ? item.freezersNum + 1 : item.freezersNum;
+                const classify = item.classify;
+                const classifyName = classifyDict[classify]
+                if (!products.value[classify]) {
+                    products.value[classify] = {
+                        name: classify,
+                        label: classifyName,
+                        children: {}
+                    }
+                }
                 if (item.prompt) {
-                    products.value[0].children[item.productCode] = {
+                    products.value[0].children[item.productId] = {
                         ...item,
                         orderQuantity: 0,
                         orderMode: 0
                     }
-                }else{
-                    products.value[freezersNum].children[item.productCode] = {
+                } else {
+                    products.value[classify].children[item.productId] = {
                         ...item,
                         orderQuantity: 0,
                         orderMode: 0
@@ -124,6 +97,7 @@ async function getProducts() {
         loading.value = false
     })
 }
+const tabName = ref(1)
 
 function checkExistOrder() {
     checkOrderRepeated().then(res => {
@@ -177,4 +151,5 @@ onMounted(async () => {
 
 .order-quantity {
     float: right;
-}</style>
+}
+</style>

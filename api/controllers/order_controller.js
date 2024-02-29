@@ -83,12 +83,9 @@ module.exports = class order {
             orderList = orderList.map(item => {
                 return [
                     item.orderId,
-                    item.productCode,
-                    item.productName,
+                    item.productId,
                     item.assignQuantity,
                     item.orderQuantity,
-                    item.unit,
-                    item.standard,
                     updateDate,
                     item.orderMode,
                     1

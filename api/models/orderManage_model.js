@@ -10,13 +10,10 @@ function createNewOrder(data) {
                 return [
                     item.id ? item.id : '',
                     orderId,
-                    item.productCode,
-                    item.productName,
+                    item.productId,
                     item.orderQuantity,
-                    item.unit,
-                    item.standard,
+                    item.orderMode,
                     data.updateDate,
-                    item.orderMode
                 ]
             })
             if (!res.resource.length) {
@@ -35,12 +32,9 @@ function createNewOrder(data) {
 function insertOrderItems(list) {
     return customQuery(`INSERT IGNORE INTO order_detail_info (
             orderId,
-            productCode,
-            productName,
+            productId,
             assignQuantity,
             orderQuantity,
-            unit,
-            standard,
             updateDate,
             orderMode,
             status) VALUES ? `, [list])
@@ -50,13 +44,10 @@ function createNewOrderItems(list) {
     return customQuery(`INSERT IGNORE INTO order_detail_info (
         id,
         orderId,
-        productCode,
-        productName,
+        productId,
         orderQuantity,
-        unit,
-        standard,
-        updateDate,
-        orderMode) VALUES ? `, [list])
+        orderMode,
+        updateDate) VALUES ? `, [list])
 }
 
 
@@ -67,6 +58,7 @@ function checkOrderRepeated(table, options) {
             resource = res.resource[0]
             let params = {
                 table: "order_detail_info",
+                join:"order_detail_info INNER JOIN product_info ON order_detail_info.productId = product_info.productId",
                 options: { orderId: resource.id },
                 size: 999,
                 page: 1
@@ -121,7 +113,7 @@ function getOrderItems(options, size, page) {
     const result = {}
     return getOrderAndgroupby(options, size, page).then(async orderItems => {
         const promiseList = orderItems.map((item, index) => {
-            return getItems({ table: "order_detail_info", options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
+            return getItems({ table: "order_detail_info",join:"order_detail_info INNER JOIN product_info ON order_detail_info.productId = product_info.productId" ,options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
                 if (res.success) {
                     let status = res.resource.find(item => item.status === 0)
                     orderItems[index].status = status ? 0 : 1

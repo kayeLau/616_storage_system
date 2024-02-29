@@ -20,3 +20,7 @@ info: Feb-29-2024 17:36:38: 	{"code":"ER_BAD_NULL_ERROR","errno":1048,"sqlMessag
 info: Feb-29-2024 17:39:06: 	undefined
 info: Feb-29-2024 17:39:09: 	undefined
 info: Feb-29-2024 17:39:57: 	{"code":"ER_TRUNCATED_WRONG_VALUE","errno":1292,"sqlMessage":"Truncated incorrect DOUBLE value: 'H1007'","sqlState":"22007","index":0,"sql":"DELETE FROM product_info where productCode = 246"}
+info: Feb-29-2024 19:16:18: 	undefined
+info: Feb-29-2024 19:16:51: 	undefined
+info: Feb-29-2024 19:20:11: 	undefined
+info: Feb-29-2024 19:31:39: 	undefined
