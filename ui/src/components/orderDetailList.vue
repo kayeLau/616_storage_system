@@ -4,21 +4,21 @@
     <el-table :data="_data.children" class="table" header-cell-class-name="table-header"
       :row-class-name="tableRowClassName" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" />
-      <el-table-column prop="status" label="分配狀態">
+      <el-table-column prop="status" label="分配狀態" width="100">
         <template #default="scope">
           <span :style="orderStateColor(scope.row.status)">{{ orderStateDict[scope.row.status] }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="productCode" label="產品編號" width="150">
+      <el-table-column prop="productCode" label="產品" width="280">
         <template #default="scope">
-          <el-select v-if='scope.row.mode === "create"' v-model="_data.children[scope.$index].productCode" filterable class="input-short"
+          <el-select v-if='scope.row.mode === "create"' v-model="_data.children[scope.$index].productId" filterable class="input-short"
             @change="setOrderItem(scope.row)">
             <el-option v-for="item in productOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
-          <span v-else>{{ scope.row.productCode }}</span>
+          <span v-else>{{ scope.row.productCode + ' ' + scope.row.productName }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="productName" label="產品名稱" />
+      <!-- <el-table-column prop="productName" label="產品名稱" /> -->
       <el-table-column prop="orderQuantity" label="下單數量" width="150" align="center">
         <template #default="scope">
           <div v-if='scope.row.mode === "create"' class="flex-row-center">
@@ -106,17 +106,18 @@ function tableRowClassName({ row }) {
 
 // 產品列表
 function setOrderItem(row) {
-    let productCode = row.productCode
-    let product = props.products.find(item => item.productCode === productCode)
+    let productId = row.productId
+    let product = props.products.find(item => item.productId === productId)
     row.productName = product.productName
+    row.productCode = product.productCode
     row.unit = product.unit
 }
 
 const productOptions = computed(() => {
     return props.products.map(item => {
         return {
-            value: item.productCode,
-            label: item.productCode
+            value: item.productId,
+            label: item.productCode + ' ' + item.productName
         }
     })
 })
@@ -127,6 +128,7 @@ function insertOrderItem() {
   _data.children.unshift({
     orderId,
     status: 2,
+    productId: '',
     productCode: '',
     productName: '',
     orderQuantity: null,
