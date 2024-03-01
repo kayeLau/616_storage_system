@@ -136,14 +136,13 @@ function getOrderItems(options, size, page) {
 }
 
 // 導出肉類總表
-function getOrderExportList(options, size, page, summaryProductCodesMap, shopsList) {
+function getOrderExportList(options, size, page, summaryProductIdsMap, shopsList) {
     const result = {}
 
     return getOrderAndgroupby(options, size, page).then(async group => {
-        console.log(summaryProductCodesMap)
-        const summaryProductCodes = Object.keys(summaryProductCodesMap)
+        const summaryProductIds = Object.keys(summaryProductIdsMap)
         let orderItems = new Array(shopsList.length).fill(0).map(() => {
-            return new Array(summaryProductCodes.length).fill(0).map(() => { return { orderQuantity: 0, unit: '' } })
+            return new Array(summaryProductIds.length).fill(0).map(() => { return { orderQuantity: 0, unit: '' } })
         })
         const promiseList = group.map((item) => {
             return getItems({ 
@@ -155,8 +154,8 @@ function getOrderExportList(options, size, page, summaryProductCodesMap, shopsLi
                 if (res.success) {
                     let index = shopsList.indexOf(item.shopName)
                     // 查product并賦值
-                    orderItems[index] = summaryProductCodes.map(summaryProductCode => {
-                        let target = res.resource.find(item => item.productCode === summaryProductCode)
+                    orderItems[index] = summaryProductIds.map(summaryProductId => {
+                        let target = res.resource.find(item => item.productId === summaryProductId)
                         return {
                             orderQuantity: target ? target.orderQuantity : 0,
                             unit: target ? target.unit : '',
@@ -167,7 +166,7 @@ function getOrderExportList(options, size, page, summaryProductCodesMap, shopsLi
         })
         await Promise.all(promiseList)
         result.msg = "get success"
-        result.resource = { orderItems, products: Object.values(summaryProductCodesMap), shopName: shopsList }
+        result.resource = { orderItems, products: Object.values(summaryProductIdsMap), shopName: shopsList }
         result.success = true
         return result
     })

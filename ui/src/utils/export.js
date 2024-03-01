@@ -71,7 +71,9 @@ function autoWidth(worksheet) {
     if (cell[0] === '!') continue;
     let col = cell.substring(0, 1); // get the column (assuming a maximum of 26 columns)
     let value = worksheet[cell].v; // get cell value
-    maxWidth[col] = Math.max(maxWidth[col] || 0, typeof value === 'string' ? value.length : (value.toString()).length);
+    if(value){
+      maxWidth[col] = Math.max(maxWidth[col] || 0, typeof value === 'string' ? value.length : (value.toString()).length);
+    }
   }
 
   worksheet['!cols'] = Object.keys(maxWidth).map(col => ({ wch: maxWidth[col] * 2.2 }));

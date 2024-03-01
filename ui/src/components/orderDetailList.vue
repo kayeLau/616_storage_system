@@ -1,7 +1,7 @@
 <template>
   <div style="height: 100%;">
     <!-- tabel -->
-    <el-table :data="_data.children" class="table" header-cell-class-name="table-header"
+    <el-table :data="orderInfo" class="table" header-cell-class-name="table-header"
       :row-class-name="tableRowClassName" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" />
       <el-table-column prop="status" label="分配狀態" width="100">
@@ -11,8 +11,8 @@
       </el-table-column>
       <el-table-column prop="productCode" label="產品" width="280">
         <template #default="scope">
-          <el-select v-if='scope.row.mode === "create"' v-model="_data.children[scope.$index].productId" filterable class="input-short"
-            @change="setOrderItem(scope.row)">
+          <el-select v-if='scope.row.mode === "create"' v-model="_data.children[scope.$index].productId" filterable
+            class="input-short" @change="setOrderItem(scope.row)">
             <el-option v-for="item in productOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
           <span v-else>{{ scope.row.productCode + ' ' + scope.row.productName }}</span>
@@ -26,13 +26,13 @@
               @change="setSubmitAvailable(scope.$index)" />
             <span>{{ scope.row.unit }}</span>
           </div>
-         </template>
+        </template>
       </el-table-column>
       <el-table-column prop="assignQuantity" label="分配數量" width="150" align="center">
         <template #default="scope">
           <div class="flex-row-center">
             <el-input-number v-model="_data.children[scope.$index].assignQuantity" :min="0" :controls="false"
-              @change="setSubmitAvailable(scope.$index)" :disabled="userInfo.auth !== -1"/>
+              @change="setSubmitAvailable(scope.$index)" :disabled="userInfo.auth !== -1" />
             <span>{{ scope.row.unit }}</span>
           </div>
         </template>
@@ -41,7 +41,8 @@
       <el-table-column prop="updateDate" label="修改時間" width="180" />
       <el-table-column prop="remark" label="備注" width="200">
         <template #default="scope">
-          <el-input v-model="_data.children[scope.$index].remark" @change="setSubmitAvailable(scope.$index)" :disabled="userInfo.auth !== -1"/>
+          <el-input v-model="_data.children[scope.$index].remark" @change="setSubmitAvailable(scope.$index)"
+            :disabled="userInfo.auth !== -1" />
         </template>
       </el-table-column>
     </el-table>
@@ -60,7 +61,7 @@
   </div>
 </template>
 <script setup>
-import { defineProps, reactive, ref, watch, defineEmits , computed } from 'vue';
+import { defineProps, reactive, ref, watch, defineEmits, computed } from 'vue';
 import { updateOrderDetailAssignQuantity, createAdditionOrderItem } from '../request/orders';
 import { orderStateDict, orderMode, orderStateColor } from '../request/dict';
 import { ElMessage } from 'element-plus'
@@ -79,6 +80,10 @@ const userInfo = computed(() => {
 let _data = reactive(props.data)
 let _params = reactive(props.params)
 let selection = ref([])
+
+const orderInfo = computed(() => {
+  return _data.children.slice((_params.page-1) * _params.size, (_params.page) * _params.size)
+})
 
 watch(() => props.data, (value) => {
   _data = value
@@ -106,20 +111,20 @@ function tableRowClassName({ row }) {
 
 // 產品列表
 function setOrderItem(row) {
-    let productId = row.productId
-    let product = props.products.find(item => item.productId === productId)
-    row.productName = product.productName
-    row.productCode = product.productCode
-    row.unit = product.unit
+  let productId = row.productId
+  let product = props.products.find(item => item.productId === productId)
+  row.productName = product.productName
+  row.productCode = product.productCode
+  row.unit = product.unit
 }
 
 const productOptions = computed(() => {
-    return props.products.map(item => {
-        return {
-            value: item.productId,
-            label: item.productCode + ' ' + item.productName
-        }
-    })
+  return props.products.map(item => {
+    return {
+      value: item.productId,
+      label: item.productCode + ' ' + item.productName
+    }
+  })
 })
 
 // 新增
@@ -140,20 +145,20 @@ function insertOrderItem() {
   })
 }
 
-async function submitOrderItem(){
-  let createList = _data.children.filter(item => item.mode === 'create' && item.productCode && item.productName 
-  && item.orderQuantity !== null && item.assignQuantity !== null)
+async function submitOrderItem() {
+  let createList = _data.children.filter(item => item.mode === 'create' && item.productCode && item.productName
+    && item.orderQuantity !== null && item.assignQuantity !== null)
   let updateList = _data.children.filter(item => !item.mode && item.assignQuantity !== null)
   await addAdditionOrderItem(createList)
   if (updateList.length) {
     updateAssignQuantity(updateList)
-  }else{
+  } else {
     emit('refreshList')
   }
 }
 
 async function addAdditionOrderItem(orderList) {
-  if (!orderList.length) {return}
+  if (!orderList.length) { return }
   await createAdditionOrderItem({ orderList }).then(res => {
     if (res.success) {
       ElMessage({ type: 'success', message: '操作成功：資料已存入數據庫' })

@@ -137,7 +137,7 @@ const customBtn = ref([
     width: '250px',
     percentage: 0,
     disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1,
-    label: '已分配門店'
+    label: '已下單門店'
   }
 ])
 
@@ -212,7 +212,7 @@ function fetchDailyOrderStatus() {
     if (res.success) {
       let total = searchFormColumns.value[1].options.length
       let current = res.total
-      customBtn.value[1].percentage = (current / total) * 100
+      customBtn.value[2].percentage = (current / total) * 100
     }
   })
 }
@@ -240,7 +240,9 @@ function exportOrderExcel(index, row) {
   const delivery = {
     sheetNames: today + row.shopName + '送貨單',
     jsonData: [
-      [row.shopName, row.orderUserName, '', row.updateDate],
+      [row.shopName],
+      [row.orderUserName[0]],
+      [row.updateDate],
       ['貨品名稱', '數量/重量', '單位', '備注'],
       // assuming `row.children` is an array of objects
       ...row.children.map(item => [

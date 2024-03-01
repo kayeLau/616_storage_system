@@ -146,11 +146,11 @@ module.exports = class order {
             let exportDate = req.body.exportDate
             const dailyOrderList = await getOrderItems({ orderDate: exportDate }, 999, 1).then(result => {
                 if (result.success) {
-                    return result.resource.filter(item => item.status === 1)
+                    return result
                 }
             })
             result.success = true
-            result.total = dailyOrderList.length
+            result.total = dailyOrderList.total
             res.json(result)
         } catch (err) {
             next(err)
@@ -158,7 +158,7 @@ module.exports = class order {
     }
 
     async postExportDailyMeetSummary(req, res, next) {
-        let summaryProductCodesMap = {}
+        let summaryProductIdsMap = {}
         let exportDate = req.body.exportDate
         let exportType = req.body.exportType
         await getProductItems({ summary: exportType }, 999, 1).then(result => {
@@ -166,7 +166,7 @@ module.exports = class order {
                 result.resource
                 .sort((a,b) => a.freezersNum - b.freezersNum)
                 .forEach(item =>
-                    summaryProductCodesMap[item.productCode] = {productName:item.productName , freezersNum:item.freezersNum }
+                    summaryProductIdsMap[item.productId] = {productName:item.productName , freezersNum:item.freezersNum }
                 )
             }
         }).catch(err => {
@@ -181,7 +181,7 @@ module.exports = class order {
             next(err)
         })
 
-        await getOrderExportList({ orderDate: exportDate }, 999, 1, summaryProductCodesMap, shopsList).then(result => {
+        await getOrderExportList({ orderDate: exportDate }, 999, 1, summaryProductIdsMap, shopsList).then(result => {
             if (result.success) {
                 res.json(result)
             }
