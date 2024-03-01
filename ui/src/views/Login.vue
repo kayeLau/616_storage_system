@@ -4,8 +4,8 @@
             <div class="form-container sign-in">
                 <div class="login-form">
                     <h1>Sign In</h1>
-                    <input type="text" placeholder="用戶名稱" v-model="loginInfo.userName">
-                    <input type="password" placeholder="用戶密碼" v-model="loginInfo.password">
+                    <input type="text" placeholder="用戶名稱" v-model="loginInfo.userName" @keydown.enter="toLogin">
+                    <input type="password" placeholder="用戶密碼" v-model="loginInfo.password" @keydown.enter="toLogin">
                     <button @click="toLogin">Sign In</button>
                 </div>
             </div>
@@ -22,7 +22,7 @@
 </template>
 <script setup>
 // import md5 from 'js-md5'
-import { setToken , setStorge} from '../utils/auth'
+import { setToken, setStorge } from '../utils/auth'
 import { login } from '../request/users'
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
@@ -35,21 +35,25 @@ const loginInfo = reactive({
 })
 
 function toLogin() {
-    let data = {
-        name: loginInfo.userName,
-        password: loginInfo.password,
-    }
-    login(data).then(res => {
-        if (res.success === true) {
-            setToken(res.token)
-            setStorge('userInfo',res.userInfo)
-            toHome()
-        }else{
-            ElMessage({ type: 'error', message: res.msg })
+    if (loginInfo.userName && loginInfo.password) {
+        let data = {
+            name: loginInfo.userName,
+            password: loginInfo.password,
         }
-    }).catch(() => {
-        ElMessage({ type: 'error', message: '服務器錯誤' })
-    })
+        login(data).then(res => {
+            if (res.success === true) {
+                setToken(res.token)
+                setStorge('userInfo', res.userInfo)
+                toHome()
+            } else {
+                ElMessage({ type: 'error', message: res.msg })
+            }
+        }).catch(() => {
+            ElMessage({ type: 'error', message: '服務器錯誤' })
+        })
+    } else {
+        ElMessage({ type: 'error', message: '帳號或密碼不能為空' })
+    }
 }
 
 function toHome() {
@@ -264,4 +268,5 @@ function toHome() {
 
 .container.active .toggle-right {
     transform: translateX(200%);
-}</style>
+}
+</style>

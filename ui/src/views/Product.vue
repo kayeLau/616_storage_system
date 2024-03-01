@@ -132,7 +132,7 @@ function editHandle(index, row) {
 }
 
 function deleteHandle(index, row) {
-  deleteProduct({ id: row.id }).then(res => {
+  deleteProduct({ productId: row.productId }).then(res => {
     if (res.success) {
       KtableRef.value.fatchList()
     }

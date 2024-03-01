@@ -65,7 +65,7 @@ module.exports = class product {
     }
 
     postUpdateProduct(req, res, next) {
-        const id = req.body.id
+        const productId = req.body.productId
         const productData = {
             classify:req.body.classify,
             productName: req.body.productName,
@@ -79,7 +79,7 @@ module.exports = class product {
             updateDate: getCurrentTime()
         }
 
-        updateProductInformation(id, productData).then(result => {
+        updateProductInformation(productId, productData).then(result => {
             res.json(result)
         }).catch(err => {
             next(err)
@@ -87,9 +87,9 @@ module.exports = class product {
     }
 
     postDeleteProduct(req, res, next) {
-        const id = req.body.id
+        const productId = req.body.productId
 
-        deleteProductItem(id).then(result => {
+        deleteProductItem(productId).then(result => {
             res.json(result)
         }).catch(err => {
             next(err)

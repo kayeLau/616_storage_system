@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "nodemon ./bin/www",
-    "prod": "set NODE_ENV=production && pm2 start bin/www --name='616storage'"
+    "prod": "set NODE_ENV=production && pm2 start bin/www --name='616storage'",
+    "prod_restart": "set NODE_ENV=production && pm2 restart 616storage"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",

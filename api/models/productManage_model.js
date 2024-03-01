@@ -6,12 +6,12 @@ function createNewProduct(data) {
         .catch(err => err)
 }
 
-function updateProductInformation(id,data){
-    return updateItem("product_info",data,'id',id)
+function updateProductInformation(productId,data){
+    return updateItem("product_info",data,'productId',productId)
 }
 
-function deleteProductItem(id){
-    return deleteItem("product_info",'id',id)
+function deleteProductItem(productId){
+    return deleteItem("product_info",'productId',productId)
 }
 
 function getProductItems(options,size,page){
