@@ -82,3 +82,14 @@ export function dictToOptions(dict){
     })
     return res
 }
+
+export function dictToFilterOptions(dict){
+    let res = []
+    Object.keys(dict).forEach(key => {
+        res.push({
+            text:dict[key],
+            value:key
+        })
+    })
+    return res
+}

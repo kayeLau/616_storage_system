@@ -22,6 +22,7 @@
 
   </div>
 </template>
+
 <script setup>
 import orderDetailList from '../components/orderDetailList.vue';
 import { getProductList } from '../request/products';
@@ -148,16 +149,15 @@ function exportDailyMeetSummary() {
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
       let shopName = res.resource.shopName.map(item => item.match(/（.*）/g)[0])
       let products = res.resource.products
-      let orderItems = res.resource.orderItems
-      let jsonData = products.map((product, rowIndex) => {
-        let summary = 0
+      let jsonData = products.map((product) => {
+        let summary = product.orderItems.reduce((prev, acc) => prev + acc) + product.unit
         let row = shopName.map((item, columnIndex) => {
-          let target = orderItems[columnIndex][rowIndex]
-          summary += target.orderQuantity
-          return target.orderQuantity + target.unit
+          let order = product.orderItems[columnIndex]
+          return order + product.unit
         })
         return [product.productName, ...row, product.productName, summary]
       })
+      console.log(jsonData)
       jsonData.unshift(['產品名稱', ...shopName, '產品名稱', '出貨總數'])
 
       const dailyMeetSummary = {
@@ -174,20 +174,13 @@ function exportDailyAllSummary() {
     if (res.success) {
       const date = new Date()
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
-      const shopName = res.resource.shopName
       const products = res.resource.products
-      const orderItems = res.resource.orderItems
       let jsonData = []
       const splitNum = Math.floor(products.length / 2)
       // 產品
       products.map((product, rowIndex) => {
-        let summary = 0
-        // 分店中的產品細項
-        shopName.forEach((item, columnIndex) => {
-          let target = orderItems[columnIndex][rowIndex]
-          summary += target.orderQuantity
-        })
-        let freezersNum = product.freezersNum === 0 ? '乾貨' : product.freezersNum
+        let summary = product.orderItems.reduce((prev, acc) => prev + acc) + product.unit
+        let freezersNum = product.freezersNum === 6 ? '乾貨' : product.freezersNum
         let jIndex = rowIndex > splitNum ? rowIndex - splitNum - 1 : rowIndex
         if (rowIndex > splitNum) {
           jsonData[jIndex] = [...jsonData[jIndex], product.productName, freezersNum, summary]
@@ -387,6 +380,7 @@ onMounted(() => {
 })
 
 </script>
+
 <style>
 .input-short {
   padding-right: 2px;

@@ -47,7 +47,7 @@ function getProducts() {
             res.resource.forEach(item => {
                 if (item.prompt === 0) {
                     productOptions.value.push({
-                        value: item.productCode,
+                        value: item.productId,
                         label: item.productCode + ' ' + item.productName
                     })
                 } else {
@@ -61,12 +61,13 @@ function getProducts() {
 function sumbitPromptItem(prompt,code){
     if(prompt === 1 && !selectPromptItemCode.value)return;
     const data = {
-        productCode:prompt === 0 ? code : selectPromptItemCode.value,
+        productId:prompt === 0 ? code : selectPromptItemCode.value,
         prompt
     }
     updateProduct(data).then(res => {
         if(res.success){
             getProducts()
+            selectPromptItemCode.value = ''
         }
     })
 }

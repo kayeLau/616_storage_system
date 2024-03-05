@@ -161,21 +161,26 @@ module.exports = class order {
         let summaryProductIdsMap = {}
         let exportDate = req.body.exportDate
         let exportType = req.body.exportType
-        await getProductItems({ summary: exportType }, 999, 1).then(result => {
+        
+        const shopsList = await getShopItems({ shopPartition: req.userInfo.shopPartition }, 999, 1).then(result => {
             if (result.success) {
-                result.resource
-                .sort((a,b) => a.freezersNum - b.freezersNum)
-                .forEach(item =>
-                    summaryProductIdsMap[item.productId] = {productName:item.productName , freezersNum:item.freezersNum }
-                )
+                return result.resource.map(item => item.shopName)
             }
         }).catch(err => {
             next(err)
         })
 
-        const shopsList = await getShopItems({ shopPartition: req.userInfo.shopPartition }, 999, 1).then(result => {
+        await getProductItems({ summary: exportType }, 999, 1).then(result => {
             if (result.success) {
-                return result.resource.map(item => item.shopName)
+                result.resource
+                .forEach(item =>
+                    summaryProductIdsMap[item.productId] = {
+                        productName:item.productName , 
+                        freezersNum:item.freezersNum ,
+                        unit:item.unit,
+                        orderItems:new Array(shopsList.length).fill(0)
+                    }
+                )
             }
         }).catch(err => {
             next(err)

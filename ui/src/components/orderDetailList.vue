@@ -1,15 +1,19 @@
 <template>
-  <div style="height: 100%;">
+  <div style="height:100%">
     <!-- tabel -->
-    <el-table :data="orderInfo" class="table" header-cell-class-name="table-header"
-      :row-class-name="tableRowClassName" @selection-change="handleSelectionChange">
+    <el-table :data="orderInfo" class="table" header-cell-class-name="table-header" :row-class-name="tableRowClassName"
+      @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="50" />
       <el-table-column prop="status" label="分配狀態" width="100">
         <template #default="scope">
           <span :style="orderStateColor(scope.row.status)">{{ orderStateDict[scope.row.status] }}</span>
         </template>
       </el-table-column>
+      <el-table-column prop="freezersNum" label="雪房號碼" :formatter="freezersNumFormatter" :filter-multiple="false"
+        :filtered-value="filteredValue" :filters="dictToFilterOptions(freezersNumDict)"
+        :filter-method="filterHandler" />
       <el-table-column prop="productCode" label="產品" width="280">
+
         <template #default="scope">
           <el-select v-if='scope.row.mode === "create"' v-model="_data.children[scope.$index].productId" filterable
             class="input-short" @change="setOrderItem(scope.row)">
@@ -18,8 +22,8 @@
           <span v-else>{{ scope.row.productCode + ' ' + scope.row.productName }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column prop="productName" label="產品名稱" /> -->
       <el-table-column prop="orderQuantity" label="下單數量" width="150" align="center">
+
         <template #default="scope">
           <div v-if='scope.row.mode === "create"' class="flex-row-center">
             <el-input-number v-model="_data.children[scope.$index].orderQuantity" :min="0" :controls="false"
@@ -29,6 +33,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="assignQuantity" label="分配數量" width="150" align="center">
+
         <template #default="scope">
           <div class="flex-row-center">
             <el-input-number v-model="_data.children[scope.$index].assignQuantity" :min="0" :controls="false"
@@ -40,6 +45,7 @@
       <el-table-column prop="orderMode" label="下單模式" :formatter="orderModeFormatter" align="center" />
       <el-table-column prop="updateDate" label="修改時間" width="180" />
       <el-table-column prop="remark" label="備注" width="200">
+
         <template #default="scope">
           <el-input v-model="_data.children[scope.$index].remark" @change="setSubmitAvailable(scope.$index)"
             :disabled="userInfo.auth !== -1" />
@@ -55,15 +61,16 @@
           <el-button type="success" @click="insertOrderItem" icon="CirclePlus" plain>新增</el-button>
         </div>
       </div>
-      <el-pagination background layout="total, prev, pager, next" :total="parseInt(_data.children.length)"
+      <el-pagination background layout="total, prev, pager, next" :total="paramsTotal"
         v-model:current-page="_params.page" :page-size="_params.size" />
     </div>
   </div>
 </template>
+
 <script setup>
 import { defineProps, reactive, ref, watch, defineEmits, computed } from 'vue';
 import { updateOrderDetailAssignQuantity, createAdditionOrderItem } from '../request/orders';
-import { orderStateDict, orderMode, orderStateColor } from '../request/dict';
+import { orderStateDict, orderMode, orderStateColor, freezersNumDict, dictToFilterOptions } from '../request/dict';
 import { ElMessage } from 'element-plus'
 import { getStorge } from '../utils/auth'
 const props = defineProps({
@@ -80,16 +87,42 @@ const userInfo = computed(() => {
 let _data = reactive(props.data)
 let _params = reactive(props.params)
 let selection = ref([])
+let filteredValue = ref([])
 
 const orderInfo = computed(() => {
-  return _data.children.slice((_params.page-1) * _params.size, (_params.page) * _params.size)
+  let _temp = _data.children
+  if (filteredValue.value.length) {
+    _temp = _data.children.filter(item => Number(item.freezersNum) === Number(filteredValue.value[0]))
+  }
+  return _temp.slice((_params.page - 1) * _params.size, (_params.page) * _params.size)
 })
+
+const paramsTotal = computed(() => {
+  let _temp = _data.children
+  if (filteredValue.value.length) {
+    _temp = _data.children.filter(item => Number(item.freezersNum) === Number(filteredValue.value[0]))
+  }
+  return parseInt(_temp.length)
+})
+
+// watch(filteredValue, (value) => {
+//   _params.total = _data.children.filter(item => Number(item.freezersNum) === Number(value[0])).length
+// }, { deep: true })
 
 watch(() => props.data, (value) => {
   _data = value
 })
 
 const emit = defineEmits(['refreshList'])
+
+const filterHandler = (value, row) => {
+  return Number(row.freezersNum) === Number(value)
+}
+
+const freezersNumFormatter = (row, column) => {
+  let cell = row[column.property]
+  return freezersNumDict[cell]
+}
 
 const orderModeFormatter = (row, column) => {
   let cell = row[column.property]

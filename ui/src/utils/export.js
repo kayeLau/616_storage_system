@@ -11,7 +11,6 @@ export function exportExcel(exportDate, usezip = false, zipFileName , hpt ) {
     autoWidth(jsonWorkSheet)
     if(hpt){
       let height = new Array(99).fill(0).map(() => { return { hpt } })
-      console.log(height)
       jsonWorkSheet['!rows'] = height
     }
 
