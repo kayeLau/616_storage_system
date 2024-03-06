@@ -10,14 +10,16 @@
                             <el-skeleton-item variant="text" style="width: 50%" />
                         </div>
                     </template>
+
                     <template #default>
                         <div class="product-list">
-                            <div v-for="(product, sIndex) of Object.values(item.children)" :key="sIndex" class="product-li">
+                            <div v-for="(product, sIndex) of Object.values(item.children)" :key="sIndex"
+                                class="product-li">
                                 <div class="product-name">{{ product.productName }}</div>
                                 <div class="order-quantity">
                                     <el-input-number v-model="product.orderQuantity" :min="0"
-                                        @change="setOrderMap(product)" /><span style="padding-left: 10px;">{{ product.unit
-                                        }}</span>
+                                        @change="orderChange(product)" /><span style="padding-left: 10px;">{{
+            product.unit }}</span>
                                 </div>
                                 <!-- <div>{{ product.standard }}</div> -->
                             </div>
@@ -29,19 +31,37 @@
         <cart :orderMap="orderMap" @orderDetailChange="orderDetailChange"></cart>
     </div>
 </template>
+
 <script setup>
 import cart from '../components/cart.vue'
 import { ref, onMounted } from 'vue';
 import { getProductList } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
 import { classifyDict } from '../request/dict';
+import { createWs , getWs } from '../utils/ws';
+import { getStorge } from '../utils/auth';
+
 let loading = ref(true)
 let orderMap = ref({})
-const products = ref([])
+const products = ref([
+    {
+        name: 0,
+        label: "必點",
+        children: {}
+    }
+])
 
+// 購物車項目改變
 function orderDetailChange(product) {
     setOrderMap(product)
     setProductListView(product)
+    sendOrderWs()
+}
+
+// 加購
+function orderChange(product) {
+    setOrderMap(product)
+    sendOrderWs()
 }
 
 function setOrderMap(product) {
@@ -50,7 +70,7 @@ function setOrderMap(product) {
 }
 
 function setProductListView(product) {
-    const target = products.value.find(item => item.name === product.classify);
+    const target = products.value.find(item => item.name === (product.classify + 1));
     target.children[product.productId] = product
 
     const promptNum = 0
@@ -68,8 +88,8 @@ async function getProducts() {
     await getProductList(params).then(res => {
         if (res.success) {
             res.resource.forEach(item => {
-                const classify = item.classify;
-                const classifyName = classifyDict[classify]
+                const classify = item.classify + 1;
+                const classifyName = classifyDict[item.classify]
                 if (!products.value[classify]) {
                     products.value[classify] = {
                         name: classify,
@@ -97,7 +117,7 @@ async function getProducts() {
         loading.value = false
     })
 }
-const tabName = ref(1)
+const tabName = ref('')
 
 function checkExistOrder() {
     checkOrderRepeated().then(res => {
@@ -109,13 +129,48 @@ function checkExistOrder() {
         }
     })
 }
+// ws
+function sendOrderWs() {
+    const userInfo = JSON.parse(getStorge('userInfo'))
+    const ws = getWs()
+    ws.send(JSON.stringify({
+        shopId: userInfo.shopId,
+        auth: userInfo.auth,
+        orderList: Object.values(orderMap.value).filter(item => item.orderQuantity !== 0)
+    }))
+}
+
+function syncOrder(message){
+    const userInfo = JSON.parse(getStorge('userInfo'))
+    if(message.shopId === userInfo.shopId && message.auth === userInfo.auth){
+        console.log(message.orderList)
+        message.orderList.forEach(item => {
+            setOrderMap(item)
+            setProductListView(item)
+        })
+    }
+}
+
+//接收 Server 發送的訊息
+function setWebsocket() {
+    const token = getStorge('token')
+    const ws = createWs(token)
+    ws.addEventListener('message', (event) => {
+        const message = JSON.parse(event.data);
+        console.log('收到消息：', message);
+        syncOrder(message)
+    });
+}
+setWebsocket()
 
 onMounted(async () => {
     await getProducts()
+    tabName.value = products.value[0].name
     checkExistOrder()
 })
 
 </script>
+
 <style>
 @media only screen and (max-width: 960px) {
     .product-list {

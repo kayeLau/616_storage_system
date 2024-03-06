@@ -18,7 +18,7 @@
                     <div class='prompt-items' style="height: calc(100% - 34px);">
                         <div class="prompt-item" v-for="(item,index) of promptItems" :key="index">
                             {{ item.productCode + ' ' + item.productName}}
-                            <el-button type="danger" icon="Delete" size="small" round @click="sumbitPromptItem(0,item.productCode)">刪除</el-button>
+                            <el-button type="danger" icon="Delete" size="small" round @click="sumbitPromptItem(0,item.productId)">刪除</el-button>
                         </div>
                     </div>
                 </el-card>

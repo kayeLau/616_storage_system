@@ -1,4 +1,4 @@
-import Cookies from 'js-cookie'
+// import Cookies from 'js-cookie'
 
 const TokenKey = 'token'
 // const visitorJumpKey = 'visitorJumpData'
@@ -15,18 +15,6 @@ export function removeToken() {
   removeStorge(TokenKey)
 }
 
-// export function getQuery() {
-//   return sessionStorage.getItem(visitorJumpKey)
-// }
-
-// export function setQuery(query) {
-//   sessionStorage.setItem(visitorJumpKey, query)
-// }
-
-// export function removeQuery() {
-//   sessionStorage.removeItem(visitorJumpKey)
-// }
-
 export function getStorge(key) {
   return localStorage.getItem(key)
 }
@@ -37,10 +25,10 @@ export function setStorge(key, value) {
   } else {
     localStorage.setItem(key, value)
   }
-  Cookies.set(key, value)
+  // Cookies.set(key, value)
 }
 
 export function removeStorge(key) {
   localStorage.removeItem(key)
-  Cookies.remove(key)
+  // Cookies.remove(key)
 }

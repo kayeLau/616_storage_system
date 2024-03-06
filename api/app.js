@@ -36,6 +36,9 @@ app.use('/products',productsRouter)
 app.use('/orders',ordersRouter)
 app.use('/setting',settingRouter)
 
+// ws
+require('./utils/ws')
+
 // error handler
 app.use(function(err, req, res, next) {
   console.log(err)

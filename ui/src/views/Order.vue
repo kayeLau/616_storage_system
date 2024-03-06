@@ -147,7 +147,7 @@ function exportDailyMeetSummary() {
     if (res.success) {
       const date = new Date()
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
-      let shopName = res.resource.shopName.map(item => item.match(/（.*）/g)[0])
+      let shopName = res.resource.shopName
       let products = res.resource.products
       let jsonData = products.map((product) => {
         let summary = product.orderItems.reduce((prev, acc) => prev + acc) + product.unit

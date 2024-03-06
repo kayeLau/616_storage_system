@@ -9,10 +9,10 @@ const jwt = require('jsonwebtoken')
 module.exports = class Member {
     static setUserInfoByRule(data) {
         const userInfoRule = {
-            '-1': ['shopPartition','shopId','shopName'],
+            '-1': ['shopPartition', 'shopId', 'shopName'],
             '0': ['shopPartition'],
             '1': ['shopPartition'],
-            '2': ['shopId','shopName']
+            '2': ['shopId', 'shopName']
         }
         const userAuth = userInfoRule[data.auth]
         userAuth.forEach(key => {
@@ -60,7 +60,7 @@ module.exports = class Member {
                 })
             } else if (checkNull(rows) === false) {
                 const token = jwt.sign({ data: rows[0].id }, config.secret, { expiresIn: '2h' });
-                // res.setHeader('token', token);
+                updateUserInformation(rows[0].id, { online: 1 })
                 res.json({
                     success: true,
                     token,
@@ -68,11 +68,22 @@ module.exports = class Member {
                         name: rows[0].name,
                         shopId: rows[0].shopId,
                         shopName: rows[0].shopName,
-                        auth: rows[0].auth
+                        auth: rows[0].auth,
                     },
                     msg: "歡迎 " + rows[0].name + " 的登入！",
                 })
             }
+        }).catch(err => {
+            next(err)
+        })
+    }
+
+    postLogout(req, res ,next){
+        const userInfo = req.userInfo
+        updateUserInformation(userInfo.id, { online: 0 }).then(result => {
+            res.json({
+                success: true
+            })
         }).catch(err => {
             next(err)
         })
@@ -110,12 +121,12 @@ module.exports = class Member {
     }
 
     async getUsersList(req, res, next) {
-        const options = { auth: req.body.auth , shopId: req.body.shopId}
+        const options = { auth: req.body.auth, shopId: req.body.shopId }
         const size = parseInt(req.body.size)
         const page = parseInt(req.body.page)
         let partitionDict = {}
         await getPartitionItems({}, 999, 1).then(result => {
-            if(result.success){
+            if (result.success) {
                 result.resource.forEach(item => {
                     partitionDict[item.id] = item.partitionName
                 });

@@ -121,19 +121,23 @@ module.exports = class Shop {
 
     }
 
-    postBindProductToShop(req, res, next) {
+    async postBindProductToShop(req, res, next) {
         let productList = req.body.productList
+        const shopId = productList[0].shopId
         productList = productList.map(item => {
             return [
-                item.shopId + '-' + item.productCode,
+                item.shopId + '-' + item.productId,
                 item.shopId,
-                item.productCode,
+                item.productId,
                 getCurrentTime(),
                 getCurrentTime()
             ]
         })
+
+
         if (Array.isArray(productList) && Array.isArray(productList[0])){
-            bindProductTOShop(productList).then(result => {
+            await deleteShopProductItem(shopId)
+            await bindProductTOShop(productList).then(result => {
                 res.json(result)
             }).catch(err => {
                 next(err)

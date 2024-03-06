@@ -12,10 +12,11 @@
         </el-drawer>
     </div>
 </template>
+
 <script setup>
 import { getShopList, getPartitionList, createPartition, deletePartitionItem } from '../request/shops'
 import { getUsersList, register, updateUserInfo, deleteUser } from '../request/users'
-import { authDict, dictToOptions } from '../request/dict'
+import { authDict, dictToOptions , onlineStateDict } from '../request/dict'
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
 import { ref } from 'vue'
@@ -119,6 +120,13 @@ const authFormatter = (row, column) => {
 }
 
 const columns = [
+    {
+        props: 'online', label: '狀態', render: (h,row) => {
+            const state = onlineStateDict[row.online]
+            const stClass = row.online === 0 ? 'offline' : 'online'
+            return h('span',{class:stClass},state)
+        }
+    },
     { props: 'name', label: '用戶名稱' },
     // { props: 'password', label: '用戶密碼' },
     { props: 'auth', label: '用戶角色', formatter: authFormatter },
@@ -155,7 +163,7 @@ const searchFormColumns = ref([
 
 const customBtn = [
     {
-        type:'button',
+        type: 'button',
         btnType: 'success',
         label: '新增',
         icon: 'CirclePlus',
@@ -229,3 +237,23 @@ async function fatchShopList() {
 fatchShopList()
 //#endregion
 </script>
+<style>
+.online{
+    color: var(--el-color-success-light-3);
+    animation: flashing 1s infinite;
+}
+.offline{
+    color: var(--el-color-danger-light-3);
+}
+@keyframes flashing {
+    0%{
+        opacity: 50%;
+    }
+    50%{
+        opacity: 100%;
+    }
+    100%{
+        opacity: 50%;
+    }
+}
+</style>

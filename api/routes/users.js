@@ -9,6 +9,8 @@ router.post('/register',userModifyMethod.postRegister)
 
 router.post('/login', userModifyMethod.postLogin);
 
+router.post('/logout', userModifyMethod.postLogout);
+
 router.post('/update', userModifyMethod.postUpdateUser);
 
 router.post('/deleteUser', userModifyMethod.postDeleteUser);

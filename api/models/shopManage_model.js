@@ -42,9 +42,8 @@ function getBandProducts(options, size, page) {
 }
 
 function bindProductTOShop(productList) {
-    return customQuery(`INSERT IGNORE INTO shop_product_info (id,shopId, productCode,createDate,updateDate) VALUES ? `, [productList])
+    return customQuery(`INSERT IGNORE INTO shop_product_info (id,shopId, productId ,createDate,updateDate) VALUES ? `, [productList])
 }
-
 
 module.exports = { getShopItems, createNewShop, updateShopInformation, deleteShopItem, bindProductTOShop , 
     getBandProducts , getPartitionItems , deletePartitionItem , createNewPartition , deleteShopProductItem }

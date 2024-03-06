@@ -52,13 +52,13 @@ function getProducts() {
                         label:freezersNumDict[item.freezersNum],
                         disabled:true,
                         children:[{
-                            id:item.productCode,
+                            id:item.productId,
                             label:item.productName,
                         }]
                     }
                 }else {
                     _data[item.freezersNum].children.push({
-                        id:item.productCode,
+                        id:item.productId,
                         label:item.productName,
                     })
                 }
@@ -78,7 +78,7 @@ function getBindedProductList(){
     }
     getBindProductList(params).then(res => {
         if(res.success){
-            let bandList = res.resource.map(item => item.productCode)
+            let bandList = res.resource.map(item => item.productId)
             treeRef.value.setCheckedKeys(bandList)
         }
     })
@@ -86,11 +86,11 @@ function getBindedProductList(){
 
 function bindProductListToshop(){
     const multipleSelection = treeRef.value.getCheckedKeys()
-    const productList = multipleSelection.map(productCode => {
+    const productList = multipleSelection.map(productId => {
         return {
-            id:props.shopId + productCode,
+            id:props.shopId + productId,
             shopId:props.shopId,
-            productCode
+            productId
         }
     })
     bindProductToShop({productList}).then(res => {
