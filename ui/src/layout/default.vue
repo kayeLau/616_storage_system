@@ -51,7 +51,7 @@ import { logout } from '../request/users';
 
 const router = useRouter()
 async function logOutbyUser() {
-    await logout()
+    await logout().catch(err => console.err(err))
     removeToken()
     router.push({
         path: '/login'
