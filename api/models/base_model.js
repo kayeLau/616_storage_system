@@ -123,7 +123,7 @@ function optionsSQLFromatter(options, table) {
     return whereClause
 }
 
-function getItems({ table, options, size, page, orderby = 'updateDate', sort = 'DESC', join , columns }) {
+function getItems({ table, options, size, page, orderby = 'updateDate', primaryKey = 'id' , sort = 'DESC', join , columns }) {
     let result = {}
     return new Promise((resolve, reject) => {
         let optionsSQL = optionsSQLFromatter(options, table)
@@ -140,7 +140,7 @@ function getItems({ table, options, size, page, orderby = 'updateDate', sort = '
         })
         let defaultColumns = `* , DATE_FORMAT(${table}.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate`
         db.query(`SELECT ${ columns ? columns : defaultColumns }
-        FROM ${join ? join : table} ${optionsSQL} ORDER BY ${table}.${orderby} ${sort} 
+        FROM ${join ? join : table} ${optionsSQL} ORDER BY ${table}.${orderby} ${sort},${primaryKey}
         LIMIT ${size} OFFSET ${(page - 1) * size}`, (err, rows) => {
             if (err) {
                 console.log(err)

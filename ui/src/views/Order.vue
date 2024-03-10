@@ -292,7 +292,6 @@ function showDetailHandle(index, row) {
   rowIndex.value = index
   orderDetailShow.value = !orderDetailShow.value
   if (orderDetailShow.value) {
-    row.children.forEach(item => item.disabled = true)
     currentRow.value = row
   }
 }

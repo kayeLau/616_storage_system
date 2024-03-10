@@ -16,7 +16,7 @@
 <script setup>
 import { getShopList, getPartitionList, createPartition, deletePartitionItem } from '../request/shops'
 import { getUsersList, register, updateUserInfo, deleteUser } from '../request/users'
-import { authDict, dictToOptions , onlineStateDict } from '../request/dict'
+import { authDict, dictToOptions } from '../request/dict'
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
 import { ref } from 'vue'
@@ -120,13 +120,13 @@ const authFormatter = (row, column) => {
 }
 
 const columns = [
-    {
-        props: 'online', label: '狀態', render: (h,row) => {
-            const state = onlineStateDict[row.online]
-            const stClass = row.online === 0 ? 'offline' : 'online'
-            return h('span',{class:stClass},state)
-        }
-    },
+    // {
+    //     props: 'online', label: '狀態', render: (h,row) => {
+    //         const state = onlineStateDict[row.online]
+    //         const stClass = row.online === 0 ? 'offline' : 'online'
+    //         return h('span',{class:stClass},state)
+    //     }
+    // },
     { props: 'name', label: '用戶名稱' },
     // { props: 'password', label: '用戶密碼' },
     { props: 'auth', label: '用戶角色', formatter: authFormatter },

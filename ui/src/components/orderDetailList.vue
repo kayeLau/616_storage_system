@@ -26,8 +26,7 @@
 
         <template #default="scope">
           <div v-if='scope.row.mode === "create"' class="flex-row-center">
-            <el-input-number v-model="_data.children[scope.$index].orderQuantity" :min="0" :controls="false"
-              @change="setSubmitAvailable(scope.$index)" />
+            <el-input-number v-model="_data.children[scope.$index].orderQuantity" :min="0" :controls="false"/>
             <span>{{ scope.row.unit }}</span>
           </div>
         </template>
@@ -36,8 +35,7 @@
 
         <template #default="scope">
           <div class="flex-row-center">
-            <el-input-number v-model="_data.children[scope.$index].assignQuantity" :min="0" :controls="false"
-              @change="setSubmitAvailable(scope.$index)" :disabled="userInfo.auth !== -1" />
+            <el-input-number v-model="_data.children[scope.$index].assignQuantity" :min="0" :controls="false" :disabled="userInfo.auth !== -1" />
             <span>{{ scope.row.unit }}</span>
           </div>
         </template>
@@ -47,8 +45,7 @@
       <el-table-column prop="remark" label="備注" width="200">
 
         <template #default="scope">
-          <el-input v-model="_data.children[scope.$index].remark" @change="setSubmitAvailable(scope.$index)"
-            :disabled="userInfo.auth !== -1" />
+          <el-input v-model="_data.children[scope.$index].remark" :disabled="userInfo.auth !== -1" />
         </template>
       </el-table-column>
     </el-table>
@@ -90,7 +87,7 @@ let selection = ref([])
 let filteredValue = ref([])
 
 const orderInfo = computed(() => {
-  let _temp = _data.children
+  let _temp = props.data.children
   if (filteredValue.value.length) {
     _temp = _data.children.filter(item => Number(item.freezersNum) === Number(filteredValue.value[0]))
   }
@@ -127,10 +124,6 @@ const freezersNumFormatter = (row, column) => {
 const orderModeFormatter = (row, column) => {
   let cell = row[column.property]
   return orderMode[cell]
-}
-
-function setSubmitAvailable(index) {
-  _data.children[index].disabled = false
 }
 
 // 表格顏色

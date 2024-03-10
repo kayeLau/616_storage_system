@@ -33,6 +33,7 @@ module.exports = class Member {
             shopId: req.body.shopId,
             shopName: req.body.shopName,
             shopPartition: req.body.shopPartition,
+            online:0,
             createDate: getCurrentTime(),
             updateDate: getCurrentTime(),
         })

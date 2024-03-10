@@ -30,11 +30,11 @@ function deletePartitionItem(id) {
 }
 
 async function getShopItems(options, size, page) {
-    return getItems({table:"shop_info", options, size, page})
+    return getItems({table:"shop_info", options, size, page , primaryKey:'shopId'})
 }
 
 function getPartitionItems(options, size, page){
-    return getItems({table:"partition_info", options, size, page})
+    return getItems({table:"partition_info", options, size, page })
 }
 
 function getBandProducts(options, size, page) {
