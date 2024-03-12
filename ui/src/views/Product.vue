@@ -174,8 +174,8 @@ const columns = [
   { props: 'classify', label: '分類', formatter: classifyFormatter },
   { props: 'freezersNum', label: '雪房號碼', formatter: freezersNumFormatter },
   { props: 'department', label: '負責部門', formatter: departmentFormatter },
-  { props: 'standard', label: '單位', width: 120 },
-  { props: 'unit', label: '規格' },
+  { props: 'standard', label: '規格' , width: 120},
+  { props: 'unit', label: '單位' },
   { props: 'summary', label: '匯總', formatter: summaryFormatter },
   { props: 'updateDate', label: '修改時間', width: 200 }
 ]
@@ -202,6 +202,12 @@ const searchFormColumns = [
     prop: 'freezersNum',
     label: '雪房號碼:',
     options: dictToOptions(freezersNumDict)
+  },
+  {
+    type: 'select',
+    prop: 'classify',
+    label: '分類:',
+    options: dictToOptions(classifyDict)
   },
   {
     type: 'select',

@@ -2,8 +2,8 @@
     <div style="height: 100%;">
         <el-form :inline="true" :model="_params" class="form-inline" v-if="searchFormColumns.length">
             <el-form-item v-for='(item, index) of _searchFormColumns' :label="item.label" :key="index">
-                <el-input v-if='item.type === "input"' v-model="_params[item.prop]" clearable style="width: 150px;" />
-                <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable style="width: 150px;"
+                <el-input v-if='item.type === "input"' v-model="_params[item.prop]" clearable style="width: 120px;" />
+                <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable style="width: 140px;"
                     placeholder="請選擇">
                     <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value" />
                 </el-select>

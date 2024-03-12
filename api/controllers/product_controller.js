@@ -6,7 +6,13 @@ const { verifyToken } = require('../models/verification')
 module.exports = class product {
     async getProductList(req, res, next) {
         const token = req.headers['token'];
-        let options = { freezersNum: req.body.freezersNum, disable: req.body.disable, productName: req.body.productName , summary:req.body.summary}
+        let options = { 
+            freezersNum: req.body.freezersNum, 
+            disable: req.body.disable, 
+            productName: req.body.productName, 
+            summary: req.body.summary, 
+            classify: req.body.classify 
+        }
         const size = req.body.size
         const page = req.body.page
         let bandList = []
@@ -21,7 +27,7 @@ module.exports = class product {
             const auth = tokenResult.userInfo.auth
             if (auth !== -1) {
                 bandList = await getBandProducts({ shopId: tokenResult.userInfo.shopId }, 999, 1)
-                    .then(res => res.resource.map(item => item.productId))
+                    .then(res => res.resource.map(item => Number(item.productId)))
                 options.department = auth
                 options.disable = 0
             }
@@ -45,14 +51,14 @@ module.exports = class product {
         const productData = {
             productCode: req.body.productCode,
             productName: req.body.productName,
-            classify:req.body.classify,
+            classify: req.body.classify,
             freezersNum: req.body.freezersNum,
             department: req.body.department,
             standard: req.body.standard,
             unit: req.body.unit,
             disable: req.body.disable,
-            summary:req.body.summary,
-            prompt:0,
+            summary: req.body.summary,
+            prompt: 0,
             createDate: getCurrentTime(),
             updateDate: getCurrentTime()
         }
@@ -67,15 +73,15 @@ module.exports = class product {
     postUpdateProduct(req, res, next) {
         const productId = req.body.productId
         const productData = {
-            classify:req.body.classify,
+            classify: req.body.classify,
             productName: req.body.productName,
             freezersNum: req.body.freezersNum,
             department: req.body.department,
             standard: req.body.standard,
             unit: req.body.unit,
             disable: req.body.disable,
-            summary:req.body.summary,
-            prompt:req.body.prompt,
+            summary: req.body.summary,
+            prompt: req.body.prompt,
             updateDate: getCurrentTime()
         }
 

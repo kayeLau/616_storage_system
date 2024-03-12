@@ -37,7 +37,7 @@ import cart from '../components/cart.vue'
 import { ref, onMounted } from 'vue';
 import { getProductList } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
-import { classifyDict } from '../request/dict';
+import { classifyDict , classifySort } from '../request/dict';
 import { createWs , getWs } from '../utils/ws';
 import { getStorge } from '../utils/auth';
 
@@ -111,7 +111,9 @@ async function getProducts() {
                     }
                 }
             });
-            products.value = products.value.filter(item => Object.keys(item.children).length)
+            products.value = products.value
+            .sort((a,b) => classifySort.indexOf(a.name) - classifySort.indexOf(b.name))
+            .filter(item => Object.keys(item.children).length)
 
         }
         loading.value = false

@@ -15,7 +15,7 @@ function deleteProductItem(productId){
 }
 
 function getProductItems(options,size,page){
-    return getItems({table:"product_info",options,size,page,primaryKey:'productId'})
+    return getItems({table:"product_info",options,size,page,primaryKey:'productId',orderby:'productCode',sort:'ASC'})
 }
 
 module.exports = { getProductItems , createNewProduct , updateProductInformation , deleteProductItem }
