@@ -26,7 +26,7 @@
 
         <template #default="scope">
           <div v-if='scope.row.mode === "create"' class="flex-row-center">
-            <el-input-number v-model="_data.children[scope.$index].orderQuantity" :min="0" :controls="false"/>
+            <el-input-number v-model="orderInfoMap[scope.row.productId].orderQuantity" :min="0" :controls="false"/>
             <span>{{ scope.row.unit }}</span>
           </div>
         </template>
@@ -35,7 +35,7 @@
 
         <template #default="scope">
           <div class="flex-row-center">
-            <el-input-number v-model="_data.children[scope.$index].assignQuantity" :min="0" :controls="false" :disabled="userInfo.auth !== -1" />
+            <el-input-number v-model="orderInfoMap[scope.row.productId].assignQuantity" :min="0" :controls="false" :disabled="userInfo.auth !== -1" />
             <span>{{ scope.row.unit }}</span>
           </div>
         </template>
@@ -85,6 +85,15 @@ let _data = reactive(props.data)
 let _params = reactive(props.params)
 let selection = ref([])
 let filteredValue = ref([])
+
+const orderInfoMap = computed(() => {
+  let map = {}
+  let _temp = props.data.children
+  _temp.forEach(item => {
+    map[item.productId] = item
+  })
+  return map
+})
 
 const orderInfo = computed(() => {
   let _temp = props.data.children
@@ -145,7 +154,9 @@ function setOrderItem(row) {
 }
 
 const productOptions = computed(() => {
-  return props.products.map(item => {
+  return props.products
+  .filter(item => !orderInfoMap.value[item.productId])
+  .map(item => {
     return {
       value: item.productId,
       label: item.productCode + ' ' + item.productName
@@ -172,9 +183,8 @@ function insertOrderItem() {
 }
 
 async function submitOrderItem() {
-  let createList = _data.children.filter(item => item.mode === 'create' && item.productCode && item.productName
-    && item.orderQuantity !== null && item.assignQuantity !== null)
-  let updateList = _data.children.filter(item => !item.mode && item.assignQuantity !== null)
+  const createList = _data.children.filter(item => item.mode === 'create' && item.productCode && item.productName && item.orderQuantity !== null)
+  const updateList = Object.values(orderInfoMap.value).filter(item => item.assignQuantity)
   await addAdditionOrderItem(createList)
   if (updateList.length) {
     updateAssignQuantity(updateList)

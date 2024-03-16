@@ -16,10 +16,12 @@
                             <div v-for="(product, sIndex) of Object.values(item.children)" :key="sIndex"
                                 class="product-li">
                                 <div class="product-name">{{ product.productName }}</div>
-                                <div class="order-quantity">
-                                    <el-input-number v-model="product.orderQuantity" :min="0"
-                                        @change="orderChange(product)" /><span style="padding-left: 10px;">{{
-            product.unit }}</span>
+                                <div class="product-row">
+                                    <div class="product-standard">{{ product.standard }}</div>
+                                    <div class="order-quantity">
+                                        <el-input-number v-model="product.orderQuantity" :min="0"
+                                            @change="orderChange(product)" /><span style="padding-left: 10px;">{{ product.unit }}</span>
+                                    </div>
                                 </div>
                                 <!-- <div>{{ product.standard }}</div> -->
                             </div>
@@ -186,6 +188,14 @@ onMounted(async () => {
 
 .product-name {
     font-weight: 500;
+}
+.product-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.product-standard{
+    color: #ccc
 }
 
 .product-tabs {
