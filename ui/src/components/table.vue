@@ -172,4 +172,7 @@ onMounted(() => {
 .form-inline {
     padding-left: 8px;
 }
+.pagination .el-button+.el-button{
+    margin: 0;
+}
 </style>

@@ -98,15 +98,15 @@ const orderInfoMap = computed(() => {
 const orderInfo = computed(() => {
   let _temp = props.data.children
   if (filteredValue.value.length) {
-    _temp = _data.children.filter(item => Number(item.freezersNum) === Number(filteredValue.value[0]))
+    _temp = props.data.children.filter(item => Number(item.freezersNum) === Number(filteredValue.value[0]))
   }
   return _temp.slice((_params.page - 1) * _params.size, (_params.page) * _params.size)
 })
 
 const paramsTotal = computed(() => {
-  let _temp = _data.children
+  let _temp = props.data.children
   if (filteredValue.value.length) {
-    _temp = _data.children.filter(item => Number(item.freezersNum) === Number(filteredValue.value[0]))
+    _temp = props.data.children.filter(item => Number(item.freezersNum) === Number(filteredValue.value[0]))
   }
   return parseInt(_temp.length)
 })
@@ -184,7 +184,7 @@ function insertOrderItem() {
 
 async function submitOrderItem() {
   const createList = _data.children.filter(item => item.mode === 'create' && item.productCode && item.productName && item.orderQuantity !== null)
-  const updateList = Object.values(orderInfoMap.value).filter(item => item.assignQuantity)
+  const updateList = Object.values(orderInfoMap.value).filter(item => item.assignQuantity !== null)
   await addAdditionOrderItem(createList)
   if (updateList.length) {
     updateAssignQuantity(updateList)

@@ -16,6 +16,7 @@ import { freezersNumDict, classifyDict, departmentDict, dictToOptions, productDi
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
 import { ref } from 'vue';
+import { exportExcel } from '../utils/export'
 
 const KtableRef = ref()
 
@@ -168,13 +169,13 @@ const productDisableFormatter = (row, column) => {
 }
 
 const columns = [
-  { props: 'disable', label: '狀態', formatter: productDisableFormatter , width: 60},
-  { props: 'productCode', label: '產品編號' , width: 80},
+  { props: 'disable', label: '狀態', formatter: productDisableFormatter, width: 60 },
+  { props: 'productCode', label: '產品編號', width: 80 },
   { props: 'productName', label: '產品名稱', width: 130 },
   { props: 'classify', label: '分類', formatter: classifyFormatter },
   { props: 'freezersNum', label: '雪房號碼', formatter: freezersNumFormatter },
   { props: 'department', label: '負責部門', formatter: departmentFormatter },
-  { props: 'standard', label: '規格' , width: 120},
+  { props: 'standard', label: '規格', width: 120 },
   { props: 'unit', label: '單位' },
   { props: 'summary', label: '匯總', formatter: summaryFormatter },
   { props: 'updateDate', label: '修改時間', width: 200 }
@@ -229,7 +230,43 @@ const customBtn = [
     label: '新增',
     icon: 'CirclePlus',
     onClick: createHandle
+  },
+  {
+    type: 'button',
+    btnType: 'success',
+    label: '導出',
+    icon: 'CirclePlus',
+    onClick: exportProductExcel
   }
 ]
+
+function exportProductExcel() {
+  getProductList({ size: 999, page: 1 }).then(res => {
+    if (res.success) {
+      let jsonData = []
+      jsonData = res.resource.map(item => {
+        return [
+          productDisable[item.disable],
+          item.productId,
+          item.productCode,
+          item.productName,
+          classifyDict[item.classify],
+          freezersNumDict[item.freezersNum],
+          departmentDict[item.department],
+          item.standard,
+          item.unit,
+          productSummary[item.summary],
+          item.updateDate,
+        ]
+      })
+      jsonData.unshift(['狀態', '產品Id', '產品編號', '產品名稱', '分類 ', '雪房號碼' ,'負責部門', '規格', '單位', '匯總', '修改時間'])
+      const products = {
+        sheetNames: '產品',
+        jsonData
+      }
+      exportExcel([products])
+    }
+  })
+}
 //#endregion
 </script>
