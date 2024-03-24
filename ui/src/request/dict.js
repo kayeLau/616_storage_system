@@ -7,6 +7,7 @@ export const authDict = {
     0:"前線廚房",
     1:"前線樓面",
     2:"分區經理",
+    3:"工埸",
 }
 
 export const classifySort = [0, 3, 1, 2, 5, 6, 7, 9, 11, 4, 8, 12, 14, 15, 16, 18]

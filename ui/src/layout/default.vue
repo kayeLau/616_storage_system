@@ -66,7 +66,7 @@ const menus = [
         name: "訂單管理",
         path: 'order',
         icon: 'Tickets',
-        auth: [-1, 1, 0, 2]
+        auth: [-1, 1, 0, 2, 3]
     },
     {
         name: "產品管理",

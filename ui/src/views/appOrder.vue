@@ -17,13 +17,13 @@
                                 class="product-li">
                                 <div class="product-name">{{ product.productName }}</div>
                                 <div class="product-row">
-                                    <div class="product-standard">{{ product.standard }}</div>
+                                    <!-- <div class="product-standard">{{ product.standard }}</div> -->
                                     <div class="order-quantity">
+                                        <span style="padding-right: 10px;">{{ product.standard }}</span>
                                         <el-input-number v-model="product.orderQuantity" :min="0"
-                                            @change="orderChange(product)" /><span style="padding-left: 10px;">{{ product.unit }}</span>
+                                            @change="orderChange(product)" />
                                     </div>
                                 </div>
-                                <!-- <div>{{ product.standard }}</div> -->
                             </div>
                         </div>
                     </template>
@@ -187,11 +187,11 @@ onMounted(async () => {
 }
 
 .product-name {
-    font-weight: 500;
+    font-weight: 600;
 }
 .product-row{
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
 }
 .product-standard{

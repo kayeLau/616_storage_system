@@ -83,7 +83,10 @@ const operations = {
   size: "small",
   children: [
     { type: "primary", name: '編輯', onClick: showDetailHandle, icon: 'Edit' },
-    { type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer', disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1 }
+    { 
+      type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer', 
+      disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1
+    }
   ]
 }
 
@@ -100,7 +103,7 @@ const customBtn = ref([
     btnType: 'success',
     label: '導出匯總表',
     icon: 'Printer',
-    disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1,
+    disabled: (row) => row.status === 0, hide: !(userInfo.value.auth === -1 || userInfo.value.auth === 3),
     render: (h) => {
       return h('div', { style: { display: 'flex', gap: '5px' } }, [
         h(ElDatePicker, {
@@ -119,7 +122,7 @@ const customBtn = ref([
     btnType: 'success',
     label: '導出肉類匯總表',
     icon: 'Printer',
-    disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1,
+    disabled: (row) => row.status === 0, hide: !(userInfo.value.auth === -1 || userInfo.value.auth === 3),
     render: (h) => {
       return h('div', { style: { display: 'flex', gap: '5px' } }, [
         h(ElDatePicker, {

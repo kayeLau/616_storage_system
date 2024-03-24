@@ -89,6 +89,10 @@ function authChange(auth) {
             editFormColumns.value[3].remove = true;
             editFormColumns.value[4].remove = false;
             break
+        case '3':
+            editFormColumns.value[3].remove = true;
+            editFormColumns.value[4].remove = true;
+            break
         default:
             editFormColumns.value[3].remove = false;
             editFormColumns.value[4].remove = true;

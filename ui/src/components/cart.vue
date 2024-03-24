@@ -9,7 +9,8 @@
                         </el-icon>
                     </el-badge>
                 </div>
-                <div class="cart-right" @click='jumpToOrderComfire' :style="{backgroundColor: orderList.length ? '' : '#ccc'}">落单</div>
+                <div class="cart-right" @click='jumpToOrderComfire'
+                    :style="{ backgroundColor: orderList.length ? '' : '#ccc' }">落单</div>
             </div>
         </div>
         <div class="detail-box" v-show="detailBoxSwitch">
@@ -18,9 +19,13 @@
                     <div class="product-name">{{ product.productName }}</div>
                     <div style="color: #ccc;font-size: 14px;">{{ product.standard }}</div>
                     <div>
-                        <el-icon @click="emitOrderDetailChange(product,true)"><CirclePlusFilled /></el-icon>
+                        <el-icon @click="emitOrderDetailChange(product, true)">
+                            <CirclePlusFilled />
+                        </el-icon>
                         {{ product.orderQuantity + product.unit }}
-                        <el-icon @click="emitOrderDetailChange(product,false)"><RemoveFilled /></el-icon>
+                        <el-icon @click="emitOrderDetailChange(product, false)">
+                            <RemoveFilled />
+                        </el-icon>
                     </div>
                 </div>
             </div>
@@ -29,17 +34,20 @@
         <el-drawer v-model="drawerSwitch" direction="ltr" :z-index="120" :withHeader="false" size="100%"
             style="background: linear-gradient(var(--el-color-primary) 0%, #fff 40%);">
             <div class="order-comfirm">
-                <div class="arrow-left" @click="drawerSwitch = !drawerSwitch"><el-icon><ArrowLeftBold /></el-icon>返回</div>
+                <div class="arrow-left" @click="drawerSwitch = !drawerSwitch"><el-icon>
+                        <ArrowLeftBold />
+                    </el-icon>返回</div>
                 <el-card>
                     <h1>{{ userInfo.shopName }}</h1>
                     <div>{{ userInfo.name }}</div>
                 </el-card>
                 <el-card>
                     <div class="order-list" style="height: 60vh;">
-                        <div v-for="(product, index) of orderList" :key="index" class="order-item">
-                            <div class="product-name">{{ product.productName }}</div>
-                            <div style="color: #ccc;font-size: 14px;">{{ product.standard }}</div>
-                            <div>{{ product.orderQuantity + product.unit }}</div>
+                        <div v-for="(product, index) of orderList" :key="index" class="order-item"  
+                        :style="product.orderQuantity === null ? 'background-color: var(--el-color-danger-light-7)' : ''">
+                            <div class="product-name" style="width: 50%;">{{ product.productName }}</div>
+                            <div style="width: 30%;">{{ product.standard }}</div>
+                            <div style="width: 20%;text-align: end;">{{ product.orderQuantity }}</div>
                         </div>
                     </div>
                 </el-card>
@@ -49,10 +57,10 @@
     </div>
 </template>
 <script setup>
-import { defineProps, computed, ref , defineEmits } from 'vue';
+import { defineProps, computed, ref, defineEmits } from 'vue';
 import { getStorge } from '../utils/auth'
 import { createOrder } from '../request/orders'
-import { ElMessage  } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus';
 
 const userInfo = computed(() => {
     let user = getStorge('userInfo')
@@ -64,14 +72,14 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['orderDetailChange'])
-function emitOrderDetailChange(product,type){
-    let _product = {...product}
-    if(type){
+function emitOrderDetailChange(product, type) {
+    let _product = { ...product }
+    if (type) {
         _product.orderQuantity++
-    }else{
+    } else {
         _product.orderQuantity--
     }
-    emit('orderDetailChange',_product)
+    emit('orderDetailChange', _product)
 }
 // const orderItems = computed(() => {
 //     return Object.keys(props.orderMap).length
@@ -84,20 +92,41 @@ const orderList = computed(() => {
 let detailBoxSwitch = ref(false)
 let drawerSwitch = ref(false)
 
-function jumpToOrderComfire(){
-    if(orderList.value.length > 0){
+function jumpToOrderComfire() {
+    if (orderList.value.length > 0) {
         drawerSwitch.value = !drawerSwitch.value
     }
 }
 
-function comfireOrder(){
-    createOrder({orderList:orderList.value}).then(res => {
-        if(res.success){
-            ElMessage ({ type: 'success', message: '提交成功' })
-        }else{
-            ElMessage ({ type: 'error', message: '提交失敗' })
+function comfireOrder() {
+    if (!verifySubmit()) {
+        ElMessageBox.confirm(
+            '訂單中存在錯誤的產品數量,請檢查',
+            'Warning',
+            {
+                showCancelButton:false,
+                confirmButtonText: '確定',
+                type: 'warning',
+            }
+        )
+        return
+    }
+    createOrder({ orderList: orderList.value }).then(res => {
+        if (res.success) {
+            ElMessage({ type: 'success', message: '提交成功' })
+        } else {
+            ElMessage({ type: 'error', message: '提交失敗' })
         }
     })
+}
+
+function verifySubmit() {
+    for (let i = 0; i < orderList.value.length; i++) {
+        if (isNaN(orderList.value[i].orderQuantity) || orderList.value[i].orderQuantity === null) {
+            return false
+        }
+    }
+    return true
 }
 
 </script>
@@ -188,7 +217,7 @@ function comfireOrder(){
 .order-item {
     padding: 5px 10px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
 }
 
@@ -199,7 +228,8 @@ function comfireOrder(){
     flex-direction: column;
     gap: 10px;
 }
-.arrow-left{
+
+.arrow-left {
     cursor: pointer;
     display: flex;
     align-items: center;

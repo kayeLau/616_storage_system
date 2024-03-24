@@ -12,7 +12,8 @@ module.exports = class Member {
             '-1': ['shopPartition', 'shopId', 'shopName'],
             '0': ['shopPartition'],
             '1': ['shopPartition'],
-            '2': ['shopId', 'shopName']
+            '2': ['shopId', 'shopName'],
+            '3':['shopPartition', 'shopId', 'shopName']
         }
         const userAuth = userInfoRule[data.auth]
         userAuth.forEach(key => {
