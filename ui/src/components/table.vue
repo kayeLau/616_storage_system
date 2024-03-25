@@ -67,6 +67,7 @@
                       </template>
                         <component :is="item.render(h)" />
                     </el-popover>
+                    <component v-if="item.type === 'render'" :is="item.render(h)" />
                 </template>
             </div>
             <el-pagination background layout="total, prev, pager, next" :total="parseInt(_params.total)"
@@ -171,6 +172,7 @@ onMounted(() => {
 }
 .form-inline {
     padding-left: 8px;
+    overflow: hidden;
 }
 </style>
 <style scoped>

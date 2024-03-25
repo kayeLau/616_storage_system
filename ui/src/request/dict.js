@@ -20,15 +20,15 @@ export const classifyDict = {
     4: '牛肉',
     5: '午市',
     6: '蔬菜',
-    7: '醬料',
-    8: '小食',
-    10:'海鮮',
+    7: '廚房用品',
+    8: '樓面用品',
+    10:'小食及海鮮',
     11:'福食',
-    12:'豬類',
+    12:'醬料',
     13:'飲品',
-    14:'雜貨',
-    15:'其他',
-    17:'外賣產品'
+    14:'乾雜貨',
+    15:'文具及制服',
+    17:'外賣用品'
 }
 
 export const freezersNumDict = {
@@ -97,4 +97,13 @@ export function dictToFilterOptions(dict){
         })
     })
     return res
+}
+
+export function exchangeKeyValue(dict){
+    let obj = {}
+    Object.keys(dict).forEach(key => {
+        let k = dict[key]
+        obj[k] = key
+    })
+    return obj
 }

@@ -15,8 +15,9 @@ import { getProductList, updateProduct, createProduct, deleteProduct } from '../
 import { freezersNumDict, classifyDict, departmentDict, dictToOptions, productDisable, productSummary } from '../request/dict'
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
-import { ref } from 'vue';
-import { exportExcel } from '../utils/export'
+import { ref } from 'vue'
+import { exportExcel , xlsxToJson } from '../utils/export'
+import { ElUpload, ElButton } from 'element-plus'
 
 const KtableRef = ref()
 
@@ -223,6 +224,8 @@ const searchFormColumns = [
     options: dictToOptions(productSummary)
   }
 ]
+
+let fileList = ref([])
 const customBtn = [
   {
     type: 'button',
@@ -235,10 +238,33 @@ const customBtn = [
     type: 'button',
     btnType: 'success',
     label: '導出',
-    icon: 'CirclePlus',
+    icon: 'Printer',
     onClick: exportProductExcel
-  }
+  },
+  {
+    type: 'render',
+    render: (h) => {
+      return h(ElUpload, {
+          class: "upload-demo", autoUpload: false, onChange:excelToJson, limit:'1',
+          ['onUpdate:modelValue']: (value) => {
+            fileList.value = value
+          }
+        }, [
+          h(ElButton, { type: "primary", plain: true, limit: "1" , 
+          style:{ borderTopRightRadius:0 , borderBottomRightRadius:0 , borderRight:'none' }}, '上傳文件')
+        ])
+    }
+  },
 ]
+
+function excelToJson(file){
+  console.log(file.raw)
+  const reader = new FileReader()
+  reader.readAsBinaryString(file.raw)
+  reader.onload = e => {
+    xlsxToJson(e.target.result)
+  };
+}
 
 function exportProductExcel() {
   getProductList({ size: 999, page: 1 }).then(res => {
@@ -259,7 +285,7 @@ function exportProductExcel() {
           item.updateDate,
         ]
       })
-      jsonData.unshift(['狀態', '產品Id', '產品編號', '產品名稱', '分類 ', '雪房號碼' ,'負責部門', '規格', '單位', '匯總', '修改時間'])
+      jsonData.unshift(['狀態', '產品Id', '產品編號', '產品名稱', '分類 ', '雪房號碼', '負責部門', '規格', '單位', '匯總', '修改時間'])
       const products = {
         sheetNames: '產品',
         jsonData
@@ -270,3 +296,12 @@ function exportProductExcel() {
 }
 //#endregion
 </script>
+<style>
+.upload-demo {
+  display: flex;
+}
+
+.el-upload-list__item .el-upload-list__item-info {
+  width: 100%;
+}
+</style>

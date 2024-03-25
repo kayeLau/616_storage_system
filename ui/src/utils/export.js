@@ -2,14 +2,48 @@ import FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import XLSXStyle from 'xlsx-style-medalsoft'
 import JSZip from 'jszip';
+import { classifyDict , departmentDict , freezersNumDict , productDisable , productSummary , exchangeKeyValue } from '../request/dict'
 
+export function xlsxToJson(fileBinaryString) {
+  const workBook = XLSX.read(fileBinaryString, { type: 'binary' })
+  const _classifyDict = exchangeKeyValue(classifyDict)
+  const _departmentDict = exchangeKeyValue(departmentDict)
+  const _freezersNumDict = exchangeKeyValue(freezersNumDict)
+  const _productDisable = exchangeKeyValue(productDisable)
+  const _productSummary = exchangeKeyValue(productSummary)
+  let result = [] 
 
-export function exportExcel(exportDate, usezip = false, zipFileName , hpt ) {
+  workBook.SheetNames.forEach(sheetName => {
+    const jsonData = XLSX.utils.sheet_to_json(workBook.Sheets[sheetName], {});
+    console.log(jsonData)
+    result = jsonData.map(item => {
+      return {
+        productId:item.productId,
+        productCode:item.productCode,
+        department:_departmentDict[item.department],
+        freezersNum:Number(_freezersNumDict[item.freezersNum]),
+        classify:Number(_classifyDict[item.classify]),
+        productName:item.productName,
+        unit:item.unit,
+        standard:item.standard,
+        disable:Number(_productDisable[item.disable]),
+        summary:Number(_productSummary[item.summary]),
+        prompt:0,
+      }
+    })
+  })
+  
+  console.log(result)
+  let fileData = new Blob([JSON.stringify(result)], { type: 'application/json' })
+  FileSaver.saveAs(fileData,'db.json')
+}
+
+export function exportExcel(exportDate, usezip = false, zipFileName, hpt) {
   let zip = new JSZip();
   exportDate.forEach(item => {
     let jsonWorkSheet = XLSX.utils.json_to_sheet(item.jsonData, { skipHeader: true });
     autoWidth(jsonWorkSheet)
-    if(hpt){
+    if (hpt) {
       let height = new Array(99).fill(0).map(() => { return { hpt } })
       jsonWorkSheet['!rows'] = height
     }
@@ -70,7 +104,7 @@ function autoWidth(worksheet) {
     if (cell[0] === '!') continue;
     let col = cell.substring(0, 1); // get the column (assuming a maximum of 26 columns)
     let value = worksheet[cell].v; // get cell value
-    if(value){
+    if (value) {
       maxWidth[col] = Math.max(maxWidth[col] || 0, typeof value === 'string' ? value.length : (value.toString()).length);
     }
   }
