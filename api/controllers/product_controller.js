@@ -25,7 +25,7 @@ module.exports = class product {
             }
 
             const auth = tokenResult.userInfo.auth
-            if (auth !== -1) {
+            if (!(auth === -1 || auth === 2)) {
                 bandList = await getBandProducts({ shopId: tokenResult.userInfo.shopId }, 999, 1)
                     .then(res => res.resource.map(item => Number(item.productId)))
                 options.department = auth
@@ -33,7 +33,7 @@ module.exports = class product {
             }
 
             await getProductItems(options, size, page).then(result => {
-                if (auth !== -1) {
+                if (!(auth === -1 || auth === 2)) {
                     result.resource = result.resource.filter(item => {
                         let isBand = bandList.indexOf(item.productId) // 禁售商品
                         return isBand === -1 ? true : false

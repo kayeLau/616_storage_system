@@ -81,6 +81,7 @@ module.exports = class order {
         let orderList = req.body.orderList
         if (Array.isArray(orderList) && orderList.length) {
             orderList = orderList.map(item => {
+                let state = item.assignQuantity === null || item.assignQuantity === undefined ? 0 : 1 
                 return [
                     item.orderId,
                     item.productId,
@@ -88,7 +89,7 @@ module.exports = class order {
                     item.orderQuantity,
                     updateDate,
                     item.orderMode,
-                    1
+                    state
                 ]
             })
             insertOrderItems(orderList).then(result => {

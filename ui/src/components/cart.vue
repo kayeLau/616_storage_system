@@ -16,13 +16,13 @@
         <div class="detail-box" v-show="detailBoxSwitch">
             <div class="order-list">
                 <div v-for="(product, index) of orderList" :key="index" class="order-item">
-                    <div class="product-name">{{ product.productName }}</div>
-                    <div style="color: #ccc;font-size: 14px;">{{ product.standard }}</div>
+                    <div class="product-name" style="flex: 1;">{{ product.productName }}</div>
+                    <div style="color: #cfcfcf;font-size: 14px;padding-right: 8px;">{{ product.standard }}</div>
                     <div>
                         <el-icon @click="emitOrderDetailChange(product, true)">
                             <CirclePlusFilled />
                         </el-icon>
-                        {{ product.orderQuantity + product.unit }}
+                        {{ product.orderQuantity }}
                         <el-icon @click="emitOrderDetailChange(product, false)">
                             <RemoveFilled />
                         </el-icon>

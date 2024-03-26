@@ -6,7 +6,7 @@
         :customBtn="customBtn" :expandHeader="{}" :expandColumns="{}" :products="products"></Ktable>
     </el-card>
 
-    <el-dialog v-model="orderDetailShow" title="訂單明細" width="90%" style="height:80vh;position: relative;" top="10vh">
+    <el-dialog v-model="orderDetailShow" title="訂單明細" width="95%" style="height:85vh;position: relative;" top="10vh">
       <template #header="{ titleId, titleClass }">
         <div class="my-header">
           <span :id="titleId" :class="titleClass">訂單明細</span>
@@ -160,7 +160,6 @@ function exportDailyMeetSummary() {
         })
         return [product.productName, ...row, product.productName, summary]
       })
-      console.log(jsonData)
       jsonData.unshift(['產品名稱', ...shopName, '產品名稱', '出貨總數'])
 
       const dailyMeetSummary = {

@@ -12,7 +12,7 @@
       <el-table-column prop="freezersNum" label="雪房號碼" :formatter="freezersNumFormatter" :filter-multiple="false"
         :filtered-value="filteredValue" :filters="dictToFilterOptions(freezersNumDict)"
         :filter-method="filterHandler" />
-      <el-table-column prop="productCode" label="產品" width="280">
+      <el-table-column prop="productCode" label="產品" width="260">
 
         <template #default="scope">
           <el-select v-if='scope.row.mode === "create"' v-model="_data.children[scope.$index].productId" filterable
@@ -22,19 +22,19 @@
           <span v-else>{{ scope.row.productCode + ' ' + scope.row.productName }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="orderQuantity" label="下單數量" width="150" align="center">
 
+      <el-table-column prop="orderQuantity" label="下單數量" width="250" align="left">
         <template #default="scope">
-          <div v-if='scope.row.mode === "create"' class="flex-row-center">
-            <el-input-number v-model="orderInfoMap[scope.row.productId].orderQuantity" :min="0" :controls="false"/>
-            <span>{{ scope.row.unit }}</span>
+          <div class="flex-row-start">
+            <el-input-number v-model="orderInfoMap[scope.row.productId].orderQuantity" :min="0" :controls="false" :disabled="userInfo.auth !== 2"/>
+            <span>{{ scope.row.standard }}</span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="assignQuantity" label="分配數量" width="150" align="center">
 
+      <el-table-column prop="assignQuantity" label="分配數量" width="150" align="left">
         <template #default="scope">
-          <div class="flex-row-center">
+          <div class="flex-row-start">
             <el-input-number v-model="orderInfoMap[scope.row.productId].assignQuantity" :min="0" :controls="false" :disabled="userInfo.auth !== -1" />
             <span>{{ scope.row.unit }}</span>
           </div>
@@ -45,17 +45,17 @@
       <el-table-column prop="remark" label="備注" width="200">
 
         <template #default="scope">
-          <el-input v-model="_data.children[scope.$index].remark" :disabled="userInfo.auth !== -1" />
+          <el-input v-model="_data.children[scope.$index].remark" :disabled="!(userInfo.auth === -1 || userInfo.auth === 2)" />
         </template>
       </el-table-column>
     </el-table>
     <!-- pagination -->
     <div class="pagination">
       <div>
-        <div v-if="userInfo.auth === -1">
-          <el-button type="primary" @click="updateAssignQuantity()" icon="Coin" plain>按下單數量分配</el-button>
-          <el-button type="success" icon="Coin" plain @click="submitOrderItem">提交</el-button>
-          <el-button type="success" @click="insertOrderItem" icon="CirclePlus" plain>新增</el-button>
+        <div>
+          <el-button v-if="userInfo.auth === -1" type="primary" @click="updateAssignQuantity()" icon="Coin" plain>按下單數量分配</el-button>
+          <el-button v-if="userInfo.auth === -1 || userInfo.auth === 2" type="success" icon="Coin" plain @click="submitOrderItem">提交</el-button>
+          <el-button v-if="userInfo.auth === -1 || userInfo.auth === 2" type="success" @click="insertOrderItem" icon="CirclePlus" plain>新增</el-button>
         </div>
       </div>
       <el-pagination background layout="total, prev, pager, next" :total="paramsTotal"

@@ -173,7 +173,7 @@ const columns = [
   { props: 'disable', label: '狀態', formatter: productDisableFormatter, width: 60 },
   { props: 'productCode', label: '產品編號', width: 80 },
   { props: 'productName', label: '產品名稱', width: 130 },
-  { props: 'classify', label: '分類', formatter: classifyFormatter },
+  { props: 'classify', label: '分類', formatter: classifyFormatter , width: 120},
   { props: 'freezersNum', label: '雪房號碼', formatter: freezersNumFormatter },
   { props: 'department', label: '負責部門', formatter: departmentFormatter },
   { props: 'standard', label: '規格', width: 120 },
@@ -251,7 +251,7 @@ const customBtn = [
           }
         }, [
           h(ElButton, { type: "primary", plain: true, limit: "1" , 
-          style:{ borderTopRightRadius:0 , borderBottomRightRadius:0 , borderRight:'none' }}, '上傳文件')
+          style:{ borderTopRightRadius:0 , borderBottomRightRadius:0 }}, '轉換為JSON')
         ])
     }
   },

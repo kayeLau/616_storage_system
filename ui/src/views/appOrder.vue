@@ -14,7 +14,7 @@
                     <template #default>
                         <div class="product-list">
                             <div v-for="(product, sIndex) of Object.values(item.children)" :key="sIndex"
-                                class="product-li">
+                                class="product-li" :style="product.checked === false ? 'background-color: var(--el-color-danger-light-3)' : ''">
                                 <div class="product-name">{{ product.productName }}</div>
                                 <div class="product-row">
                                     <!-- <div class="product-standard">{{ product.standard }}</div> -->
@@ -40,8 +40,8 @@ import { ref, onMounted } from 'vue';
 import { getProductList } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
 import { classifyDict , classifySort } from '../request/dict';
-import { createWs , getWs } from '../utils/ws';
-import { getStorge } from '../utils/auth';
+// import { createWs , getWs } from '../utils/ws';
+// import { getStorge } from '../utils/auth';
 
 let loading = ref(true)
 let orderMap = ref({})
@@ -55,15 +55,17 @@ const products = ref([
 
 // 購物車項目改變
 function orderDetailChange(product) {
+    setMustOrderChecked(product)
     setOrderMap(product)
     setProductListView(product)
-    sendOrderWs()
+    // sendOrderWs()
 }
 
 // 加購
 function orderChange(product) {
+    setMustOrderChecked(product)
     setOrderMap(product)
-    sendOrderWs()
+    // sendOrderWs()
 }
 
 function setOrderMap(product) {
@@ -71,8 +73,14 @@ function setOrderMap(product) {
     orderMap.value[productId] = product
 }
 
+function setMustOrderChecked(product){
+    if(product.checked === false){
+        product.checked = true
+    }
+}
+
 function setProductListView(product) {
-    const target = products.value.find(item => item.name === (product.classify + 1));
+    const target = products.value.find(item => item.name === (product.classify));
     target.children[product.productId] = product
 
     const promptNum = 0
@@ -90,7 +98,7 @@ async function getProducts() {
     await getProductList(params).then(res => {
         if (res.success) {
             res.resource.forEach(item => {
-                const classify = item.classify + 1;
+                const classify = item.classify;
                 const classifyName = classifyDict[item.classify]
                 if (!products.value[classify]) {
                     products.value[classify] = {
@@ -100,11 +108,14 @@ async function getProducts() {
                     }
                 }
                 if (item.prompt) {
-                    products.value[0].children[item.productId] = {
+                    const _item = {
                         ...item,
-                        orderQuantity: 0,
-                        orderMode: 0
+                        orderQuantity: null,
+                        orderMode: 0,
+                        checked:false
                     }
+                    products.value[0].children[item.productId] = _item
+                    orderMap.value[item.productId] = _item
                 } else {
                     products.value[classify].children[item.productId] = {
                         ...item,
@@ -134,38 +145,38 @@ function checkExistOrder() {
     })
 }
 // ws
-function sendOrderWs() {
-    const userInfo = JSON.parse(getStorge('userInfo'))
-    const ws = getWs()
-    ws.send(JSON.stringify({
-        shopId: userInfo.shopId,
-        auth: userInfo.auth,
-        orderList: Object.values(orderMap.value).filter(item => item.orderQuantity !== 0)
-    }))
-}
+// function sendOrderWs() {
+//     const userInfo = JSON.parse(getStorge('userInfo'))
+//     const ws = getWs()
+//     ws.send(JSON.stringify({
+//         shopId: userInfo.shopId,
+//         auth: userInfo.auth,
+//         orderList: Object.values(orderMap.value).filter(item => item.orderQuantity !== 0)
+//     }))
+// }
 
-function syncOrder(message){
-    const userInfo = JSON.parse(getStorge('userInfo'))
-    if(message.shopId === userInfo.shopId && message.auth === userInfo.auth){
-        console.log(message.orderList)
-        message.orderList.forEach(item => {
-            setOrderMap(item)
-            setProductListView(item)
-        })
-    }
-}
+// function syncOrder(message){
+//     const userInfo = JSON.parse(getStorge('userInfo'))
+//     if(message.shopId === userInfo.shopId && message.auth === userInfo.auth){
+//         console.log(message.orderList)
+//         message.orderList.forEach(item => {
+//             setOrderMap(item)
+//             setProductListView(item)
+//         })
+//     }
+// }
 
 //接收 Server 發送的訊息
-function setWebsocket() {
-    const token = getStorge('token')
-    const ws = createWs(token)
-    ws.addEventListener('message', (event) => {
-        const message = JSON.parse(event.data);
-        console.log('收到消息：', message);
-        syncOrder(message)
-    });
-}
-setWebsocket()
+// function setWebsocket() {
+//     const token = getStorge('token')
+//     const ws = createWs(token)
+//     ws.addEventListener('message', (event) => {
+//         const message = JSON.parse(event.data);
+//         console.log('收到消息：', message);
+//         syncOrder(message)
+//     });
+// }
+// setWebsocket()
 
 onMounted(async () => {
     await getProducts()
