@@ -1,20 +1,21 @@
 <template>
     <div style="position: relative;">
         <div class="tool-bar"></div>
-        <el-tabs v-model="tabName" class="product-tabs" type="border-card">
-            <el-tab-pane v-for="(item, index) of products" :label="item.label" :name="item.name" :key="index">
-                <el-skeleton :loading="loading" animated>
-                    <template #template>
-                        <div class="product-list">
-                            <el-skeleton-item variant="text" style="width: 80%" />
-                            <el-skeleton-item variant="text" style="width: 50%" />
-                        </div>
-                    </template>
-
+        <el-skeleton :loading="loading" animated>
+            <template #template>
+                <div class="product-skeleton">
+                    <el-skeleton-item variant="text" style="width: 90%" />
+                    <el-skeleton-item variant="text" style="width: 80%" />
+                    <el-skeleton-item variant="text" style="width: 50%" />
+                </div>
+            </template>
+            <el-tabs v-model="tabName" class="product-tabs" type="border-card">
+                <el-tab-pane v-for="(item, index) of products" :label="item.label" :name="item.name" :key="index">
                     <template #default>
                         <div class="product-list">
                             <div v-for="(product, sIndex) of Object.values(item.children)" :key="sIndex"
-                                class="product-li" :style="product.checked === false ? 'background-color: var(--el-color-danger-light-3)' : ''">
+                                class="product-li"
+                                :style="product.checked === false ? 'background-color: var(--el-color-danger-light-3)' : ''">
                                 <div class="product-name">{{ product.productName }}</div>
                                 <div class="product-row">
                                     <!-- <div class="product-standard">{{ product.standard }}</div> -->
@@ -27,10 +28,11 @@
                             </div>
                         </div>
                     </template>
-                </el-skeleton>
-            </el-tab-pane>
-        </el-tabs>
-        <cart :orderMap="orderMap" @orderDetailChange="orderDetailChange"></cart>
+                </el-tab-pane>
+            </el-tabs>
+        </el-skeleton>
+
+        <cart v-show="!loading" :orderMap="orderMap" @orderDetailChange="orderDetailChange"></cart>
     </div>
 </template>
 
@@ -39,7 +41,7 @@ import cart from '../components/cart.vue'
 import { ref, onMounted } from 'vue';
 import { getProductList } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
-import { classifyDict , classifySort } from '../request/dict';
+import { classifyDict, classifySort } from '../request/dict';
 // import { createWs , getWs } from '../utils/ws';
 // import { getStorge } from '../utils/auth';
 
@@ -73,8 +75,8 @@ function setOrderMap(product) {
     orderMap.value[productId] = product
 }
 
-function setMustOrderChecked(product){
-    if(product.checked === false){
+function setMustOrderChecked(product) {
+    if (product.checked === false) {
         product.checked = true
     }
 }
@@ -112,7 +114,7 @@ async function getProducts() {
                         ...item,
                         orderQuantity: null,
                         orderMode: 0,
-                        checked:false
+                        checked: false
                     }
                     products.value[0].children[item.productId] = _item
                     orderMap.value[item.productId] = _item
@@ -125,17 +127,16 @@ async function getProducts() {
                 }
             });
             products.value = products.value
-            .sort((a,b) => classifySort.indexOf(a.name) - classifySort.indexOf(b.name))
-            .filter(item => Object.keys(item.children).length)
+                .sort((a, b) => classifySort.indexOf(a.name) - classifySort.indexOf(b.name))
+                .filter(item => Object.keys(item.children).length)
 
         }
-        loading.value = false
     })
 }
 const tabName = ref('')
 
-function checkExistOrder() {
-    checkOrderRepeated().then(res => {
+async function checkExistOrder() {
+    await checkOrderRepeated().then(res => {
         if (res.success && res.resource.children) {
             res.resource.children.forEach(item => {
                 setOrderMap(item)
@@ -181,7 +182,8 @@ function checkExistOrder() {
 onMounted(async () => {
     await getProducts()
     tabName.value = products.value[0].name
-    checkExistOrder()
+    await checkExistOrder()
+    loading.value = false
 })
 
 </script>
@@ -200,12 +202,14 @@ onMounted(async () => {
 .product-name {
     font-weight: 600;
 }
-.product-row{
+
+.product-row {
     display: flex;
     justify-content: flex-end;
     align-items: center;
 }
-.product-standard{
+
+.product-standard {
     color: #ccc
 }
 
@@ -225,6 +229,11 @@ onMounted(async () => {
     width: 100%;
     height: calc(100vh - 180px);
     overflow-y: scroll;
+}
+.product-skeleton{
+    padding: 10px;
+    height: calc(100vh - 150px);
+    background-color: #fff;
 }
 
 .order-quantity {

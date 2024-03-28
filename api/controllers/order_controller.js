@@ -104,9 +104,9 @@ module.exports = class order {
 
     postupdateOrderDetailAssignQuantity(req, res, next) {
         const data = req.body.assignQuantitys
-        const orderId = req.body.orderId
+        const userInfo = req.userInfo
         if (Array.isArray(data)) {
-            updateOrderDetailAssignQuantity(data, orderId).then(result => {
+            updateOrderDetailAssignQuantity(data,userInfo).then(result => {
                 res.json(result)
             }).catch(err => {
                 next(err)

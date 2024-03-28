@@ -26,7 +26,7 @@
       <el-table-column prop="orderQuantity" label="下單數量" width="250" align="left">
         <template #default="scope">
           <div class="flex-row-start">
-            <el-input-number v-model="orderInfoMap[scope.row.productId].orderQuantity" :min="0" :controls="false" :disabled="userInfo.auth !== 2"/>
+            <el-input-number v-model="orderInfoMap[scope.row.productId].orderQuantity" :min="0" :controls="false" :disabled="!(userInfo.auth === -1 || userInfo.auth === 2)"/>
             <span>{{ scope.row.standard }}</span>
           </div>
         </template>
@@ -41,7 +41,8 @@
         </template>
       </el-table-column>
       <el-table-column prop="orderMode" label="下單模式" :formatter="orderModeFormatter" align="center" />
-      <el-table-column prop="updateDate" label="修改時間" width="180" />
+      <el-table-column prop="updateDate" label="最後修改時間" width="180" />
+      <!-- <el-table-column prop="lastEditBy" label="最後修改人" width="100" /> -->
       <el-table-column prop="remark" label="備注" width="200">
 
         <template #default="scope">
@@ -184,7 +185,10 @@ function insertOrderItem() {
 
 async function submitOrderItem() {
   const createList = _data.children.filter(item => item.mode === 'create' && item.productCode && item.productName && item.orderQuantity !== null)
-  const updateList = Object.values(orderInfoMap.value).filter(item => item.assignQuantity !== null)
+  let updateList = Object.values(orderInfoMap.value).filter(item => item.assignQuantity !== null)
+  if(userInfo.value.auth === 2){
+    updateList = Object.values(orderInfoMap.value)
+  }
   await addAdditionOrderItem(createList)
   if (updateList.length) {
     updateAssignQuantity(updateList)
@@ -240,6 +244,7 @@ function generateAssignQuantityParams(orderList) {
     return {
       id: item.id,
       assignQuantity: item.assignQuantity,
+      orderQuantity:item.orderQuantity,
       remark: item.remark
     }
   })

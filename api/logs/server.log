@@ -28,3 +28,15 @@ info: Mar-06-2024 15:00:10: 	{"code":"ER_TRUNCATED_WRONG_VALUE","errno":1292,"sq
 info: Mar-06-2024 15:00:12: 	{"code":"ER_TRUNCATED_WRONG_VALUE","errno":1292,"sqlMessage":"Truncated incorrect DOUBLE value: 'H1015'","sqlState":"22007","index":0,"sql":"UPDATE product_info SET `prompt` = 0, `updateDate` = '2024-03-06 15:00:12' where productId = 'H1015'"}
 info: Mar-06-2024 15:01:30: 	{"code":"ER_TRUNCATED_WRONG_VALUE","errno":1292,"sqlMessage":"Truncated incorrect DOUBLE value: 'H1015'","sqlState":"22007","index":0,"sql":"UPDATE product_info SET `prompt` = 0, `updateDate` = '2024-03-06 15:01:30' where productId = 'H1015'"}
 info: Mar-10-2024 10:26:09: 	undefined
+info: Mar-28-2024 10:20:31: 	undefined
+info: Mar-28-2024 10:27:11: 	undefined
+info: Mar-28-2024 10:27:11: 	undefined
+info: Mar-28-2024 10:29:07: 	undefined
+info: Mar-28-2024 10:30:20: 	undefined
+info: Mar-28-2024 10:30:44: 	undefined
+info: Mar-28-2024 10:45:10: 	undefined
+info: Mar-28-2024 10:45:57: 	undefined
+info: Mar-28-2024 10:46:01: 	undefined
+info: Mar-28-2024 14:46:04: 	undefined
+info: Mar-28-2024 14:46:17: 	undefined
+info: Mar-28-2024 14:52:15: 	undefined

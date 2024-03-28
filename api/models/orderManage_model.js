@@ -74,7 +74,9 @@ function checkOrderRepeated(table, options) {
     })
 }
 
-function updateOrderDetailAssignQuantity(list) {
+function updateOrderDetailAssignQuantity(list , userInfo) {
+    console.log(userInfo)
+    let orderQuantity = ''
     let assignQuantity = ''
     let status = ''
     let remark = ''
@@ -83,12 +85,15 @@ function updateOrderDetailAssignQuantity(list) {
     const currentTime = getCurrentTime()
     list.forEach(item => {
         ids.push(item.id)
-        assignQuantity += `WHEN ${item.id} THEN ${Number(item.assignQuantity)} \n`
+        orderQuantity += `WHEN ${item.id} THEN ${ item.orderQuantity === null ? null : Number(item.orderQuantity) } \n`
+        assignQuantity += `WHEN ${item.id} THEN ${ item.assignQuantity === null ? null : Number(item.assignQuantity) } \n`
         status += `WHEN ${item.id} THEN ${Number(1)} \n`
         updateDate += `WHEN ${item.id} THEN "${currentTime}" \n`
         remark += `WHEN ${item.id} THEN "${item.remark || '-'}" \n`
     })
     return customQuery(`UPDATE order_detail_info SET
+            orderQuantity=CASE id
+            ${orderQuantity} END,
             assignQuantity=CASE id
             ${assignQuantity} END,
             status=CASE id

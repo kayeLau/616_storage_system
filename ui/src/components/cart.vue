@@ -86,7 +86,7 @@ function emitOrderDetailChange(product, type) {
 // })
 
 const orderList = computed(() => {
-    return Object.values(props.orderMap).filter(item => item.orderQuantity !== 0)
+    return Object.values(props.orderMap).filter(item => item.orderQuantity !== 0 || item.checked === true)
 })
 
 let detailBoxSwitch = ref(false)

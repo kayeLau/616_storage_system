@@ -9,8 +9,7 @@
                 <div class="expand-header">
                     <div class="expand-list-body-row">
                         <span>分配狀態</span>
-                        <span></span>
-                        <span></span>
+                        <span>產品</span>
                         <span>下單數量</span>
                         <span>分配數量</span>
                         <span>下單模式</span>
@@ -22,9 +21,8 @@
                 <div v-for="(item, index) of orderItems" :key="index" class="expand-list-body-box">
                     <div class="expand-list-body-row">
                         <span v-html="orderStateFormatter(item.status)"></span>
-                        <span>{{ item.productCode }}</span>
-                        <span>{{ item.productName || '-' }}</span>
-                        <span>{{ item.orderQuantity + item.unit }}</span>
+                        <span>{{ item.productCode + ' ' + item.productName}}</span>
+                        <span>{{ item.orderQuantity + ' ' + item.standard }}</span>
                         <span>{{ item.assignQuantity === null ? '-' : item.assignQuantity + item.unit }}</span>
                         <span>{{ orderMode[item.orderMode] }}</span>
                         <span>{{ item.updateDate }}</span>
@@ -85,9 +83,9 @@ const orderItems = ref(expandTable_temp)
 .expand-list-body-row {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     text-align: center;
-    justify-items: center;
+    justify-items: left;
     align-items: center;
 }
 
