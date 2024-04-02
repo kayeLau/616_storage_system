@@ -124,8 +124,8 @@ module.exports = class Member {
 
     async getUsersList(req, res, next) {
         const options = { auth: req.body.auth, shopId: req.body.shopId }
-        const size = parseInt(req.body.size)
-        const page = parseInt(req.body.page)
+        const size = parseInt(req.body.size) || 999
+        const page = parseInt(req.body.page) || 1
         let partitionDict = {}
         await getPartitionItems({}, 999, 1).then(result => {
             if (result.success) {

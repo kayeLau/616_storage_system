@@ -75,7 +75,6 @@ function checkOrderRepeated(table, options) {
 }
 
 function updateOrderDetailAssignQuantity(list , userInfo) {
-    console.log(userInfo)
     let orderQuantity = ''
     let assignQuantity = ''
     let status = ''

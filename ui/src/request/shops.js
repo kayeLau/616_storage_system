@@ -71,3 +71,11 @@ export function bindProductToShop(data){
       data,
     });
 }
+
+export function postSetShopOrder(data){
+  return request({
+      url: '/shops/postSetShopOrder',
+      method: 'post',
+      data,
+    });
+}

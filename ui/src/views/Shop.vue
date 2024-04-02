@@ -5,9 +5,11 @@
         :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
     </el-card>
     <bandList :dialogVisible="bandListDialogVisible" @closeDialog="manageBandProduct" :shopId="shopId"></bandList>
+    <shopSort :shopOrderDialogVisible="shopOrderDialogVisible" @closeDialog="switchShopOrderDialogVisible"></shopSort>
     <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
       <jsonForm ref='JsonFormRef' :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules"
-        :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList" @addSelectItem="addSelectItem"></jsonForm>
+        :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList" @addSelectItem="addSelectItem">
+      </jsonForm>
     </el-drawer>
   </div>
 </template>
@@ -18,6 +20,8 @@ import bandList from '../components/bandList.vue';
 import Ktable from '../components/table.vue';
 import jsonForm from '../components/jsonForm.vue';
 import { ref, onMounted } from 'vue';
+import shopSort from '../components/shopSort.vue'
+
 
 const shopTypeOptions = dictToOptions(shopType)
 let shopId = ref("")
@@ -92,7 +96,7 @@ function deleteSelectItem(partitionId) {
   })
 }
 function addSelectItem(partitionName) {
-  if(!partitionName)return;
+  if (!partitionName) return;
   createPartition({ partitionName }).then(res => {
     if (res.success) {
       getPartitionItems()
@@ -140,6 +144,7 @@ const columns = [
   { props: 'shopName', label: '店舖名稱', width: 250 },
   { props: 'shopPartition', label: '所屬分區' },
   { props: 'shopType', label: '店舖類型', formatter: shopTypeFormatter },
+  // { props: 'shopOrder', label: '分店排序' },
   // {props:'productCount',label:'產品種類'},
   { props: 'updateDate', label: '修改時間', width: 250 }
 ]
@@ -166,12 +171,21 @@ const searchFormColumns = [
 ]
 const customBtn = [
   {
-    type:'button',
+    type: 'button',
     btnType: 'success',
     label: '新增',
     icon: 'CirclePlus',
     onClick: createHandle
   },
+  {
+    type: 'button',
+    btnType: 'primary',
+    label: '店舖排序',
+    icon: 'CirclePlus',
+    onClick: ()=>{
+      shopOrderDialogVisible.value = !shopOrderDialogVisible.value
+    }
+  }
 ]
 
 // popup
@@ -181,5 +195,11 @@ function manageBandProduct(index, row) {
     shopId.value = row.shopId
   }
   bandListDialogVisible.value = !bandListDialogVisible.value
+}
+//
+let shopOrderDialogVisible = ref(false)
+function switchShopOrderDialogVisible() {
+  KtableRef.value.fatchList()
+  shopOrderDialogVisible.value = !shopOrderDialogVisible.value
 }
 </script>

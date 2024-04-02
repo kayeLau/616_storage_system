@@ -23,5 +23,7 @@ router.post('/getBindProductList',shopModifyMethod.getBindProductList)
 
 router.post('/bindProductToShop',shopModifyMethod.postBindProductToShop)
 
+router.post('/postSetShopOrder',shopModifyMethod.postSetShopOrder)
+
 
 module.exports = router;

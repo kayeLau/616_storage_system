@@ -53,3 +53,8 @@ body{
     align-items: center;
     gap: 5px;
 }
+.dialog{
+    border-radius: 10px;
+    height: 70vh;
+    overflow: hidden;
+}
