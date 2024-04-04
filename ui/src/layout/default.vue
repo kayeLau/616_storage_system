@@ -17,7 +17,7 @@
             </el-header>
 
             <el-container>
-                <el-aside width="180px" style="padding-right: 8px;">
+                <el-aside width="180px" style="padding-right: 8px;position: relative;">
                     <el-menu default-active="1" class="el-menu-vertical-demo" router background-color="#f2f6fc">
                         <component v-for='(item, index) of menus' :key='index' :index="item.path"
                             :is='item.childen ? "el-sub-menu" : "el-menu-item"'>
@@ -32,6 +32,9 @@
                                 one</el-menu-item>
                         </component>
                     </el-menu>
+                    <div class="version">
+                        v1.0.0.0
+                    </div>
                 </el-aside>
 
                 <el-main>
@@ -161,5 +164,13 @@ onBeforeUnmount(async() => {
 
 .avatar-detail>p {
     padding-bottom: 5px;
+}
+.version{
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color:#6c6a6a;
+    font-size: smaller
 }
 </style>
