@@ -21,6 +21,7 @@ import Ktable from '../components/table.vue';
 import jsonForm from '../components/jsonForm.vue';
 import { ref, onMounted } from 'vue';
 import shopSort from '../components/shopSort.vue'
+import { ElTag } from 'element-plus';
 
 
 const shopTypeOptions = dictToOptions(shopType)
@@ -52,6 +53,7 @@ const editFormColumns = ref([
   {
     type: 'select',
     prop: 'shopPartition',
+    multiple: true,
     label: '所屬分區:',
     options: [],
     icon: 'DeleteFilled',
@@ -142,10 +144,13 @@ const shopTypeFormatter = (row, column) => {
 const columns = [
   { props: 'shopCode', label: '店舖編號' },
   { props: 'shopName', label: '店舖名稱', width: 250 },
-  { props: 'shopPartition', label: '所屬分區' },
+  {
+    props: 'shopPartitionName', label: '所屬分區', width: 250, render: (h, row) => {
+      let shopPartitionName = row.shopPartitionName.map(item => h(ElTag, { type: 'info', style: { marginRight: '5px' } }, item))
+      return h('div', shopPartitionName)
+    }
+  },
   { props: 'shopType', label: '店舖類型', formatter: shopTypeFormatter },
-  // { props: 'shopOrder', label: '分店排序' },
-  // {props:'productCount',label:'產品種類'},
   { props: 'updateDate', label: '修改時間', width: 250 }
 ]
 const operations = {
@@ -182,7 +187,7 @@ const customBtn = [
     btnType: 'primary',
     label: '店舖排序',
     icon: 'CirclePlus',
-    onClick: ()=>{
+    onClick: () => {
       shopOrderDialogVisible.value = !shopOrderDialogVisible.value
     }
   }

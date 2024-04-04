@@ -20,7 +20,8 @@ module.exports = class Shop {
 
         getShopItems(options, size, page).then(result => {
             result.resource.forEach(item => {
-                item.shopPartition = partitionDict[item.shopPartition]
+                item.shopPartition = item.shopPartition.split(',').map(item => Number(item))
+                item.shopPartitionName = item.shopPartition.map(item => partitionDict[item])
             })
             res.json(result)
         }).catch(err => {

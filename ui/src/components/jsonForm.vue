@@ -7,7 +7,7 @@
                     <span v-show="item.unit">{{ item.unit }}</span>
                 </div>
                 <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable :disabled="item.disabled"
-                    @change="item.change" placeholder="請選擇">
+                    @change="item.change" placeholder="請選擇" :multiple="item.multiple">
                     <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value">
                         <div class="select-options-wicon" v-if="item.icon">
                             <span>{{ opt.label }}</span>
@@ -95,6 +95,8 @@ function additionData(data) {
         if (key === 'shopId' && shopNameList.value) {
             let target = shopNameList.value.options.find(item => item.value === data.shopId)
             data.shopName = target ? target.label : ''
+        }else if (key === 'shopPartition') {
+            data.shopPartition = data.shopPartition.join(',')
         }
     })
     return data
