@@ -7,7 +7,7 @@
     <bandList :dialogVisible="bandListDialogVisible" @closeDialog="manageBandProduct" :shopId="shopId"></bandList>
     <shopSort :shopOrderDialogVisible="shopOrderDialogVisible" @closeDialog="switchShopOrderDialogVisible"></shopSort>
     <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
-      <jsonForm ref='JsonFormRef' :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules"
+      <jsonForm ref='JsonFormRef' :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules" flag="shop"
         :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList" @addSelectItem="addSelectItem">
       </jsonForm>
     </el-drawer>

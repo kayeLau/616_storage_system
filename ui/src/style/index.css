@@ -2,6 +2,7 @@
 @import "./card.css";
 @import "./input.css";
 @import "./table.css";
+@import "./ststistic.css";
 
 :root{
     --background-color:#f2f6fc;
@@ -45,6 +46,7 @@ body{
     justify-content: center;
     align-items: center;
     gap: 5px;
+    text-align: center;
 }
 
 .flex-row-start{

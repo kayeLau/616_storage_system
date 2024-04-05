@@ -17,7 +17,7 @@
             </el-header>
 
             <el-container>
-                <el-aside width="180px" style="padding-right: 8px;position: relative;">
+                <el-aside width="180px" class='aside'>
                     <el-menu default-active="1" class="el-menu-vertical-demo" router background-color="#f2f6fc">
                         <component v-for='(item, index) of menus' :key='index' :index="item.path"
                             :is='item.childen ? "el-sub-menu" : "el-menu-item"'>
@@ -102,6 +102,12 @@ const menus = [
         icon: 'Setting',
         auth: [-1]
     },
+    // {
+    //     name: "數據",
+    //     path: 'data',
+    //     icon: 'TrendCharts',
+    //     auth: [-1]
+    // },
 ].filter(item => item.auth.includes(userInfo.value.auth))
 
 let avatarDetailShow = ref(false)
@@ -172,5 +178,10 @@ onBeforeUnmount(async() => {
     transform: translateX(-50%);
     color:#6c6a6a;
     font-size: smaller
+}
+.aside{
+    padding-right: 8px;
+    position: relative;
+    height: calc(100vh - 60px);
 }
 </style>

@@ -44,6 +44,7 @@
 import { defineProps, ref, defineEmits, watch, computed, defineExpose , unref } from 'vue';
 import { ElMessage } from 'element-plus'
 const props = defineProps({
+    flag:String,
     comfireCallBack: Function,
     formModel: Object,
     formColumns: Array,
@@ -95,7 +96,7 @@ function additionData(data) {
         if (key === 'shopId' && shopNameList.value) {
             let target = shopNameList.value.options.find(item => item.value === data.shopId)
             data.shopName = target ? target.label : ''
-        }else if (key === 'shopPartition') {
+        }else if (key === 'shopPartition' && props.flag === 'shop') {
             data.shopPartition = data.shopPartition.join(',')
         }
     })

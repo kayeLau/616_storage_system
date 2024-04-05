@@ -57,6 +57,15 @@ const routes = [
     }]
   },
   {
+    path: '/data',
+    component: layout,
+    children:[{
+      path:'',
+      name: 'Data',
+      component: () => import('../views/Data.vue')
+    }]
+  },
+  {
     path: '/login',
     component: () => import('../views/Login.vue'),
   },
