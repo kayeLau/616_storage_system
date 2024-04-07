@@ -11,16 +11,18 @@ module.exports = class order {
         const options = { updateDate: req.body.updateDate, orderShopId }
         const size = req.body.size
         const page = req.body.page
-
         if (userInfoAuth === 2) {
-            let shopIdList = await getShopItems({ shopPartition: req.userInfo.shopPartition }, 999, 1).then(result => {
+            let shopIdList = await getShopItems({}, 999, 1).then(result => {
                 if (result.success) {
-                    return result.resource.map(item => item.shopId)
+                    return result.resource
+                    .filter(item => item.shopPartition.split(',').find(item => item === String(req.userInfo.shopPartition)))
+                    .map(item => item.shopId)
                 }
             }).catch(() => [])
             options.orderShopId = shopIdList
+            console.log(options)
         }
-
+        console.log(options)
         getOrderItems(options, size, page).then(result => {
             res.json(result)
         }).catch(err => {
