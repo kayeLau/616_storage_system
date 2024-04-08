@@ -13,6 +13,7 @@ const { verifyToken } = require('../models/verification')
 
 async function auth(req, res, next) {
     const token = req.headers['token'];
+    const ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
     let userInfo = {}
     if(req.path === '/users/login'){
         next()
@@ -23,6 +24,14 @@ async function auth(req, res, next) {
         if (tokenResult.success === true) {
             userInfo = tokenResult.userInfo
             req.userInfo = tokenResult.userInfo
+            if(userInfo.ipAddress && userInfo.ipAddress !== ip){
+                res.json({
+                    success:false,
+                    msg:"token verify fail",
+                    ip:userInfo.ipAddress
+                })
+                return
+            }
             next()
         } else {
             res.json(tokenResult)

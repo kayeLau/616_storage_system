@@ -20,9 +20,7 @@ module.exports = class order {
                 }
             }).catch(() => [])
             options.orderShopId = shopIdList
-            console.log(options)
         }
-        console.log(options)
         getOrderItems(options, size, page).then(result => {
             res.json(result)
         }).catch(err => {
