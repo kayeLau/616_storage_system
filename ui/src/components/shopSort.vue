@@ -1,15 +1,17 @@
 <template>
     <div class="itxst">
-        <el-dialog custom-class='dialog' v-model="_dialogVisible" title="分店禁售產品" width="70%" height="60%"
+        <el-dialog custom-class='dialog' v-model="_dialogVisible" title="店舖排序" width="70%" height="60%"
             @open="fetchShopList">
-            <draggable :list="state.list" ghost-class="ghost" chosen-class="chosenClass" animation="300"
-                @start="onStart" @end="onEnd">
-                <template #item="{ element }">
-                    <div class="item">
-                        {{ element.name }}
-                    </div>
-                </template>
-            </draggable>
+            <div style="overflow: scroll;height: calc(100% - 50px);">
+                <draggable :list="state.list" ghost-class="ghost" chosen-class="chosenClass" animation="300"
+                    @start="onStart" @end="onEnd">
+                    <template #item="{ element }">
+                        <div class="item">
+                            {{ element.name }}
+                        </div>
+                    </template>
+                </draggable>
+            </div>
         </el-dialog>
     </div>
 </template>

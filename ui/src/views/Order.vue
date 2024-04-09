@@ -176,7 +176,10 @@ function exportDailyAllSummary() {
     if (res.success) {
       const date = new Date()
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
-      const products = res.resource.products
+      let products = res.resource.products
+      if(userInfo.value.auth === 3){
+        products = products.filter(item => item.freezersNum === 1 || item.freezersNum === 3)
+      }
       let jsonData = []
       const splitNum = Math.floor(products.length / 2)
       // 產品
