@@ -6,10 +6,10 @@
         :customBtn="customBtn" :expandHeader="{}" :expandColumns="{}" :products="products"></Ktable>
     </el-card>
 
-    <el-dialog v-model="orderDetailShow" title="訂單明細" width="95%" style="height:85vh;position: relative;" top="10vh">
+    <el-dialog v-model="orderDetailShow" width="95%" style="height:85vh;position: relative;" top="10vh">
       <template #header="{ titleId, titleClass }">
         <div class="my-header">
-          <span :id="titleId" :class="titleClass">訂單明細</span>
+          <span :id="titleId" :class="titleClass">訂單明細 | {{ currentRow.shopName }}</span>
           <el-icon class="refresh" :class="loading ? 'is-loading' : ''">
             <Refresh v-show="!loading" @click="refreshList" />
             <Loading v-show="loading" />
@@ -184,17 +184,17 @@ function exportDailyAllSummary() {
       const splitNum = Math.floor(products.length / 2)
       // 產品
       products.map((product, rowIndex) => {
-        let summary = product.orderItems.reduce((prev, acc) => prev + acc) + product.unit
+        let summary = product.orderItems.reduce((prev, acc) => prev + acc) 
         let freezersNum = product.freezersNum === 6 ? '乾貨' : product.freezersNum
         let jIndex = rowIndex > splitNum ? rowIndex - splitNum - 1 : rowIndex
         if (rowIndex > splitNum) {
-          jsonData[jIndex] = [...jsonData[jIndex], product.productName, freezersNum, summary]
+          jsonData[jIndex] = [...jsonData[jIndex], product.productName, freezersNum, summary , product.unit ]
         } else {
-          jsonData[jIndex] = [product.productName, freezersNum, summary, ' ']
+          jsonData[jIndex] = [product.productName, freezersNum, summary, product.unit , ' ']
         }
       })
 
-      jsonData.unshift(['產品名稱', '雪房編號', '出貨總數', ' ', '產品名稱', '雪房編號', '出貨總數'])
+      jsonData.unshift(['產品名稱', '雪房編號', '出貨數量', '單位' , ' ', '產品名稱', '雪房編號', '出貨數量' , '單位'])
 
       const dailyMeetSummary = {
         sheetNames: today + '出貨匯總表',

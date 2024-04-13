@@ -59,6 +59,7 @@ function checkOrderRepeated(table, options) {
             let params = {
                 table: "order_detail_info",
                 join:"order_detail_info INNER JOIN product_info ON order_detail_info.productId = product_info.productId",
+                orderby:'order_detail_info.updateDate',
                 options: { orderId: resource.id },
                 size: 999,
                 page: 1
@@ -117,7 +118,8 @@ function getOrderItems(options, size, page) {
     const result = {}
     return getOrderAndgroupby(options, size, page).then(async orderItems => {
         const promiseList = orderItems.map((item, index) => {
-            return getItems({ table: "order_detail_info",join:"order_detail_info INNER JOIN product_info ON order_detail_info.productId = product_info.productId" ,options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
+            return getItems({ table: "order_detail_info",join:"order_detail_info INNER JOIN product_info ON order_detail_info.productId = product_info.productId" , 
+            orderby:'product_info.productCode', sort:'ASC' , options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
                 if (res.success) {
                     let status = res.resource.find(item => item.status === 0)
                     orderItems[index].status = status ? 0 : 1
@@ -178,6 +180,7 @@ async function getOrderAndgroupby(options, size, page) {
         table: "order_info",
         join: "order_info INNER JOIN shop_info ON orderShopId = shopId",
         columns: ` * , DATE_FORMAT(order_info.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate , DATE_FORMAT(order_info.createDate,'%Y-%m-%d') AS createDate , IF(order_info.orderDate = '${orderDateStr}',1,0) AS isToday`,
+        orderby:'order_info.updateDate',
         options,
         size,
         page

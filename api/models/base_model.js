@@ -140,7 +140,7 @@ function getItems({ table, options, size, page, orderby = 'updateDate', primaryK
         })
         let defaultColumns = `* , DATE_FORMAT(${table}.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate`
         db.query(`SELECT ${ columns ? columns : defaultColumns }
-        FROM ${join ? join : table} ${optionsSQL} ORDER BY ${table}.${orderby} ${sort},${primaryKey}
+        FROM ${join ? join : table} ${optionsSQL} ORDER BY ${orderby} ${sort},${primaryKey}
         LIMIT ${size} OFFSET ${(page - 1) * size}`, (err, rows) => {
             if (err) {
                 console.log(err)
