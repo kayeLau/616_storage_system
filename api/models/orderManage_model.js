@@ -113,6 +113,12 @@ function deleteOrderItem(shopId) {
     return deleteItem("order_info", 'shopId', shopId)
 }
 
+// 獲取訂單總數
+function getOrderItemsNumber(options){
+    let optionsSQL = optionsSQLFromatter(options, 'order_info')
+    return customQuery(`SELECT COUNT(*) AS total FROM ( SELECT COUNT(*) AS total FROM order_info ${optionsSQL} GROUP BY orderCode) AS total`)
+}
+
 // 獲取訂單
 function getOrderItems(options, size, page) {
     const result = {}
@@ -127,8 +133,7 @@ function getOrderItems(options, size, page) {
                 }
             })
         })
-        let optionsSQL = optionsSQLFromatter(options, 'order_info')
-        await customQuery(`SELECT COUNT(*) AS total FROM ( SELECT COUNT(*) AS total FROM order_info ${optionsSQL} GROUP BY orderCode) AS total`).then(res => {
+        await getOrderItemsNumber(options).then(res => {
             if (res.success) {
                 result.total = res.resource[0].total || 0;
             }
@@ -211,6 +216,6 @@ async function getOrderAndgroupby(options, size, page) {
 
 module.exports = {
     getOrderExportList,
-    createNewOrder, updateOrderInformation, deleteOrderItem,
+    createNewOrder, updateOrderInformation, deleteOrderItem, getOrderItemsNumber,
     getOrderItems, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated
 }

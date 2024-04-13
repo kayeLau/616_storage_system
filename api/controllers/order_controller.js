@@ -1,6 +1,6 @@
 const { getCurrentTime, getSettingTimeRange } = require('../utils')
 const { generateUUID } = require('../models/encryption');
-const { getOrderItems, createNewOrder, updateOrderInformation, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated, getOrderExportList } = require('../models/orderManage_model')
+const { getOrderItems, createNewOrder, updateOrderInformation, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated, getOrderExportList , getOrderItemsNumber } = require('../models/orderManage_model')
 const { getProductItems } = require('../models/productManage_model')
 const { getShopItems } = require('../models/shopManage_model')
 
@@ -76,6 +76,7 @@ module.exports = class order {
         })
     }
 
+    // 追加
     postAdditionOrder(req, res, next) {
         const updateDate = getCurrentTime()
         let orderList = req.body.orderList
@@ -102,6 +103,7 @@ module.exports = class order {
         }
     }
 
+    // 更改分配數量
     postupdateOrderDetailAssignQuantity(req, res, next) {
         const data = req.body.assignQuantitys
         const userInfo = req.userInfo
@@ -145,13 +147,13 @@ module.exports = class order {
         let result = {}
         try {
             let exportDate = req.body.exportDate
-            const dailyOrderList = await getOrderItems({ orderDate: exportDate }, 999, 1).then(result => {
+            const dailyOrderList = await getOrderItemsNumber({ orderDate: exportDate }, 999, 1).then(result => {
                 if (result.success) {
-                    return result
+                    return result.resource
                 }
             })
             result.success = true
-            result.total = dailyOrderList.total
+            result.total = dailyOrderList[0].total || 0
             res.json(result)
         } catch (err) {
             next(err)
@@ -163,12 +165,10 @@ module.exports = class order {
         let exportDate = req.body.exportDate
         let exportType = req.body.exportType
         
-        const shopsList = await getShopItems({ shopPartition: req.userInfo.shopPartition }, 999, 1).then(result => {
+        const shopsList = await getOrderItems({ orderDate: exportDate }, 999, 1).then(result => {
             if (result.success) {
                 return result.resource.map(item => item.shopName)
             }
-        }).catch(err => {
-            next(err)
         })
 
         await getProductItems({ summary: exportType }, 999, 1).then(result => {

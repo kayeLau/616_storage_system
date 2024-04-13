@@ -83,8 +83,8 @@ const operations = {
   size: "small",
   children: [
     { type: "primary", name: '編輯', onClick: showDetailHandle, icon: 'Edit' },
-    { 
-      type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer', 
+    {
+      type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer',
       disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1
     }
   ]
@@ -166,7 +166,7 @@ function exportDailyMeetSummary() {
         sheetNames: today + '工埸鮮肉匯總表',
         jsonData
       }
-      exportExcel([dailyMeetSummary], false, '', 40)
+      exportExcel({ exportDate: [dailyMeetSummary], usezip: false, zipFileName: '', hpt: 40 })
     }
   })
 }
@@ -177,30 +177,30 @@ function exportDailyAllSummary() {
       const date = new Date()
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
       let products = res.resource.products
-      if(userInfo.value.auth === 3){
+      if (userInfo.value.auth === 3) {
         products = products.filter(item => item.freezersNum === 1 || item.freezersNum === 3)
       }
       let jsonData = []
       const splitNum = Math.floor(products.length / 2)
       // 產品
       products.map((product, rowIndex) => {
-        let summary = product.orderItems.reduce((prev, acc) => prev + acc) 
+        let summary = product.orderItems.reduce((prev, acc) => prev + acc)
         let freezersNum = product.freezersNum === 6 ? '乾貨' : product.freezersNum
         let jIndex = rowIndex > splitNum ? rowIndex - splitNum - 1 : rowIndex
         if (rowIndex > splitNum) {
-          jsonData[jIndex] = [...jsonData[jIndex], product.productName, freezersNum, summary , product.unit ]
+          jsonData[jIndex] = [...jsonData[jIndex], product.productName, freezersNum, summary, product.unit]
         } else {
-          jsonData[jIndex] = [product.productName, freezersNum, summary, product.unit , ' ']
+          jsonData[jIndex] = [product.productName, freezersNum, summary, product.unit, ' ']
         }
       })
 
-      jsonData.unshift(['產品名稱', '雪房編號', '出貨數量', '單位' , ' ', '產品名稱', '雪房編號', '出貨數量' , '單位'])
+      jsonData.unshift(['產品名稱', '雪房編號', '出貨數量', '單位', ' ', '產品名稱', '雪房編號', '出貨數量', '單位'])
 
       const dailyMeetSummary = {
         sheetNames: today + '出貨匯總表',
         jsonData
       }
-      exportExcel([dailyMeetSummary])
+      exportExcel({ exportDate: [dailyMeetSummary] , header:'1'})
     }
   })
 }
@@ -251,7 +251,7 @@ function exportOrderExcel(index, row) {
       ])
     ]
   }
-  exportExcel([shipping, delivery], true, String(today + row.shopName))
+  exportExcel({ exportDate: [shipping, delivery], usezip: true, zipFileName: String(today + row.shopName) , header:'2'})
 }
 const defaultDateRange = computed(() => {
   let date = new Date()

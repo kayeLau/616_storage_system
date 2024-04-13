@@ -38,7 +38,7 @@ export function xlsxToJson(fileBinaryString) {
   FileSaver.saveAs(fileData,'db.json')
 }
 
-export function exportExcel(exportDate, usezip = false, zipFileName, hpt) {
+export function exportExcel({exportDate, usezip = false, zipFileName, hpt , header }) {
   let zip = new JSZip();
   exportDate.forEach(item => {
     let jsonWorkSheet = XLSX.utils.json_to_sheet(item.jsonData, { skipHeader: true });
@@ -50,7 +50,11 @@ export function exportExcel(exportDate, usezip = false, zipFileName, hpt) {
 
     for (let cell in jsonWorkSheet) {
       if (cell[0] === '!') continue;
-      let isBold = cell[1] === '2' ? true : false;
+      let isBold = false;
+      if(header){
+        let currentRow = cell.match(/\d+/) === null ? '-1' : cell.match(/\d+/)[0];
+        isBold = currentRow === String(header) ? true : false;
+      }
       jsonWorkSheet[cell].s = {
         font: {
           name: "Calibri",
@@ -69,7 +73,7 @@ export function exportExcel(exportDate, usezip = false, zipFileName, hpt) {
         }
       }
     }
-
+    console.log(jsonWorkSheet)
 
     // 构造workBook
     let workBook = {
