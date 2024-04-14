@@ -60,3 +60,9 @@ body{
     height: 70vh;
     overflow: hidden;
 }
+.title{
+    padding-bottom: 15px;
+    font-size: large;
+    font-weight: 700;
+    color: var(--el-color-primary);
+}

@@ -82,12 +82,13 @@ function updateOrderDetailAssignQuantity(list , userInfo) {
     let remark = ''
     let updateDate = ''
     let ids = []
+    let st = userInfo.auth === 2 ? 0 : 1
     const currentTime = getCurrentTime()
     list.forEach(item => {
         ids.push(item.id)
         orderQuantity += `WHEN ${item.id} THEN ${ item.orderQuantity === null ? null : Number(item.orderQuantity) } \n`
         assignQuantity += `WHEN ${item.id} THEN ${ item.assignQuantity === null ? null : Number(item.assignQuantity) } \n`
-        status += `WHEN ${item.id} THEN ${Number(1)} \n`
+        status += `WHEN ${item.id} THEN ${st} \n`
         updateDate += `WHEN ${item.id} THEN "${currentTime}" \n`
         remark += `WHEN ${item.id} THEN "${item.remark || '-'}" \n`
     })

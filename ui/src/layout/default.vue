@@ -102,12 +102,12 @@ const menus = [
         icon: 'Setting',
         auth: [-1]
     },
-    // {
-    //     name: "數據",
-    //     path: 'data',
-    //     icon: 'TrendCharts',
-    //     auth: [-1]
-    // },
+    {
+        name: "數據",
+        path: 'data',
+        icon: 'TrendCharts',
+        auth: [-1]
+    },
 ].filter(item => item.auth.includes(userInfo.value.auth))
 
 let avatarDetailShow = ref(false)

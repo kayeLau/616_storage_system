@@ -86,6 +86,7 @@ let _params = reactive(props.params)
 let selection = ref([])
 let filteredValue = ref([])
 
+// 產品map
 const orderInfoMap = computed(() => {
   let map = {}
   let _temp = props.data.children
@@ -94,7 +95,9 @@ const orderInfoMap = computed(() => {
   })
   return map
 })
+let orderInfoMapCopy = JSON.parse(JSON.stringify(orderInfoMap.value))
 
+// 訂單分頁
 const orderInfo = computed(() => {
   let _temp = props.data.children
   if (filteredValue.value.length) {
@@ -111,9 +114,6 @@ const paramsTotal = computed(() => {
   return parseInt(_temp.length)
 })
 
-// watch(filteredValue, (value) => {
-//   _params.total = _data.children.filter(item => Number(item.freezersNum) === Number(value[0])).length
-// }, { deep: true })
 
 watch(() => props.data, (value) => {
   _data = value
@@ -182,18 +182,31 @@ function insertOrderItem() {
   })
 }
 
+// 對比產品map的改動
+function diffOrderInfoMap(){
+  const diffList = []
+  for (const [key,item] of Object.entries(orderInfoMap.value)) {
+    if(item.mode !== 'create'){
+      if(item.assignQuantity !== orderInfoMapCopy[key].assignQuantity || 
+      item.orderQuantity !== orderInfoMapCopy[key].orderQuantity || 
+      item.remark !== orderInfoMapCopy[key].remark){
+        diffList.push(item)
+      }
+    }
+  }
+  return diffList
+}
+
 async function submitOrderItem() {
   const createList = _data.children.filter(item => item.mode === 'create' && item.productCode && item.productName && item.orderQuantity !== null)
-  let updateList = Object.values(orderInfoMap.value).filter(item => item.assignQuantity !== null)
-  if(userInfo.value.auth === 2){
-    updateList = Object.values(orderInfoMap.value)
-  }
+  let updateList = diffOrderInfoMap()
   await addAdditionOrderItem(createList)
   if (updateList.length) {
     updateAssignQuantity(updateList)
   } else {
     emit('refreshList')
   }
+  orderInfoMapCopy = JSON.parse(JSON.stringify(orderInfoMap.value))
 }
 
 async function addAdditionOrderItem(orderList) {
