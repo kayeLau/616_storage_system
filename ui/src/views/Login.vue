@@ -4,27 +4,38 @@
             <div class="form-container sign-in">
                 <div class="login-form">
                     <h1>Sign In</h1>
-                    <input type="text" placeholder="用戶名稱" v-model="loginInfo.userName" @keydown.enter="toLogin">
-                    <input type="password" placeholder="用戶密碼" v-model="loginInfo.password" @keydown.enter="toLogin">
-                    <button @click="toLogin">Sign In</button>
+                    <input type="text" placeholder="用戶名稱" v-model="loginInfo.userName" @keydown.enter="toLogin(false)">
+                    <input type="password" placeholder="用戶密碼" v-model="loginInfo.password" @keydown.enter="toLogin(false)">
+                    <button @click="toLogin(false)">Sign In</button>
                 </div>
             </div>
             <div class="toggle-container">
                 <div class="toggle">
                     <div class="toggle-panel toggle-right">
                         <h1>616智能倉務系統</h1>
-                        <!-- <p>Welcome Back!</p> -->
                     </div>
                 </div>
             </div>
         </div>
+        <el-dialog v-model="dialogVisible" title="強制退出登陸" width="500" top="25vh">
+            <span>此用戶正在設備
+                <span style="font-weight: 700;color: var(--el-color-primary);">{{ ipAddress }}</span>
+                上登陸,是否強制退出登陸
+            </span>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="dialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="toLogin(true)">確定</el-button>
+                </div>
+            </template>
+        </el-dialog>
     </div>
 </template>
 <script setup>
 // import md5 from 'js-md5'
 import { setToken, setStorge } from '../utils/auth'
 import { login } from '../request/users'
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus'
 const router = useRouter()
@@ -34,17 +45,24 @@ const loginInfo = reactive({
     password: null
 })
 
-function toLogin() {
+let dialogVisible = ref(false)
+let ipAddress = ref('')
+
+function toLogin(force = false) {
     if (loginInfo.userName && loginInfo.password) {
         let data = {
             name: loginInfo.userName,
             password: loginInfo.password,
+            force
         }
         login(data).then(res => {
             if (res.success === true) {
                 setToken(res.token)
                 setStorge('userInfo', res.userInfo)
                 toHome()
+            } else if (res.isUsing) {
+                ipAddress.value = res.ip
+                dialogVisible.value = true
             } else {
                 ElMessage({ type: 'error', message: res.msg })
             }

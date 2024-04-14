@@ -2,7 +2,7 @@ import FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import XLSXStyle from 'xlsx-style-medalsoft'
 import JSZip from 'jszip';
-import { classifyDict , departmentDict , freezersNumDict , productDisable , productSummary , exchangeKeyValue } from '../request/dict'
+import { classifyDict, departmentDict, freezersNumDict, productDisable, productSummary, exchangeKeyValue } from '../request/dict'
 
 export function xlsxToJson(fileBinaryString) {
   const workBook = XLSX.read(fileBinaryString, { type: 'binary' })
@@ -11,38 +11,38 @@ export function xlsxToJson(fileBinaryString) {
   const _freezersNumDict = exchangeKeyValue(freezersNumDict)
   const _productDisable = exchangeKeyValue(productDisable)
   const _productSummary = exchangeKeyValue(productSummary)
-  let result = [] 
+  let result = []
 
   workBook.SheetNames.forEach(sheetName => {
     const jsonData = XLSX.utils.sheet_to_json(workBook.Sheets[sheetName], {});
     console.log(jsonData)
     result = jsonData.map(item => {
       return {
-        productId:item.productId,
-        productCode:item.productCode,
-        department:_departmentDict[item.department],
-        freezersNum:Number(_freezersNumDict[item.freezersNum]),
-        classify:Number(_classifyDict[item.classify]),
-        productName:item.productName,
-        unit:item.unit,
-        standard:item.standard,
-        disable:Number(_productDisable[item.disable]),
-        summary:Number(_productSummary[item.summary]),
-        prompt:0,
+        productId: item.productId,
+        productCode: item.productCode,
+        department: _departmentDict[item.department],
+        freezersNum: Number(_freezersNumDict[item.freezersNum]),
+        classify: Number(_classifyDict[item.classify]),
+        productName: item.productName,
+        unit: item.unit,
+        standard: item.standard,
+        disable: Number(_productDisable[item.disable]),
+        summary: Number(_productSummary[item.summary]),
+        prompt: 0,
       }
     })
   })
-  
+
   console.log(result)
   let fileData = new Blob([JSON.stringify(result)], { type: 'application/json' })
-  FileSaver.saveAs(fileData,'db.json')
+  FileSaver.saveAs(fileData, 'db.json')
 }
 
-export function exportExcel({exportDate, usezip = false, zipFileName, hpt , header }) {
+export function exportExcel({ exportDate, usezip = false, zipFileName, hpt, header, wpt }) {
   let zip = new JSZip();
   exportDate.forEach(item => {
     let jsonWorkSheet = XLSX.utils.json_to_sheet(item.jsonData, { skipHeader: true });
-    autoWidth(jsonWorkSheet)
+    autoWidth(jsonWorkSheet, wpt)
     if (hpt) {
       let height = new Array(99).fill(0).map(() => { return { hpt } })
       jsonWorkSheet['!rows'] = height
@@ -51,14 +51,14 @@ export function exportExcel({exportDate, usezip = false, zipFileName, hpt , head
     for (let cell in jsonWorkSheet) {
       if (cell[0] === '!') continue;
       let isBold = false;
-      if(header){
+      if (header) {
         let currentRow = cell.match(/\d+/) === null ? '-1' : cell.match(/\d+/)[0];
         isBold = currentRow === String(header) ? true : false;
       }
       jsonWorkSheet[cell].s = {
         font: {
           name: "Calibri",
-          sz: 14,
+          sz: 16,
           bold: isBold,
         },
         alignment: {
@@ -102,7 +102,7 @@ export function exportExcel({exportDate, usezip = false, zipFileName, hpt , head
   }
 }
 
-function autoWidth(worksheet) {
+function autoWidth(worksheet, wpt = 2.2) {
   let maxWidth = {};
   for (let cell in worksheet) {
     if (cell[0] === '!') continue;
@@ -113,7 +113,7 @@ function autoWidth(worksheet) {
     }
   }
 
-  worksheet['!cols'] = Object.keys(maxWidth).map(col => ({ wch: maxWidth[col] * 2.2 }));
+  worksheet['!cols'] = Object.keys(maxWidth).map(col => ({ wch: maxWidth[col] * wpt }));
 }
 
 function s2ab(s) {

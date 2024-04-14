@@ -28,7 +28,7 @@ import orderDetailList from '../components/orderDetailList.vue';
 import { getProductList } from '../request/products';
 import { getShopList } from '../request/shops'
 import { getOrderList, getDailyOrderStatus, postExportDailyMeetSummary } from '../request/orders';
-import { departmentDict, orderStateDict } from '../request/dict';
+import { departmentDict, orderStateDict , freezersNumDict } from '../request/dict';
 import { exportExcel } from '../utils/export';
 import Ktable from '../components/table.vue';
 import { ref, onMounted, computed } from 'vue';
@@ -166,7 +166,7 @@ function exportDailyMeetSummary() {
         sheetNames: today + '工埸鮮肉匯總表',
         jsonData
       }
-      exportExcel({ exportDate: [dailyMeetSummary], usezip: false, zipFileName: '', hpt: 40 })
+      exportExcel({ exportDate: [dailyMeetSummary], usezip: false, zipFileName: '', hpt: 40 , wpt:3 , header:'1'})
     }
   })
 }
@@ -182,25 +182,29 @@ function exportDailyAllSummary() {
       }
       let jsonData = []
       const splitNum = Math.floor(products.length / 2)
+      let rowIndex = 0
       // 產品
-      products.map((product, rowIndex) => {
+      products.map((product) => {
         let summary = product.orderItems.reduce((prev, acc) => prev + acc)
-        let freezersNum = product.freezersNum === 6 ? '乾貨' : product.freezersNum
-        let jIndex = rowIndex > splitNum ? rowIndex - splitNum - 1 : rowIndex
-        if (rowIndex > splitNum) {
-          jsonData[jIndex] = [...jsonData[jIndex], product.productName, freezersNum, summary, product.unit]
-        } else {
-          jsonData[jIndex] = [product.productName, freezersNum, summary, product.unit, ' ']
+        if(summary > 0){
+          let freezersNum = freezersNumDict[product.freezersNum]
+          let jIndex = rowIndex > splitNum ? rowIndex - splitNum - 1 : rowIndex
+          if (rowIndex > splitNum) {
+            jsonData[jIndex] = [...jsonData[jIndex], ' ' , product.productName, freezersNum, summary, product.unit]
+          } else {
+            jsonData[jIndex] = [product.productName, freezersNum, summary, product.unit]
+          }
+          rowIndex++
         }
       })
-
-      jsonData.unshift(['產品名稱', '雪房編號', '出貨數量', '單位', ' ', '產品名稱', '雪房編號', '出貨數量', '單位'])
+      const header = rowIndex > splitNum ? ['產品名稱', '雪房編號', '出貨數量', '單位', ' ', '產品名稱', '雪房編號', '出貨數量', '單位'] : ['產品名稱', '雪房編號', '出貨數量', '單位']
+      jsonData.unshift(header)
 
       const dailyMeetSummary = {
         sheetNames: today + '出貨匯總表',
         jsonData
       }
-      exportExcel({ exportDate: [dailyMeetSummary] , header:'1'})
+      exportExcel({ exportDate: [dailyMeetSummary] , header:'1' , hpt:30 , wpt:2.5})
     }
   })
 }
@@ -238,9 +242,7 @@ function exportOrderExcel(index, row) {
   const delivery = {
     sheetNames: today + row.shopName + '送貨單',
     jsonData: [
-      [row.shopName],
-      [row.orderUserName[0]],
-      [row.updateDate],
+      [row.shopName , row.orderUserName[0] , row.updateDate],
       ['貨品名稱', '數量/重量', '單位', '備注'],
       // assuming `row.children` is an array of objects
       ...row.children.map(item => [
@@ -251,7 +253,7 @@ function exportOrderExcel(index, row) {
       ])
     ]
   }
-  exportExcel({ exportDate: [shipping, delivery], usezip: true, zipFileName: String(today + row.shopName) , header:'2'})
+  exportExcel({ exportDate: [shipping, delivery], usezip: true, zipFileName: String(today + row.shopName) , header:'2' , wpt:3})
 }
 const defaultDateRange = computed(() => {
   let date = new Date()

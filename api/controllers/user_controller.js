@@ -5,7 +5,6 @@ var { getCurrentTime, checkNull } = require('../utils')
 const { generateUUID, hashPassword } = require('../models/encryption');
 const config = require('../config/development_config')
 const jwt = require('jsonwebtoken')
-const ip = require('ip');
 
 module.exports = class Member {
     static setUserInfoByRule(data) {
@@ -51,11 +50,12 @@ module.exports = class Member {
     // 登入
     postLogin(req, res, next) {
         const ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+        const isForceLogin = req.body.force;
         const memberData = {
             name: req.body.name,
             password: hashPassword(req.body.password),
             updateDate: getCurrentTime(),
-        }
+        };
         loginCheck(memberData).then(rows => {
             if (checkNull(rows) === true) {
                 res.json({
@@ -63,13 +63,17 @@ module.exports = class Member {
                     msg: "請輸入正確的帳號或密碼。"
                 })
             } else if (checkNull(rows) === false) {
-                if(rows[0].ipAddress && rows[0].ipAddress !== ip){
-                    res.json({
-                        success:false,
-                        msg:"token verify fail",
-                        ip:rows[0].ipAddress
-                    })
-                    return
+                console.log(isForceLogin)
+                if(!isForceLogin){
+                    if(rows[0].ipAddress && rows[0].ipAddress !== ip){
+                        res.json({
+                            success:false,
+                            msg:"用戶"+ rows[0].ipAddress + "正在使用",
+                            ip:rows[0].ipAddress,
+                            isUsing:true
+                        })
+                        return
+                    }
                 }
                 const token = jwt.sign({ data: rows[0].id }, config.secret, { expiresIn: '1h' });
                 updateUserInformation(rows[0].id, { online: 1 , ipAddress: ip})
