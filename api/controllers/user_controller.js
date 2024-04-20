@@ -75,7 +75,7 @@ module.exports = class Member {
                         return
                     }
                 }
-                const token = jwt.sign({ data: rows[0].id }, config.secret, { expiresIn: '1h' });
+                const token = jwt.sign({ data: rows[0].id }, config.secret, { expiresIn: '5h' });
                 updateUserInformation(rows[0].id, { online: 1 , ipAddress: ip})
                 res.json({
                     success: true,

@@ -290,7 +290,7 @@ function exportProductExcel() {
         sheetNames: '產品',
         jsonData
       }
-      exportExcel([products])
+      exportExcel({exportDate:[products]})
     }
   })
 }

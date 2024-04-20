@@ -73,7 +73,7 @@ export function exportExcel({ exportDate, usezip = false, zipFileName, hpt, head
         }
       }
     }
-    console.log(jsonWorkSheet)
+    // console.log(jsonWorkSheet)
 
     // 构造workBook
     let workBook = {
@@ -109,11 +109,15 @@ function autoWidth(worksheet, wpt = 2.2) {
     let col = cell.substring(0, 1); // get the column (assuming a maximum of 26 columns)
     let value = worksheet[cell].v; // get cell value
     if (value) {
+      // console.log(col,worksheet[cell].v)
       maxWidth[col] = Math.max(maxWidth[col] || 0, typeof value === 'string' ? value.length : (value.toString()).length);
+      if(col === 'C'){
+        console.log(maxWidth[col])
+        // console.log(worksheet[cell].v)
+      }
     }
   }
-
-  worksheet['!cols'] = Object.keys(maxWidth).map(col => ({ wch: maxWidth[col] * wpt }));
+  worksheet['!cols'] = Object.keys(maxWidth).sort().map(col => ({ wch: maxWidth[col] * wpt }));
 }
 
 function s2ab(s) {

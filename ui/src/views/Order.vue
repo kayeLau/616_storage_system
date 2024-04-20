@@ -28,7 +28,7 @@ import orderDetailList from '../components/orderDetailList.vue';
 import { getProductList } from '../request/products';
 import { getShopList } from '../request/shops'
 import { getOrderList, getDailyOrderStatus, postExportDailyMeetSummary } from '../request/orders';
-import { departmentDict, orderStateDict , freezersNumDict } from '../request/dict';
+import { departmentDict, orderStateDict, freezersNumDict } from '../request/dict';
 import { exportExcel } from '../utils/export';
 import Ktable from '../components/table.vue';
 import { ref, onMounted, computed } from 'vue';
@@ -84,8 +84,7 @@ const operations = {
   children: [
     { type: "primary", name: '編輯', onClick: showDetailHandle, icon: 'Edit' },
     {
-      type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer',
-      disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1
+      type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer', hide: userInfo.value.auth !== -1
     }
   ]
 }
@@ -166,7 +165,7 @@ function exportDailyMeetSummary() {
         sheetNames: today + '工埸鮮肉匯總表',
         jsonData
       }
-      exportExcel({ exportDate: [dailyMeetSummary], usezip: false, zipFileName: '', hpt: 40 , wpt:3 , header:'1'})
+      exportExcel({ exportDate: [dailyMeetSummary], usezip: false, zipFileName: '', hpt: 40, wpt: 3, header: '1' })
     }
   })
 }
@@ -178,33 +177,33 @@ function exportDailyAllSummary() {
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
       let products = res.resource.products
       if (userInfo.value.auth === 3) {
-        products = products.filter(item => item.freezersNum === 1 || item.freezersNum === 3)
+        products = products.filter(item => item.freezersNum === 1 || item.freezersNum === 3 || item.freezersNum === 4)
       }
       let jsonData = []
-      const splitNum = Math.floor(products.length / 2)
       let rowIndex = 0
+      let jindex = 0
       // 產品
       products.map((product) => {
         let summary = product.orderItems.reduce((prev, acc) => prev + acc)
-        if(summary > 0){
+        if (summary > 0) {
           let freezersNum = freezersNumDict[product.freezersNum]
-          let jIndex = rowIndex > splitNum ? rowIndex - splitNum - 1 : rowIndex
-          if (rowIndex > splitNum) {
-            jsonData[jIndex] = [...jsonData[jIndex], ' ' , product.productName, freezersNum, summary, product.unit]
+          if (rowIndex % 2 === 1) {
+            jsonData[jindex] = [...jsonData[jindex], ' ', product.productName, freezersNum, summary, product.unit]
+            jindex++
           } else {
-            jsonData[jIndex] = [product.productName, freezersNum, summary, product.unit]
+            jsonData[jindex] = [product.productName, freezersNum, summary, product.unit]
           }
           rowIndex++
         }
       })
-      const header = rowIndex > splitNum ? ['產品名稱', '雪房編號', '出貨數量', '單位', ' ', '產品名稱', '雪房編號', '出貨數量', '單位'] : ['產品名稱', '雪房編號', '出貨數量', '單位']
+      const header = rowIndex > 0 ? ['產品名稱', '雪房編號', '出貨數量', '單位', ' ', '產品名稱', '雪房編號', '出貨數量', '單位'] : ['產品名稱', '雪房編號', '出貨數量', '單位']
       jsonData.unshift(header)
 
       const dailyMeetSummary = {
         sheetNames: today + '出貨匯總表',
         jsonData
       }
-      exportExcel({ exportDate: [dailyMeetSummary] , header:'1' , hpt:30 , wpt:2.5})
+      exportExcel({ exportDate: [dailyMeetSummary], header: '1', hpt: 30, wpt: 2.5 })
     }
   })
 }
@@ -242,18 +241,19 @@ function exportOrderExcel(index, row) {
   const delivery = {
     sheetNames: today + row.shopName + '送貨單',
     jsonData: [
-      [row.shopName , row.orderUserName[0] , row.updateDate],
-      ['貨品名稱', '數量/重量', '單位', '備注'],
-      // assuming `row.children` is an array of objects
+      [row.shopName, row.orderUserName[0], '', '', '', row.updateDate],
+      ['貨品名稱', '分配數量', '單位', '下單數量', '包裝規格', '備注'],
       ...row.children.map(item => [
         item.productName,
         item.assignQuantity,
         item.unit,
+        item.orderQuantity,
+        item.standard,
         item.remark
       ])
     ]
   }
-  exportExcel({ exportDate: [shipping, delivery], usezip: true, zipFileName: String(today + row.shopName) , header:'2' , wpt:3})
+  exportExcel({ exportDate: [shipping, delivery], usezip: true, zipFileName: String(today + row.shopName), header: '2', wpt: 3 })
 }
 const defaultDateRange = computed(() => {
   let date = new Date()

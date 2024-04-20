@@ -95,7 +95,8 @@ const orderInfoMap = computed(() => {
   })
   return map
 })
-let orderInfoMapCopy = JSON.parse(JSON.stringify(orderInfoMap.value))
+
+let orderInfoMapCopy = {}
 
 // 訂單分頁
 const orderInfo = computed(() => {
@@ -117,7 +118,8 @@ const paramsTotal = computed(() => {
 
 watch(() => props.data, (value) => {
   _data = value
-})
+  orderInfoMapCopy = JSON.parse(JSON.stringify(orderInfoMap.value))
+},{ immediate: true })
 
 const emit = defineEmits(['refreshList'])
 
