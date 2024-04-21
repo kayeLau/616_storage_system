@@ -258,7 +258,6 @@ const customBtn = [
 ]
 
 function excelToJson(file){
-  console.log(file.raw)
   const reader = new FileReader()
   reader.readAsBinaryString(file.raw)
   reader.onload = e => {

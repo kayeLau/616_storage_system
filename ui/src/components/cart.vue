@@ -86,7 +86,6 @@ function emitOrderDetailChange(product, type) {
 // })
 
 const orderList = computed(() => {
-    console.log(props.orderMap)
     return Object.values(props.orderMap).filter(item => item.orderQuantity !== 0 || item.checked === true || item.prompt === 1)
 })
 

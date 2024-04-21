@@ -32,6 +32,7 @@ module.exports = class order {
     async postCheckOrderRepeated(req, res, next) {
         const userInfo = req.userInfo
         const orderDateRange = await getSettingTimeRange()
+        console.log(orderDateRange)
 
         const orderData = {
             orderShopId: userInfo.shopId,
