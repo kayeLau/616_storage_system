@@ -165,10 +165,16 @@ module.exports = class order {
         let summaryProductIdsMap = {}
         let exportDate = req.body.exportDate
         let exportType = req.body.exportType
+        let orderedShops = new Set()
         
-        const shopsList = await getOrderItems({ orderDate: exportDate }, 999, 1).then(result => {
+        await getOrderItems({ orderDate: exportDate }, 999, 1).then(result => {
             if (result.success) {
-                return result.resource.map(item => item.shopName)
+                result.resource.forEach(item => orderedShops.add(item.shopName))
+            }
+        })
+        const shopsList = await getShopItems({}, 999, 1).then(result => {
+            if (result.success) {
+                return result.resource.map(item => item.shopName).filter(item => orderedShops.has(item))
             }
         })
 
