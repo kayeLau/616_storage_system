@@ -108,7 +108,7 @@ const props = defineProps({
 
 let data = ref([])
 let _params = reactive(props.params)
-let _operationsChildren = props.operations.children.filter(item => !item.hide)
+let _operationsChildren = props.operations ? props.operations.children.filter(item => !item.hide) : []
 let _searchFormColumns = props.searchFormColumns.filter(item => !item.hide)
 let _customBtn = props.customBtn.filter(item => !item.hide)
 

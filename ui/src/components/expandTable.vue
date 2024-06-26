@@ -22,8 +22,14 @@
                     <div class="expand-list-body-row">
                         <span v-html="orderStateFormatter(item.status)"></span>
                         <span>{{ item.productCode + ' ' + item.productName}}</span>
-                        <span>{{ item.orderQuantity + ' ' + item.standard }}</span>
-                        <span>{{ item.assignQuantity === null ? '-' : item.assignQuantity + item.unit }}</span>
+                        <div>
+                            <strong class="inline-title">{{ item.orderQuantity }}</strong>
+                            <span>{{ item.standard }}</span>
+                        </div>
+                        <div>
+                            <strong class="inline-title">{{ item.assignQuantity === null ? '-' : item.assignQuantity }}</strong>
+                            <span>{{ item.unit }}</span>
+                        </div>
                         <span>{{ orderMode[item.orderMode] }}</span>
                         <span>{{ item.updateDate }}</span>
                         <span>{{ item.remark }}</span>
@@ -83,7 +89,7 @@ const orderItems = ref(expandTable_temp)
 .expand-list-body-row {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 80px 1fr 1fr 100px 80px 1fr 1fr;
     text-align: center;
     justify-items: left;
     align-items: center;
@@ -111,5 +117,10 @@ input {
     width: 100%;
     height: 1px;
     background-color: black;
+}
+.inline-title{
+    display: inline-block;
+    width: 30px;
+    text-align: left;
 }
 </style>

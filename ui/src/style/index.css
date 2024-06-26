@@ -66,3 +66,7 @@ body{
     font-weight: 700;
     color: var(--el-color-primary);
 }
+.text-overflow{
+    overflow: hidden;
+    white-space: nowrap;
+}

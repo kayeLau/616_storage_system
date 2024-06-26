@@ -168,7 +168,7 @@ const productOptions = computed(() => {
 
 // 新增
 function insertOrderItem() {
-  let orderId = _data.id[0]
+  let orderId = _data.id
   _data.children.unshift({
     orderId,
     status: 2,

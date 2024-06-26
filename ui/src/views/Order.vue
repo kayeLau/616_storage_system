@@ -5,8 +5,8 @@
         :tableRowClassName="tableRowClassName" :getList="getOrderList" :searchFormColumns="searchFormColumns"
         :customBtn="customBtn" :expandHeader="{}" :expandColumns="{}" :products="products"></Ktable>
     </el-card>
-
-    <el-dialog v-model="orderDetailShow" width="95%" style="height:85vh;position: relative;" top="10vh">
+    <!-- OrderDetail -->
+    <el-dialog v-model="orderDetailShow" width="95%" style="height:80vh;position: relative;" top="10vh">
       <template #header="{ titleId, titleClass }">
         <div class="my-header">
           <span :id="titleId" :class="titleClass">訂單明細 | {{ currentRow.shopName }}</span>
@@ -16,10 +16,13 @@
           </el-icon>
         </div>
       </template>
-      <orderDetailList :data="currentRow" :params="ODparams" @refreshList="refreshList" :products="products">
-      </orderDetailList>
+      <orderDetailList :data="currentRow" :params="ODparams" @refreshList="refreshList" :products="products" />
     </el-dialog>
-
+    <!-- History -->
+    <el-dialog v-model="historyDetailShow" width="95%" style="height:80vh;position: relative;" top="10vh" destroy-on-close>
+      <Ktable ref='KtableRef3' :columns="columns" isExpand :operations="null" :params="historyParams" :getList="postHistoryOrder" :searchFormColumns="[]"
+        :customBtn="[]" :expandHeader="{}" :expandColumns="{}"></Ktable>
+    </el-dialog>
   </div>
 </template>
 
@@ -27,19 +30,19 @@
 import orderDetailList from '../components/orderDetailList.vue';
 import { getProductList } from '../request/products';
 import { getShopList } from '../request/shops'
-import { getOrderList, getDailyOrderStatus, postExportDailyMeetSummary } from '../request/orders';
+import { getOrderList, getDailyOrderStatus, postExportDailyMeetSummary , postHistoryOrder } from '../request/orders';
 import { departmentDict, orderStateDict, freezersNumDict } from '../request/dict';
 import { exportExcel } from '../utils/export';
 import Ktable from '../components/table.vue';
 import { ref, onMounted, computed } from 'vue';
 import { getStorge } from '../utils/auth'
 import { ElButton, ElDatePicker } from 'element-plus'
-
+// get userinfo
 const userInfo = computed(() => {
   let user = getStorge('userInfo')
   return user ? JSON.parse(user) : {}
 })
-
+// getshopList
 async function fatchShopList() {
   let result = []
   await getShopList({ size: 999, page: 1 }).then(res => {
@@ -54,8 +57,8 @@ async function fatchShopList() {
 //#region order tabel
 const KtableRef2 = ref()
 const departmentFormatter = (row, column) => {
-  let cell = row[column.property].map(item => departmentDict[item]).join(',')
-  return cell
+  let cell = row[column.property]
+  return departmentDict[cell]
 }
 const orderStateFormatter = (row, column) => {
   let cell = row[column.property]
@@ -72,20 +75,21 @@ function tableRowClassName({ row }) {
 
 const columns = [
   { props: 'status', label: '訂單狀態', formatter: orderStateFormatter },
-  { props: 'shopName', label: '落單門店', width: 250 },
-  { props: 'department', label: '落單部門', formatter: departmentFormatter },
-  { props: 'orderUserName', label: '落單人', width: 220, formatter: (row, column) => row[column.property].join(',') },
-  { props: 'updateDate', label: '落單時間', width: 200 }
+  { props: 'shopName', label: '落單門店', width: 180 },
+  { props: 'department', label: '落單部門' , formatter: departmentFormatter },
+  { props: 'orderUserName', label: '落單人', width: 130 },
+  { props: 'orderIndex', label: '落單次數', width: 100 },
+  { props: 'createDate', label: '落單時間', width: 180 },
+  { props: 'updateDate', label: '最後更新時間', width: 180 }
 ]
 
 const operations = {
-  width: 240,
+  width: 350,
   size: "small",
   children: [
     { type: "primary", name: '編輯', onClick: showDetailHandle, icon: 'Edit' },
-    {
-      type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer', hide: userInfo.value.auth !== -1
-    }
+    { type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer', hide: userInfo.value.auth !== -1 },
+    { type: "warning", name: '歷史訂單', onClick: showHistoryHandle, icon: 'DocumentCopy' }
   ]
 }
 
@@ -294,14 +298,26 @@ const ODparams = {
 }
 
 let orderDetailShow = ref(false)
-let rowIndex = ref(null)
 function showDetailHandle(index, row) {
-  rowIndex.value = index
   orderDetailShow.value = !orderDetailShow.value
   if (orderDetailShow.value) {
     currentRow.value = row
   }
 }
+
+const KtableRef3 = ref()
+let historyDetailShow = ref(false)
+async function showHistoryHandle(index, row){
+  historyParams.value = {
+    size: 20,
+    page: 1,
+    orderCode:row.orderCode
+  }
+  historyDetailShow.value = !historyDetailShow.value
+}
+let historyParams = ref({})
+
+
 //#endregion
 
 //#region jsonForm

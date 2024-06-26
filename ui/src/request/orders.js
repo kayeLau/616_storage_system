@@ -71,3 +71,11 @@ export function getDailyOrderStatus(data){
       data,
     });
 }
+
+export function postHistoryOrder(data){
+  return request({
+      url: '/orders/postHistoryOrder',
+      method: 'post',
+      data,
+    });
+}
