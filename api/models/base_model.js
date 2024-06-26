@@ -3,15 +3,16 @@ const logger = require("../utils/log");
 
 // @params
 // getRepeat 是否需要取出重复项，如果是重复项不会被拦截
-function checkRepeated(table, options , getRepeat = false) {
+function checkRepeated({table, options , getRepeat = false , orderby = 'updateDate' , sort = 'DESC' }) {
     let result = {}
     let optionsSQL = optionsSQLFromatter(options, table)
     return new Promise((resolve, reject) => {
-        db.query(`SELECT * FROM ${table} ${optionsSQL}`, (err, row) => {
+        db.query(`SELECT * FROM ${table} ${optionsSQL} ORDER BY ${orderby} ${sort}`, (err, row) => {
             if (err) {
                 result.msg = "server error,please try again"
                 result.success = false
                 logger.info(JSON.stringify(err))
+                console.log(err)
                 reject(result)
                 return
             }

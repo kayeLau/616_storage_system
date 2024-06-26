@@ -26,7 +26,6 @@ module.exports = class order {
         }).catch(err => {
             next(err)
         })
-
     }
 
     async postCheckOrderRepeated(req, res, next) {
@@ -41,6 +40,7 @@ module.exports = class order {
         }
 
         await checkOrderRepeated("order_info", orderData).then(result => {
+            console.log(result)
             res.json(result)
         }).catch(err => {
             console.log(err)
@@ -48,6 +48,7 @@ module.exports = class order {
         })
     }
 
+    // 前線員工建立新訂單
     async postCreateOrder(req, res, next) {
         const userInfo = req.userInfo
         const orderDateRange = await getSettingTimeRange()
@@ -77,7 +78,7 @@ module.exports = class order {
         })
     }
 
-    // 追加
+    // 管理員追加訂單
     postAdditionOrder(req, res, next) {
         const updateDate = getCurrentTime()
         let orderList = req.body.orderList
@@ -144,6 +145,7 @@ module.exports = class order {
         })
     }
 
+    // 獲取每日狀態
     async getDailyOrderStatus(req, res, next) {
         let result = {}
         try {
@@ -161,6 +163,7 @@ module.exports = class order {
         }
     }
 
+    // 導出每日總表
     async postExportDailyMeetSummary(req, res, next) {
         let summaryProductIdsMap = {}
         let exportDate = req.body.exportDate
@@ -204,4 +207,14 @@ module.exports = class order {
 
     }
 
+    async postHistoryOrder(req, res, next){
+        const options = { orderCode: req.body.orderCode }
+        const size = req.body.size
+        const page = req.body.page
+        getOrderItems(options, size, page , false).then(result => {
+            res.json(result)
+        }).catch(err => {
+            next(err)
+        })
+    }
 }

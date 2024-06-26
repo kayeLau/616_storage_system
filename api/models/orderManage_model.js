@@ -3,27 +3,43 @@ const { optionsSQLFromatter, createNew, updateItem, deleteItem, getItems, custom
 
 // 如有修改訂單,沒有則創建訂單
 function createNewOrder(data) {
-    return checkRepeated("order_info", { orderShopId: data.orderShopId, orderDate: data.orderDate, department: data.department }, true)
-        .then(async (res) => {
-            const orderId = res.resource.length ? res.resource[0].id : data.id
-            let orderList = data.orderList.map(item => {
-                return [
-                    item.id ? item.id : '',
-                    orderId,
-                    item.productId,
-                    item.orderQuantity,
-                    item.orderMode,
-                    data.updateDate,
-                ]
-            })
-            if (!res.resource.length) {
-                delete data.orderList
-                createNew("order_info", data) // 訂單
-            } else {
-                await deleteItem("order_detail_info", 'orderId', orderId)
-            }
-            return orderList
+    return checkRepeated({
+        table: "order_info",
+        options: { orderShopId: data.orderShopId, orderDate: data.orderDate, department: data.department },
+        getRepeat: true
+    }).then(async (res) => {
+        let lastOrder = -1;
+        if (res.resource.length) {
+            res.resource.forEach(item => {
+                lastOrder = Math.max(lastOrder, item.orderIndex)
+            });
+        }
+
+        createNew("order_info", {
+            id: data.id,
+            orderUserId: data.orderUserId,
+            orderUserName: data.orderUserName,
+            orderShopId: data.orderShopId,
+            department: data.department,
+            orderDate: data.orderDate,
+            orderCode: data.orderCode,
+            createDate: data.createDate,
+            updateDate: data.updateDate,
+            orderIndex: ++lastOrder
         })
+
+        const orderList = data.orderList.map(item => {
+            return [
+                '',
+                data.id,
+                item.productId,
+                item.orderQuantity,
+                item.orderMode,
+                data.updateDate,
+            ]
+        })
+        return orderList
+    })
         .then((orderList) => createNewOrderItems(orderList)) // 訂單明細
         .catch(err => err)
 }
@@ -52,14 +68,14 @@ function createNewOrderItems(list) {
 
 
 function checkOrderRepeated(table, options) {
-    return checkRepeated(table, options, true).then(async res => {
+    return checkRepeated({ table, options, getRepeat: true, orderby: 'orderIndex' }).then(async res => {
         let resource = {}
         if (res.resource.length >= 1) {
             resource = res.resource[0]
             let params = {
                 table: "order_detail_info",
-                join:"order_detail_info INNER JOIN product_info ON order_detail_info.productId = product_info.productId",
-                orderby:'order_detail_info.updateDate',
+                join: "order_detail_info INNER JOIN product_info ON order_detail_info.productId = product_info.productId",
+                orderby: 'order_detail_info.updateDate',
                 options: { orderId: resource.id },
                 size: 999,
                 page: 1
@@ -75,7 +91,7 @@ function checkOrderRepeated(table, options) {
     })
 }
 
-function updateOrderDetailAssignQuantity(list , userInfo) {
+function updateOrderDetailAssignQuantity(list, userInfo) {
     let orderQuantity = ''
     let assignQuantity = ''
     let status = ''
@@ -86,8 +102,8 @@ function updateOrderDetailAssignQuantity(list , userInfo) {
     const currentTime = getCurrentTime()
     list.forEach(item => {
         ids.push(item.id)
-        orderQuantity += `WHEN ${item.id} THEN ${ item.orderQuantity === null ? null : Number(item.orderQuantity) } \n`
-        assignQuantity += `WHEN ${item.id} THEN ${ item.assignQuantity === null ? null : Number(item.assignQuantity) } \n`
+        orderQuantity += `WHEN ${item.id} THEN ${item.orderQuantity === null ? null : Number(item.orderQuantity)} \n`
+        assignQuantity += `WHEN ${item.id} THEN ${item.assignQuantity === null ? null : Number(item.assignQuantity)} \n`
         status += `WHEN ${item.id} THEN ${st} \n`
         updateDate += `WHEN ${item.id} THEN "${currentTime}" \n`
         remark += `WHEN ${item.id} THEN "${item.remark || '-'}" \n`
@@ -115,18 +131,20 @@ function deleteOrderItem(shopId) {
 }
 
 // 獲取訂單總數
-function getOrderItemsNumber(options){
+function getOrderItemsNumber(options) {
     let optionsSQL = optionsSQLFromatter(options, 'order_info')
     return customQuery(`SELECT COUNT(*) AS total FROM ( SELECT COUNT(*) AS total FROM order_info ${optionsSQL} GROUP BY orderCode) AS total`)
 }
 
 // 獲取訂單
-function getOrderItems(options, size, page) {
+function getOrderItems(options, size, page , groupbyMode) {
     const result = {}
-    return getOrderAndgroupby(options, size, page).then(async orderItems => {
+    return getOrderAndgroupby(options, size, page , groupbyMode).then(async orderItems => {
         const promiseList = orderItems.map((item, index) => {
-            return getItems({ table: "order_detail_info",join:"order_detail_info INNER JOIN product_info ON order_detail_info.productId = product_info.productId" , 
-            orderby:'product_info.productCode', sort:'ASC' , options: { orderId: item.id }, size: 999, page: 1 }).then(res => {
+            return getItems({
+                table: "order_detail_info", join: "order_detail_info INNER JOIN product_info ON order_detail_info.productId = product_info.productId",
+                orderby: 'product_info.productCode', sort: 'ASC', options: { orderId: item.id }, size: 999, page: 1
+            }).then(res => {
                 if (res.success) {
                     let status = res.resource.find(item => item.status === 0)
                     orderItems[index].status = status ? 0 : 1
@@ -154,12 +172,12 @@ function getOrderExportList(options, size, page, summaryProductIdsMap, shopsList
     return getOrderAndgroupby(options, size, page).then(async group => {
         const summaryProductIds = Object.keys(summaryProductIdsMap)
         const promiseList = group.map((item) => {
-            return getItems({ 
-            table: "order_detail_info", 
-            options: { orderId: item.id }, 
-            size: 999, 
-            page: 1 
-        }).then(res => {
+            return getItems({
+                table: "order_detail_info",
+                options: { orderId: item.id },
+                size: 999,
+                page: 1
+            }).then(res => {
                 if (res.success) {
                     let index = shopsList.indexOf(item.shopName)
                     summaryProductIds.forEach(summaryProductId => {
@@ -170,48 +188,48 @@ function getOrderExportList(options, size, page, summaryProductIdsMap, shopsList
             })
         })
         await Promise.all(promiseList)
-        const products = Object.values(summaryProductIdsMap).sort((a,b) => a.freezersNum - b.freezersNum)
+        const products = Object.values(summaryProductIdsMap).sort((a, b) => a.freezersNum - b.freezersNum)
         result.msg = "get success"
-        result.resource = { products , shopName: shopsList }
+        result.resource = { products, shopName: shopsList }
         result.success = true
         return result
     })
 }
 
 // 根據orderCode groupby
-async function getOrderAndgroupby(options, size, page) {
+async function getOrderAndgroupby(options, size, page , groupbyMode = true) {
+    console.log(groupbyMode)
     const orderDateRange = await getSettingTimeRange()
     const orderDateStr = orderDateRange[0].substring(0, 10)
     const query = {
         table: "order_info",
         join: "order_info INNER JOIN shop_info ON orderShopId = shopId",
-        columns: ` * , DATE_FORMAT(order_info.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate , DATE_FORMAT(order_info.createDate,'%Y-%m-%d') AS createDate , IF(order_info.orderDate = '${orderDateStr}',1,0) AS isToday`,
-        orderby:'order_info.updateDate',
+        columns: ` * , 
+        DATE_FORMAT(order_info.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate , 
+        DATE_FORMAT(order_info.createDate,'%Y-%m-%d %H:%i:%S') AS createDate , 
+        IF(order_info.orderDate = '${orderDateStr}',1,0) AS isToday
+        `,
+        orderby: 'order_info.updateDate',
         options,
         size,
         page
     }
     return getItems(query).then(res => {
         let orderItems = []
-        if (res.success) {
+        if (res.success && groupbyMode) {
             orderItems = res.resource.reduce((group, order) => {
                 let key = order.orderCode
                 if (group[key]) {
-                    group[key].id.push(order.id)
-                    group[key].orderUserName.push(order.orderUserName)
-                    group[key].department.push(order.department)
+                    if(order.orderIndex > group[key].orderIndex){
+                        group[key] = order
+                    }
                 } else {
-                    group[key] = {
-                        ...order,
-                        id: [order.id],
-                        orderUserName: [order.orderUserName],
-                        department: [order.department]
-                    };
+                    group[key] = { ...order };
                 }
                 return group;
             }, {});
         }
-        return Object.values(orderItems)
+        return groupbyMode ? Object.values(orderItems) : res.resource
     })
 }
 

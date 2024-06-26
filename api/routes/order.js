@@ -23,5 +23,7 @@ router.post('/exportDailyMeetSummary',orderModifyMethod.postExportDailyMeetSumma
 
 router.post('/getDailyOrderStatus',orderModifyMethod.getDailyOrderStatus)
 
+router.post('/postHistoryOrder',orderModifyMethod.postHistoryOrder)
+
 
 module.exports = router;
