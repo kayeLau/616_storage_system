@@ -74,17 +74,17 @@ function tableRowClassName({ row }) {
 }
 
 const columns = [
-  { props: 'status', label: '訂單狀態', formatter: orderStateFormatter },
-  { props: 'shopName', label: '落單門店', width: 180 },
-  { props: 'department', label: '落單部門' , formatter: departmentFormatter },
-  { props: 'orderUserName', label: '落單人', width: 130 },
-  { props: 'orderIndex', label: '落單次數', width: 100 },
+  { props: 'status', label: '訂單狀態', formatter: orderStateFormatter , width: 130},
+  { props: 'shopName', label: '落單門店' },
+  { props: 'department', label: '落單部門' , width: 130 , formatter: departmentFormatter },
+  { props: 'orderUserName', label: '落單人', width: 180 },
+  { props: 'orderIndex', label: '落單次數', width: 130 , formatter: (row, column) => row[column.property] + 1},
   { props: 'createDate', label: '落單時間', width: 180 },
-  { props: 'updateDate', label: '最後更新時間', width: 180 }
+  // { props: 'updateDate', label: '最後更新時間', width: 180 }
 ]
 
 const operations = {
-  width: 350,
+  width: 360,
   size: "small",
   children: [
     { type: "primary", name: '編輯', onClick: showDetailHandle, icon: 'Edit' },

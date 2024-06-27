@@ -31,11 +31,12 @@ function createNewOrder(data) {
         const orderList = data.orderList.map(item => {
             return [
                 '',
-                data.id,
+                data.id, // 訂單ID
                 item.productId,
                 item.orderQuantity,
                 item.orderMode,
                 data.updateDate,
+                data.orderUserName // 最後修改人ID
             ]
         })
         return orderList
@@ -53,9 +54,11 @@ function insertOrderItems(list) {
             orderQuantity,
             updateDate,
             orderMode,
-            status) VALUES ? `, [list])
+            status,
+            lastEditBy,
+            remark) VALUES ? `, [list])
 }
-
+// 前線落單時用
 function createNewOrderItems(list) {
     return customQuery(`INSERT IGNORE INTO order_detail_info (
         id,
@@ -63,7 +66,8 @@ function createNewOrderItems(list) {
         productId,
         orderQuantity,
         orderMode,
-        updateDate) VALUES ? `, [list])
+        updateDate,
+        lastEditBy) VALUES ? `, [list])
 }
 
 
@@ -96,6 +100,7 @@ function updateOrderDetailAssignQuantity(list, userInfo) {
     let assignQuantity = ''
     let status = ''
     let remark = ''
+    let lastEditBy = ''
     let updateDate = ''
     let ids = []
     let st = userInfo.auth === 2 ? 0 : 1
@@ -107,6 +112,7 @@ function updateOrderDetailAssignQuantity(list, userInfo) {
         status += `WHEN ${item.id} THEN ${st} \n`
         updateDate += `WHEN ${item.id} THEN "${currentTime}" \n`
         remark += `WHEN ${item.id} THEN "${item.remark || '-'}" \n`
+        lastEditBy += `WHEN ${item.id} THEN "${userInfo.name || '-'}" \n`
     })
     return customQuery(`UPDATE order_detail_info SET
             orderQuantity=CASE id
@@ -118,7 +124,9 @@ function updateOrderDetailAssignQuantity(list, userInfo) {
             remark=CASE id
             ${remark} END,
             updateDate=CASE id
-            ${updateDate} END
+            ${updateDate} END,
+            lastEditBy=CASE id
+            ${lastEditBy} END 
             WHERE id IN (?)`, [ids])
 }
 

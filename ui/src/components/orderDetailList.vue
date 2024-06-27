@@ -42,7 +42,7 @@
       </el-table-column>
       <el-table-column prop="orderMode" label="下單模式" :formatter="orderModeFormatter" align="center" />
       <el-table-column prop="updateDate" label="最後修改時間" width="180" />
-      <!-- <el-table-column prop="lastEditBy" label="最後修改人" width="100" /> -->
+      <el-table-column prop="lastEditBy" label="最後修改人" width="100" />
       <el-table-column prop="remark" label="備注" width="200">
         <template #default="scope">
           <el-input v-model="orderInfoMap[scope.row.productId].remark" :disabled="!(userInfo.auth === -1 || userInfo.auth === 2)" />

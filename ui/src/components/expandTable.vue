@@ -15,6 +15,7 @@
                         <span>下單模式</span>
                         <span>修改時間</span>
                         <span>備注</span>
+                        <span>最後修改人</span>
                     </div>
                 </div>
                 <!-- 訂單明细(前線) -->
@@ -33,6 +34,7 @@
                         <span>{{ orderMode[item.orderMode] }}</span>
                         <span>{{ item.updateDate }}</span>
                         <span>{{ item.remark }}</span>
+                        <span>{{ item.lastEditBy }}</span>
                     </div>
                 </div>
             </div>
@@ -89,7 +91,7 @@ const orderItems = ref(expandTable_temp)
 .expand-list-body-row {
     width: 100%;
     display: grid;
-    grid-template-columns: 80px 1fr 1fr 100px 80px 1fr 1fr;
+    grid-template-columns: 80px 1fr 1fr 100px 80px 180px 1fr 100px;
     text-align: center;
     justify-items: left;
     align-items: center;

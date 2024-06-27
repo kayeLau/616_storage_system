@@ -80,6 +80,7 @@ module.exports = class order {
 
     // 管理員追加訂單
     postAdditionOrder(req, res, next) {
+        const userInfo = req.userInfo
         const updateDate = getCurrentTime()
         let orderList = req.body.orderList
         if (Array.isArray(orderList) && orderList.length) {
@@ -92,7 +93,9 @@ module.exports = class order {
                     item.orderQuantity,
                     updateDate,
                     item.orderMode,
-                    state
+                    state,
+                    userInfo.name,
+                    item.remark
                 ]
             })
             insertOrderItems(orderList).then(result => {
