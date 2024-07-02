@@ -17,6 +17,7 @@ function createNewOrder(data) {
 
         createNew("order_info", {
             id: data.id,
+            state:0,
             orderUserId: data.orderUserId,
             orderUserName: data.orderUserName,
             orderShopId: data.orderShopId,
