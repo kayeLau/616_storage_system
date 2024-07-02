@@ -91,7 +91,7 @@ const orderItems = ref(expandTable_temp)
 .expand-list-body-row {
     width: 100%;
     display: grid;
-    grid-template-columns: 80px 1fr 1fr 100px 80px 180px 1fr 100px;
+    grid-template-columns: 80px 1fr 1fr 120px 80px 180px 1fr 100px;
     text-align: center;
     justify-items: left;
     align-items: center;
