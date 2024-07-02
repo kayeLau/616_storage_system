@@ -1,0 +1,17 @@
+.side-in-enter-active {
+    animation: side-in 0.3s;
+}
+
+.side-in-leave-active {
+    animation: side-in 0.3s reverse;
+}
+
+@keyframes side-in {
+    0% {
+        bottom: -100%;
+    }
+
+    100% {
+        bottom: 0;
+    }
+}
