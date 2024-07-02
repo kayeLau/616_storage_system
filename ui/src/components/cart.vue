@@ -114,6 +114,7 @@ function comfireOrder() {
     createOrder({ orderList: orderList.value }).then(res => {
         if (res.success) {
             ElMessage({ type: 'success', message: '提交成功' })
+            drawerSwitch.value = false
         } else {
             ElMessage({ type: 'error', message: '提交失敗' })
         }

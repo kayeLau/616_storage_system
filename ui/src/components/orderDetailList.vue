@@ -9,10 +9,10 @@
           <span :style="orderStateColor(scope.row.status)">{{ orderStateDict[scope.row.status] }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="freezersNum" label="雪房號碼" :formatter="freezersNumFormatter" :filter-multiple="false"
+      <el-table-column prop="freezersNum" label="雪房號碼"  width="120" :formatter="freezersNumFormatter" :filter-multiple="false"
         :filtered-value="filteredValue" :filters="dictToFilterOptions(freezersNumDict)"
         :filter-method="filterHandler" />
-      <el-table-column prop="productCode" label="產品" width="260">
+      <el-table-column prop="productCode" label="產品" width="250">
 
         <template #default="scope">
           <el-select v-if='scope.row.mode === "create"' v-model="_data.children[scope.$index].productId" filterable

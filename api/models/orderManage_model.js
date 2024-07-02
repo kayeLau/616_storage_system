@@ -178,6 +178,7 @@ function getOrderExportList(options, size, page, summaryProductIdsMap, shopsList
     const result = {}
 
     return getOrderAndgroupby(options, size, page).then(async group => {
+        console.log(group)
         const summaryProductIds = Object.keys(summaryProductIdsMap)
         const promiseList = group.map((item) => {
             return getItems({
@@ -206,12 +207,14 @@ function getOrderExportList(options, size, page, summaryProductIdsMap, shopsList
 
 // 根據orderCode groupby
 async function getOrderAndgroupby(options, size, page , groupbyMode = true) {
-    console.log(groupbyMode)
     const orderDateRange = await getSettingTimeRange()
     const orderDateStr = orderDateRange[0].substring(0, 10)
+    const join = 'order_info INNER JOIN shop_info ON orderShopId = shopId'
+    const groupByJoin = `order_info INNER JOIN shop_info ON orderShopId = shopId INNER JOIN ( SELECT orderCode, MAX(orderIndex) AS maxOrderIndex
+            FROM order_info GROUP BY orderCode) AS max_order ON order_info.orderCode = max_order.orderCode AND order_info.orderIndex = max_order.maxOrderIndex`
     const query = {
         table: "order_info",
-        join: "order_info INNER JOIN shop_info ON orderShopId = shopId",
+        join: groupbyMode ? groupByJoin : join,
         columns: ` * , 
         DATE_FORMAT(order_info.updateDate,'%Y-%m-%d %H:%i:%S') AS updateDate , 
         DATE_FORMAT(order_info.createDate,'%Y-%m-%d %H:%i:%S') AS createDate , 
@@ -224,20 +227,22 @@ async function getOrderAndgroupby(options, size, page , groupbyMode = true) {
     }
     return getItems(query).then(res => {
         let orderItems = []
-        if (res.success && groupbyMode) {
-            orderItems = res.resource.reduce((group, order) => {
-                let key = order.orderCode
-                if (group[key]) {
-                    if(order.orderIndex > group[key].orderIndex){
-                        group[key] = order
-                    }
-                } else {
-                    group[key] = { ...order };
-                }
-                return group;
-            }, {});
-        }
-        return groupbyMode ? Object.values(orderItems) : res.resource
+        // if (res.success && groupbyMode) {
+        //     orderItems = res.resource.reduce((group, order) => {
+        //         let key = order.orderCode
+        //         if (group[key]) {
+        //             if(order.orderIndex > group[key].orderIndex){
+        //                 group[key] = order
+        //             }
+        //         } else {
+        //             group[key] = { ...order };
+        //         }
+        //         return group;
+        //     }, {});
+        // }
+        // return groupbyMode ? Object.values(orderItems) : res.resource
+        console.log('88',res)
+        return res.resource
     })
 }
 
