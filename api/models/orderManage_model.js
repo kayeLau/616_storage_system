@@ -95,6 +95,7 @@ function checkOrderRepeated(table, options) {
     })
 }
 
+// 設置訂單細項
 function updateOrderDetailAssignQuantity(list, userInfo) {
     let orderQuantity = ''
     let assignQuantity = ''
@@ -130,10 +131,6 @@ function updateOrderDetailAssignQuantity(list, userInfo) {
             WHERE id IN (?)`, [ids])
 }
 
-function updateOrderInformation(orderId, data) {
-    return updateItem("order_info", data, 'id', orderId)
-}
-
 function deleteOrderItem(shopId) {
     return deleteItem("order_info", 'shopId', shopId)
 }
@@ -148,28 +145,40 @@ function getOrderItemsNumber(options) {
 function getOrderItems(options, size, page , groupbyMode) {
     const result = {}
     return getOrderAndgroupby(options, size, page , groupbyMode).then(async orderItems => {
-        const promiseList = orderItems.map((item, index) => {
-            return getItems({
-                table: "order_detail_info", join: "order_detail_info INNER JOIN product_info ON order_detail_info.productId = product_info.productId",
-                orderby: 'product_info.productCode', sort: 'ASC', options: { orderId: item.id }, size: 999, page: 1
-            }).then(res => {
-                if (res.success) {
-                    let status = res.resource.find(item => item.status === 0)
-                    orderItems[index].status = status ? 0 : 1
-                    orderItems[index].children = res.resource
-                }
-            })
+        // const promiseList = orderItems.map((item, index) => {
+        //     return getItems({
+        //         table: "order_detail_info", join: "order_detail_info INNER JOIN product_info ON order_detail_info.productId = product_info.productId",
+        //         orderby: 'product_info.productCode', sort: 'ASC', options: { orderId: item.id }, size: 999, page: 1
+        //     }).then(res => {
+        //         if (res.success) {
+        //             let status = res.resource.find(item => item.status === 0)
+        //             orderItems[index].status = status ? 0 : 1
+        //             orderItems[index].children = res.resource
+        //         }
+        //     })
+        // })
+        orderItems = orderItems.map(item => {
+            item.children = []
+            return item
         })
         await getOrderItemsNumber(options).then(res => {
             if (res.success) {
                 result.total = res.resource[0].total || 0;
             }
         })
-        await Promise.all(promiseList)
+        // await Promise.all(promiseList)
         result.msg = "get success"
         result.resource = orderItems
         result.success = true
         return result
+    })
+}
+
+// 獲取訂單細項
+function getOrderDetail(orderId){
+    return getItems({
+        table: "order_detail_info", join: "order_detail_info INNER JOIN product_info ON order_detail_info.productId = product_info.productId",
+        orderby: 'product_info.productCode', sort: 'ASC', options: { orderId }, size: 999, page: 1
     })
 }
 
@@ -178,7 +187,6 @@ function getOrderExportList(options, size, page, summaryProductIdsMap, shopsList
     const result = {}
 
     return getOrderAndgroupby(options, size, page).then(async group => {
-        console.log(group)
         const summaryProductIds = Object.keys(summaryProductIdsMap)
         const promiseList = group.map((item) => {
             return getItems({
@@ -241,13 +249,23 @@ async function getOrderAndgroupby(options, size, page , groupbyMode = true) {
         //     }, {});
         // }
         // return groupbyMode ? Object.values(orderItems) : res.resource
-        console.log('88',res)
         return res.resource
     })
 }
 
+// 設置訂單狀態
+async function setOrderState(orderId){
+    let orderState = 0
+    await getItems({table: "order_detail_info", options: { orderId: orderId , status:0 }, size: 999, page: 1}).then(res => {
+        if (res.success) {
+            orderState = res.resource.length ? 0 : 1
+        }
+    })
+    return updateItem("order_info", { state:orderState }, 'id', orderId)
+}
+
 module.exports = {
-    getOrderExportList,
-    createNewOrder, updateOrderInformation, deleteOrderItem, getOrderItemsNumber,
+    getOrderExportList, setOrderState, getOrderDetail,
+    createNewOrder, deleteOrderItem, getOrderItemsNumber,
     getOrderItems, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated
 }

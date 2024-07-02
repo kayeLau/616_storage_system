@@ -8,6 +8,14 @@ export function getOrderList(data){
       });
 }
 
+export function getOrderDetail(data){
+    return request({
+        url: '/orders/getOrderDetail',
+        method: 'post',
+        data,
+      });
+}
+
 export function createOrder(data){
   return request({
       url: '/orders/createOrder',
@@ -35,14 +43,6 @@ export function checkOrderRepeated(data){
 export function updateOrderDetailAssignQuantity(data){
   return request({
       url: '/orders/updateOrderDetailAssignQuantity',
-      method: 'post',
-      data,
-    });
-}
-
-export function updateOrder(data){
-  return request({
-      url: '/orders/updateOrder',
       method: 'post',
       data,
     });

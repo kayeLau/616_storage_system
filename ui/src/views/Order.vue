@@ -2,8 +2,9 @@
   <div>
     <el-card class="Ktable-container">
       <Ktable ref='KtableRef2' isExpand :columns="columns" :operations="operations" :params="params"
-        :tableRowClassName="tableRowClassName" :getList="getOrderList" :searchFormColumns="searchFormColumns"
-        :customBtn="customBtn" :expandHeader="{}" :expandColumns="{}" :products="products"></Ktable>
+        :tableRowClassName="tableRowClassName" :getList="getOrderList" :expandChange="expandChange"
+        :searchFormColumns="searchFormColumns" :customBtn="customBtn" :expandHeader="{}" :expandColumns="{}"
+        :products="products" :expandRowKeys="expandRowKeys"></Ktable>
     </el-card>
     <!-- OrderDetail -->
     <el-dialog v-model="orderDetailShow" width="95%" style="height:80vh;position: relative;" top="10vh">
@@ -19,9 +20,11 @@
       <orderDetailList :data="currentRow" :params="ODparams" @refreshList="refreshList" :products="products" />
     </el-dialog>
     <!-- History -->
-    <el-dialog v-model="historyDetailShow" width="95%" style="height:80vh;position: relative;" top="10vh" destroy-on-close>
-      <Ktable ref='KtableRef3' :columns="columns" isExpand :operations="null" :params="historyParams" :getList="postHistoryOrder" :searchFormColumns="[]"
-        :customBtn="[]" :expandHeader="{}" :expandColumns="{}"></Ktable>
+    <el-dialog v-model="historyDetailShow" width="95%" style="height:80vh;position: relative;" top="10vh"
+      destroy-on-close @close="resetexpandRowKeys">
+      <Ktable ref='KtableRef3' :columns="columns" isExpand :operations="null" :params="historyParams" :expandChange="expandChange"
+        :getList="postHistoryOrder" :searchFormColumns="[]" :customBtn="[]" :expandHeader="{}" :expandColumns="{}" :expandRowKeys="expandRowKeys">
+      </Ktable>
     </el-dialog>
   </div>
 </template>
@@ -30,7 +33,7 @@
 import orderDetailList from '../components/orderDetailList.vue';
 import { getProductList } from '../request/products';
 import { getShopList } from '../request/shops'
-import { getOrderList, getDailyOrderStatus, postExportDailyMeetSummary , postHistoryOrder } from '../request/orders';
+import { getOrderList, getDailyOrderStatus, postExportDailyMeetSummary, postHistoryOrder, getOrderDetail } from '../request/orders';
 import { departmentDict, orderStateDict, freezersNumDict } from '../request/dict';
 import { exportExcel } from '../utils/export';
 import Ktable from '../components/table.vue';
@@ -74,11 +77,11 @@ function tableRowClassName({ row }) {
 }
 
 const columns = [
-  { props: 'status', label: '訂單狀態', formatter: orderStateFormatter , width: 130},
+  { props: 'state', label: '訂單狀態', formatter: orderStateFormatter, width: 130 },
   { props: 'shopName', label: '落單門店' },
-  { props: 'department', label: '落單部門' , width: 130 , formatter: departmentFormatter },
+  { props: 'department', label: '落單部門', width: 130, formatter: departmentFormatter },
   { props: 'orderUserName', label: '落單人', width: 180 },
-  { props: 'orderIndex', label: '落單次數', width: 130 , formatter: (row, column) => row[column.property] + 1},
+  { props: 'orderIndex', label: '落單次數', width: 130, formatter: (row, column) => row[column.property] + 1 },
   { props: 'createDate', label: '落單時間', width: 180 },
   // { props: 'updateDate', label: '最後更新時間', width: 180 }
 ]
@@ -290,7 +293,7 @@ const searchFormColumns = ref([
 //#endregion
 
 //#region order detail tabel
-let currentRow = ref({})
+let currentRow = ref([])
 
 const ODparams = {
   size: 20,
@@ -299,24 +302,46 @@ const ODparams = {
 
 let orderDetailShow = ref(false)
 function showDetailHandle(index, row) {
-  orderDetailShow.value = !orderDetailShow.value
-  if (orderDetailShow.value) {
-    currentRow.value = row
-  }
+  getOrderDetail({ orderId: row.id }).then(res => {
+    if (res.success) {
+      currentRow.value = {
+        orderCode: row.orderCode,
+        id: row.id,
+        children: res.resource
+      }
+      orderDetailShow.value = !orderDetailShow.value
+    }
+  })
 }
 
 const KtableRef3 = ref()
 let historyDetailShow = ref(false)
-async function showHistoryHandle(index, row){
+async function showHistoryHandle(index, row) {
   historyParams.value = {
     size: 20,
     page: 1,
-    orderCode:row.orderCode
+    orderCode: row.orderCode
   }
+  resetexpandRowKeys()
   historyDetailShow.value = !historyDetailShow.value
 }
 let historyParams = ref({})
 
+// 展開
+let expandRowKeys = ref([])
+async function expandChange(row, expandRow) {
+  if (expandRow.length) {
+    await getOrderDetail({ orderId: row.id }).then(res => {
+      if (res.success) {
+        row.children = res.resource
+      }
+    })
+    expandRowKeys.value = expandRow.map(item => item.id)
+  }
+}
+function resetexpandRowKeys(){
+  expandRowKeys.value = []
+}
 
 //#endregion
 
@@ -363,10 +388,12 @@ function productChange(productCode) {
 let loading = ref(false)
 async function refreshList() {
   loading.value = true
-  let result = await KtableRef2.value.fatchList()
-  let target = result.resource.find(item => item.orderCode === currentRow.value.orderCode)
-  target.children.forEach(item => item.disabled = true)
-  currentRow.value = target
+  await KtableRef2.value.fatchList()
+  await getOrderDetail({ orderId: currentRow.value.id }).then(res => {
+    if (res.success) {
+      currentRow.value.children = res.resource
+    }
+  })
   loading.value = false
 }
 
