@@ -225,17 +225,23 @@ function fetchDailyOrderStatus() {
   })
 }
 
-function exportOrderExcel(index, row) {
+async function exportOrderExcel(index, row) {
   const date = new Date()
   const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
   const todayF = String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear()
+  let children = []
+  await getOrderDetail({ orderId: row.id }).then(res => {
+    if (res.success) {
+      children = res.resource
+    }
+  })
   const shipping = {
     sheetNames: today + row.shopName + '出貨表',
     jsonData: [
       [row.shopCode, row.shopName, '', todayF],
       ['貨品編號', '貨品名稱', '數量/重量', '單位', '包裝規格'],
       // assuming `row.children` is an array of objects
-      ...row.children.map(item => [
+      ...children.map(item => [
         item.productCode,
         item.productName,
         item.assignQuantity,
@@ -250,7 +256,7 @@ function exportOrderExcel(index, row) {
     jsonData: [
       [row.shopName, row.orderUserName[0], '', '', '', row.updateDate],
       ['貨品名稱', '分配數量', '單位', '下單數量', '包裝規格', '備注'],
-      ...row.children.map(item => [
+      ...children.map(item => [
         item.productName,
         item.assignQuantity,
         item.unit,
