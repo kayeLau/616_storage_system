@@ -17,8 +17,8 @@
             </el-form-item>
         </el-form>
         <!-- tabel -->
-        <el-table :data="data" class="table" header-cell-class-name="table-header"
-            :row-class-name="tableRowClassName" @selection-change="handleSelectionChange">
+        <el-table :data="data" class="table" header-cell-class-name="table-header" row-key="id" :expand-row-keys="expandRowKeys"
+            :row-class-name="tableRowClassName" @selection-change="handleSelectionChange" @expand-change="expandChange">
             <el-table-column v-if="isExpand" type="expand">
                 <template v-slot="props">
                     <expandTable :expandTable="props.row.children" :products="products"></expandTable>
@@ -103,7 +103,14 @@ const props = defineProps({
     getList: Function,
     customBtn: Array,
     products: Array,
-    tableRowClassName: Function
+    expandRowKeys:{
+        type: Array,
+        default: () => {
+            return []
+        }
+    },
+    tableRowClassName: Function,
+    expandChange:Function,
 })
 
 let data = ref([])

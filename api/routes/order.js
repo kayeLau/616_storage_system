@@ -7,9 +7,9 @@ const orderModifyMethod = new OrderModifyMethod()
 
 router.post('/getOrderList',orderModifyMethod.getOrderList)
 
-router.post('/createOrder',orderModifyMethod.postCreateOrder)
+router.post('/getOrderDetail',orderModifyMethod.getOrderDetail)
 
-router.post('/updateOrder',orderModifyMethod.postUpdateOrder)
+router.post('/createOrder',orderModifyMethod.postCreateOrder)
 
 router.post('/deleteOrder',orderModifyMethod.postDeleteOrder)
 

@@ -245,12 +245,12 @@ const customBtn = [
     type: 'render',
     render: (h) => {
       return h(ElUpload, {
-          class: "upload-demo", autoUpload: false, onChange:excelToJson, limit:'1',
+          class: "upload-demo", autoUpload: false, onChange:excelToJson, limit:1,
           ['onUpdate:modelValue']: (value) => {
             fileList.value = value
           }
         }, [
-          h(ElButton, { type: "primary", plain: true, limit: "1" , 
+          h(ElButton, { type: "primary", plain: true, limit: 1 , 
           style:{ borderTopRightRadius:0 , borderBottomRightRadius:0 }}, '轉換為JSON')
         ])
     }

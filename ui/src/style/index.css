@@ -3,6 +3,7 @@
 @import "./input.css";
 @import "./table.css";
 @import "./ststistic.css";
+@import "./transition.css";
 
 :root{
     --background-color:#f2f6fc;
@@ -38,7 +39,7 @@ body{
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: var(--el-color-primary-light-3);
+  background-color: var(--el-color-info-light-5);
   border-radius: 20px;
 }
 .flex-row-center{

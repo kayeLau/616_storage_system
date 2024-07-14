@@ -147,7 +147,7 @@ const columns = [
   {
     props: 'shopPartitionName', label: '所屬分區', width: 250, render: (h, row) => {
       let shopPartitionName = row.shopPartitionName.map(item => h(ElTag, { type: 'info', style: { marginRight: '5px' } }, item))
-      return h('div', shopPartitionName)
+      return h('div', {} , shopPartitionName)
     }
   },
   { props: 'shopType', label: '店舖類型', formatter: shopTypeFormatter },

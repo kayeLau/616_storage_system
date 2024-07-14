@@ -13,6 +13,7 @@
                     :style="{ backgroundColor: orderList.length ? '' : '#ccc' }">落单</div>
             </div>
         </div>
+        <Transition name="side-in">
         <div class="detail-box" v-show="detailBoxSwitch">
             <div class="order-list">
                 <div v-for="(product, index) of orderList" :key="index" class="order-item">
@@ -30,9 +31,10 @@
                 </div>
             </div>
         </div>
+        </Transition>
         <div class="cart-cover" v-show="detailBoxSwitch" @click="detailBoxSwitch = !detailBoxSwitch"></div>
         <el-drawer v-model="drawerSwitch" direction="ltr" :z-index="120" :withHeader="false" size="100%"
-            style="background: linear-gradient(var(--el-color-primary) 0%, #fff 40%);">
+            style="background: linear-gradient(var(--el-color-primary) 0%, #f2f6fc 50%);">
             <div class="order-comfirm">
                 <div class="arrow-left" @click="drawerSwitch = !drawerSwitch"><el-icon>
                         <ArrowLeftBold />
@@ -52,6 +54,15 @@
                     </div>
                 </el-card>
                 <el-button round style="justify-self: flex-end;" type="primary" @click="comfireOrder" :disabled="submitDisabled">確定訂單</el-button>
+                <div class="order-list">
+                    <div v-for="(product, index) of orderList" :key="index" class="order-item"  
+                    :style="product.orderQuantity === null ? 'background-color: var(--el-color-danger-light-7)' : ''">
+                        <div class="product-name" style="width: 50%;">{{ product.productName }}</div>
+                        <div style="width: 30%;">{{ product.standard }}</div>
+                        <div style="width: 20%;text-align: end;">{{ product.orderQuantity }}</div>
+                    </div>
+                </div>
+                <el-button round style="justify-self: flex-end;" type="primary" @click="comfireOrder">確定訂單</el-button>
             </div>
         </el-drawer>
     </div>
@@ -197,15 +208,18 @@ function verifySubmit() {
     background-color: #fff;
     bottom: 0;
     width: 100%;
-    height: 50vh;
+    height: 70vh;
     z-index: 99;
     border-top-right-radius: 10px;
     border-top-left-radius: 10px;
 }
 
 .order-list {
+    flex: 1;
+    background-color: #fff;
+    border-radius: 15px;
+    border: 3px solid var(--el-card-border-color);
     overflow-y: scroll;
-    height: calc(100% - 55px);
 }
 
 .cart-cover {

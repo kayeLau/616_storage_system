@@ -1,6 +1,6 @@
 const { getCurrentTime, getSettingTimeRange } = require('../utils')
 const { generateUUID } = require('../models/encryption');
-const { getOrderItems, createNewOrder, updateOrderInformation, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated, getOrderExportList , getOrderItemsNumber } = require('../models/orderManage_model')
+const { getOrderItems, createNewOrder, setOrderState, deleteOrderItem, insertOrderItems, updateOrderDetailAssignQuantity, checkOrderRepeated, getOrderExportList , getOrderItemsNumber , getOrderDetail} = require('../models/orderManage_model')
 const { getProductItems } = require('../models/productManage_model')
 const { getShopItems } = require('../models/shopManage_model')
 
@@ -28,11 +28,18 @@ module.exports = class order {
         })
     }
 
+    async getOrderDetail(req, res, next){
+        const orderId = req.body.orderId
+        getOrderDetail(orderId).then(result => {
+            res.json(result)
+        }).catch(err => {
+            next(err)
+        })
+    }
+
     async postCheckOrderRepeated(req, res, next) {
         const userInfo = req.userInfo
         const orderDateRange = await getSettingTimeRange()
-        console.log(orderDateRange)
-
         const orderData = {
             orderShopId: userInfo.shopId,
             department: userInfo.auth,
@@ -84,6 +91,7 @@ module.exports = class order {
         const updateDate = getCurrentTime()
         let orderList = req.body.orderList
         if (Array.isArray(orderList) && orderList.length) {
+            const orderId = orderList[0].orderId
             orderList = orderList.map(item => {
                 let state = item.assignQuantity === null || item.assignQuantity === undefined ? 0 : 1 
                 return [
@@ -98,7 +106,8 @@ module.exports = class order {
                     item.remark
                 ]
             })
-            insertOrderItems(orderList).then(result => {
+            insertOrderItems(orderList).then(async result => {
+                await setOrderState(orderId)
                 res.json(result)
             }).catch(err => {
                 next(err)
@@ -112,8 +121,10 @@ module.exports = class order {
     postupdateOrderDetailAssignQuantity(req, res, next) {
         const data = req.body.assignQuantitys
         const userInfo = req.userInfo
+        const orderId = req.body.orderId
         if (Array.isArray(data)) {
-            updateOrderDetailAssignQuantity(data,userInfo).then(result => {
+            updateOrderDetailAssignQuantity(data,userInfo).then(async result => {
+                await setOrderState(orderId)
                 res.json(result)
             }).catch(err => {
                 next(err)
@@ -121,21 +132,6 @@ module.exports = class order {
         } else {
             next(new Error('voild input'))
         }
-    }
-
-    postUpdateOrder(req, res, next) {
-        const orderId = req.body.orderId
-        const orderData = {
-            orderType: req.body.orderType,
-            orderName: req.body.orderName,
-            updateDate: getCurrentTime()
-        }
-
-        updateOrderInformation(orderId, orderData).then(result => {
-            res.json(result)
-        }).catch(err => {
-            next(err)
-        })
     }
 
     postDeleteOrder(req, res, next) {

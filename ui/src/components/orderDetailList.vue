@@ -229,8 +229,9 @@ async function updateAssignQuantity(row) {
     ElMessage({ type: 'warning', message: '請至少選擇一個目標' })
     return
   }
-  let orderId = _data.orderCode
-  await updateOrderDetailAssignQuantity({ assignQuantitys, orderId }).then(res => {
+  let orderCode = _data.orderCode
+  let orderId = _data.id
+  await updateOrderDetailAssignQuantity({ assignQuantitys, orderId , orderCode}).then(res => {
     if (res.success) {
       ElMessage({ type: 'success', message: '操作成功：資料已存入數據庫' })
     } else {
