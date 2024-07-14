@@ -51,7 +51,7 @@
                         </div>
                     </div>
                 </el-card>
-                <el-button round style="justify-self: flex-end;" type="primary" @click="comfireOrder">確定訂單</el-button>
+                <el-button round style="justify-self: flex-end;" type="primary" @click="comfireOrder" :disabled="submitDisabled">確定訂單</el-button>
             </div>
         </el-drawer>
     </div>
@@ -98,7 +98,8 @@ function jumpToOrderComfire() {
     }
 }
 
-function comfireOrder() {
+let submitDisabled = ref(false)
+async function comfireOrder() {
     if (!verifySubmit()) {
         ElMessageBox.confirm(
             '訂單中存在錯誤的產品數量,請檢查',
@@ -111,10 +112,12 @@ function comfireOrder() {
         )
         return
     }
-    createOrder({ orderList: orderList.value }).then(res => {
+    submitDisabled.value = true
+    await createOrder({ orderList: orderList.value }).then(res => {
         if (res.success) {
             ElMessage({ type: 'success', message: '提交成功' })
             drawerSwitch.value = false
+            submitDisabled.value = false
         } else {
             ElMessage({ type: 'error', message: '提交失敗' })
         }
