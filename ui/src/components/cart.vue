@@ -43,18 +43,8 @@
                     <h1>{{ userInfo.shopName }}</h1>
                     <div>{{ userInfo.name }}</div>
                 </el-card>
-                <el-card>
-                    <div class="order-list" style="height: 60vh;">
-                        <div v-for="(product, index) of orderList" :key="index" class="order-item"  
-                        :style="product.orderQuantity === null ? 'background-color: var(--el-color-danger-light-7)' : ''">
-                            <div class="product-name" style="width: 50%;">{{ product.productName }}</div>
-                            <div style="width: 30%;">{{ product.standard }}</div>
-                            <div style="width: 20%;text-align: end;">{{ product.orderQuantity }}</div>
-                        </div>
-                    </div>
-                </el-card>
-                <el-button round style="justify-self: flex-end;" type="primary" @click="comfireOrder" :disabled="submitDisabled">確定訂單</el-button>
-                <div class="order-list">
+
+                <div class="order-list" style="height: 60vh;">
                     <div v-for="(product, index) of orderList" :key="index" class="order-item"  
                     :style="product.orderQuantity === null ? 'background-color: var(--el-color-danger-light-7)' : ''">
                         <div class="product-name" style="width: 50%;">{{ product.productName }}</div>
@@ -62,7 +52,8 @@
                         <div style="width: 20%;text-align: end;">{{ product.orderQuantity }}</div>
                     </div>
                 </div>
-                <el-button round style="justify-self: flex-end;" type="primary" @click="comfireOrder">確定訂單</el-button>
+
+                <el-button round style="justify-self: flex-end;" type="primary" @click="comfireOrder" :disabled="submitDisabled">確定訂單</el-button>
             </div>
         </el-drawer>
     </div>
