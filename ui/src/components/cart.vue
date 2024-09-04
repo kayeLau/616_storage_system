@@ -193,6 +193,7 @@ function verifySubmit() {
 }
 
 .detail-box {
+    overflow: scroll;
     padding: 10px;
     box-sizing: border-box;
     position: absolute;

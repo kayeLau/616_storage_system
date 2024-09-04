@@ -324,7 +324,7 @@ const KtableRef3 = ref()
 let historyDetailShow = ref(false)
 async function showHistoryHandle(index, row) {
   historyParams.value = {
-    size: 20,
+    size: 99,
     page: 1,
     orderCode: row.orderCode
   }

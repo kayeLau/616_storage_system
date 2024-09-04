@@ -2,9 +2,8 @@
     <div class="common-layout">
         <el-container>
             <el-header class="header-bar">
-                <img src="../assets/616_logo.jpg" alt="616_logo" class='logo'>
-                <div class="avatar" @click="avatarDetailShow = !avatarDetailShow">
-                    <!-- <span>Kaye</span> -->
+                <img src="../assets/616_logo.png" alt="616_logo" class='logo'>
+                <div class="avatar" @click="avatarNavHandle">
                     <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
                     <el-card class="avatar-detail" v-show="avatarDetailShow">
                         <div class="avatar-detail-info">
@@ -13,6 +12,25 @@
                         </div>
                         <el-button type="primary" style="width: 100%" @click="logOutbyUser">登出</el-button>
                     </el-card>
+                    <el-drawer v-model="phoneNavShow" direction="rtl" size="40%">
+                        <div class="phone-nav">
+                            <div>
+                                <router-link v-for='(item, index) of menus' :key='index' :to="item.path">
+                                    <div class="phone-nav-link">
+                                        <el-icon>
+                                            <component :is='item.icon'></component>
+                                        </el-icon>
+                                        <span >{{ item.name }}</span>
+                                    </div>
+                                </router-link>
+                            </div>
+                            <div>
+                                <div>{{ authDict[userInfo.auth] }}</div>
+                                <div>{{ userInfo.name }}</div>
+                                <el-button type="primary" style="width: 100%" @click="logOutbyUser">登出</el-button>
+                            </div>
+                        </div>
+                    </el-drawer>
                 </div>
             </el-header>
 
@@ -33,7 +51,7 @@
                         </component>
                     </el-menu>
                     <div class="version">
-                        v1.0.0.3
+                        v1.0.0.4
                     </div>
                 </el-aside>
 
@@ -46,7 +64,7 @@
 </template>
 
 <script setup>
-import { computed, ref , onBeforeUnmount } from 'vue';
+import { computed, ref, onBeforeUnmount } from 'vue';
 import { getStorge, removeToken } from '../utils/auth'
 import { authDict } from '../request/dict'
 import { useRouter } from 'vue-router';
@@ -111,8 +129,18 @@ const menus = [
 ].filter(item => item.auth.includes(userInfo.value.auth))
 
 let avatarDetailShow = ref(false)
+let phoneNavShow = ref(false)
+function avatarNavHandle() {
+    let screenWidth = window.screen.width
+    if (screenWidth <= 760) {
+        phoneNavShow.value = !phoneNavShow.value
+    } else {
+        avatarDetailShow.value = !avatarDetailShow.value
+    }
 
-onBeforeUnmount(async() => {
+}
+
+onBeforeUnmount(async () => {
     await logout()
 })
 </script>
@@ -171,17 +199,43 @@ onBeforeUnmount(async() => {
 .avatar-detail>p {
     padding-bottom: 5px;
 }
-.version{
+
+.version {
     position: absolute;
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
-    color:#6c6a6a;
+    color: #6c6a6a;
     font-size: smaller
 }
-.aside{
+
+.aside {
     padding-right: 8px;
     position: relative;
     height: calc(100vh - 60px);
+}
+
+.phone-nav {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.phone-nav-link {
+    color: #000;
+}
+
+.phone-nav a {
+    text-decoration: none;
+}
+
+.phone-nav-link {
+    color: #000;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 3px;
 }
 </style>
