@@ -20,13 +20,13 @@
                     <div class="product-name" style="flex: 1;">{{ product.productName }}</div>
                     <div style="color: #cfcfcf;font-size: 14px;padding-right: 8px;">{{ product.standard }}</div>
                     <div>
-                        <el-icon @click="emitOrderDetailChange(product, true)">
+                        <!-- <el-icon @click="emitOrderDetailChange(product, true)">
                             <CirclePlusFilled />
-                        </el-icon>
+                        </el-icon> -->
                         {{ product.orderQuantity }}
-                        <el-icon @click="emitOrderDetailChange(product, false)">
+                        <!-- <el-icon @click="emitOrderDetailChange(product, false)">
                             <RemoveFilled />
-                        </el-icon>
+                        </el-icon> -->
                     </div>
                 </div>
             </div>
@@ -59,7 +59,7 @@
     </div>
 </template>
 <script setup>
-import { defineProps, computed, ref, defineEmits } from 'vue';
+import { defineProps, computed, ref } from 'vue';
 import { getStorge } from '../utils/auth'
 import { createOrder } from '../request/orders'
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -73,16 +73,16 @@ const props = defineProps({
     orderMap: Object
 })
 
-const emit = defineEmits(['orderDetailChange'])
-function emitOrderDetailChange(product, type) {
-    let _product = { ...product }
-    if (type) {
-        _product.orderQuantity++
-    } else {
-        _product.orderQuantity--
-    }
-    emit('orderDetailChange', _product)
-}
+// const emit = defineEmits(['orderDetailChange'])
+// function emitOrderDetailChange(product, type) {
+//     let _product = { ...product }
+//     if (type) {
+//         _product.orderQuantity++
+//     } else {
+//         _product.orderQuantity--
+//     }
+//     emit('orderDetailChange', _product)
+// }
 // const orderItems = computed(() => {
 //     return Object.keys(props.orderMap).length
 // })
