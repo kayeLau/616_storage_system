@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 // require('./models/create_tabel')
 const app = express();
+require("reflect-metadata");
 
 // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
