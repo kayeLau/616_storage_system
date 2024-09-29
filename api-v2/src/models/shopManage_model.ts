@@ -2,7 +2,6 @@ import AppDataSource from '../data-source';
 import { Shop } from '../entity/Shop';
 import { Partition } from '../entity/Partition';
 import { ShopProduct } from '../entity/ShopProduct';
-import { getCurrentTime } from '../utils';
 import { optionsGenerater } from './base_model';
 const shopRepository = AppDataSource.getRepository(Shop);
 const partitionRepository = AppDataSource.getRepository(Partition);
@@ -47,7 +46,7 @@ export async function createShop(data) {
         .select("MAX(shop.shopOrder)", "shopOrder")
         .getRawOne();
 
-    const maxShopOrder = maxShop.shopOrder !== null ? maxShop.shopOrder : 0; 
+    const maxShopOrder = maxShop.shopOrder !== null ? maxShop.shopOrder++ : 0; 
 
     if (!existingShop) {
         const newMember = shopRepository.create({ ...data , shopOrder:maxShopOrder });
@@ -117,15 +116,6 @@ export function deletePartition(id) {
         .execute()
 }
 
-// export function deleteShopPartition(id) {
-//     return partitionRepository
-//         .createQueryBuilder()
-//         .delete()
-//         .from(Partition)
-//         .where("id = :id", { id })
-//         .execute()
-// }
-
 export function readBindProduct(options) {
     return shopProductRepository
     .createQueryBuilder()
@@ -133,24 +123,33 @@ export function readBindProduct(options) {
     .getMany()
 }
 
-// function bindProductTOShop(productList) {
-//     return customQuery(`INSERT IGNORE INTO shop_product_info (id,shopId, productId ,createDate,updateDate) VALUES ? `, [productList])
-// }
+export async function bindProductTOShop(shopId,productList) {
+    await deleteShopPartition(shopId)
+    return shopProductRepository 
+    .createQueryBuilder()
+    .insert()
+    .into(ShopProduct)
+    .values(productList)
+    .execute();
+}
 
-// function setShopOrder(shopList) {
-//     let shopOrder = ''
-//     let updateDate = ''
-//     let ids = []
-//     const currentTime = getCurrentTime()
-//     shopList.forEach(item => {
-//         ids.push(item.shopId)
-//         updateDate += `WHEN "${item.shopId}" THEN "${currentTime}" \n`
-//         shopOrder += `WHEN "${item.shopId}" THEN ${Number(item.shopOrder)} \n`
-//     })
-//     return customQuery(`UPDATE shop_info SET
-//             shopOrder=CASE shopId
-//             ${shopOrder} END,
-//             updateDate=CASE shopId
-//             ${updateDate} END
-//             WHERE shopId IN (?)`, [ids])
-// }
+async function deleteShopPartition(shopId) {
+    return shopProductRepository
+        .createQueryBuilder()
+        .delete()
+        .from(ShopProduct)
+        .where("shopId = :shopId", { shopId })
+        .execute()
+}
+
+export async function setShopOrder(shopList) {
+    return shopRepository
+    .createQueryBuilder()
+    .update(Shop)
+    .set({ shopOrder: () => "CASE shopId " + 
+        shopList.map(shop => `WHEN ${shop.shopId} THEN '${shopList.shopOrder}'`).join(' ') + 
+        " END"
+    })
+    .whereInIds(shopList.map(shop => shop.shopId))
+    .execute();
+}

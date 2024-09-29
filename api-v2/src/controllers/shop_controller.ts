@@ -1,6 +1,6 @@
 const { getCurrentTime } = require('../utils')
-const { readShop, readPartition, createShop, createPartition, updateShop, deleteShop, deletePartition ,
-    bindProductTOShop, readBindProduct, deleteShopProductItem, setShopOrder } = require('../models/shopManage_model')
+const { readShop, readPartition, createShop, createPartition, updateShop, deleteShop, deletePartition,
+    bindProductTOShop, readBindProduct, setShopOrder } = require('../models/shopManage_model')
 const { generateUUID } = require('../models/encryption');
 
 module.exports = class Shop {
@@ -43,13 +43,10 @@ module.exports = class Shop {
             })
         }
         const shopData = {
-            shopId: generateUUID(),
             shopCode: req.body.shopCode,
             shopType: req.body.shopType,
             shopName: req.body.shopName,
             shopPartition: req.body.shopPartition,
-            createDate: getCurrentTime(),
-            updateDate: getCurrentTime(),
         }
         createShop(shopData).then(result => {
             res.json(result)
@@ -66,10 +63,7 @@ module.exports = class Shop {
                 msg: '缺少分區名稱'
             })
         }
-        const data = {
-            partitionName: req.body.partitionName,
-            updateDate: getCurrentTime()
-        }
+        const data = { partitionName: req.body.partitionName }
         createPartition(data).then(result => {
             res.json(result)
         }).catch(err => {
@@ -123,7 +117,7 @@ module.exports = class Shop {
 
     // 獲取禁銷列表
     readBindProduct(req, res, next) {
-        if(!req.body.shopId){
+        if (!req.body.shopId) {
             return {
                 success: false,
                 msg: '缺少商店編號'
@@ -140,44 +134,43 @@ module.exports = class Shop {
 
     // 設置禁售產品
     async bindProductToShop(req, res, next) {
-        let productList = req.body.productList
-        const shopId = productList[0].shopId
-        productList = productList.map(item => {
-            return [
-                item.shopId + '-' + item.productId,
-                item.shopId,
-                item.productId,
-                getCurrentTime(),
-                getCurrentTime()
-            ]
-        })
-
-
-        if (Array.isArray(productList) && Array.isArray(productList[0])) {
-            await deleteShopProductItem(shopId)
-            await bindProductTOShop(productList).then(result => {
-                res.json(result)
-            }).catch(err => {
-                next(err)
-            })
-        } else {
-            next(new Error('voild input'))
+        interface productList {
+            shopId: string;
+            productId: number;
         }
+        const productList: Array<productList> = req.body.productList
+        if (!productList.length) {
+            return {
+                success: false,
+                msg: '缺少禁售產品列表'
+            }
+        }
+        const shopId = productList[0].shopId
+        await bindProductTOShop(shopId, productList).then(result => {
+            res.json(result)
+        }).catch(err => {
+            next(err)
+        })
     }
 
     setShopOrder(req, res, next) {
-        const shopList = req.body.shopList
-        if (Array.isArray(shopList)) {
-            setShopOrder(shopList).then(result => {
-                if (res.success) {
-                    res.json(result)
-                }
-            }).catch(err => {
-                next(err)
-            })
-        } else {
-            next(new Error('voild input'))
-
+        interface shopList {
+            shopId: string;
+            shopOrder: number;
         }
+        const shopList: Array<shopList> = req.body.shopList
+        if (!shopList.length) {
+            return {
+                success: false,
+                msg: '缺少商店列表'
+            }
+        }
+        setShopOrder(shopList).then(result => {
+            if (res.success) {
+                res.json(result)
+            }
+        }).catch(err => {
+            next(err)
+        })
     }
 }
