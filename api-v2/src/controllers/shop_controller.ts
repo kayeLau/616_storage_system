@@ -1,7 +1,5 @@
-const { getCurrentTime } = require('../utils')
-const { readShop, readPartition, createShop, createPartition, updateShop, deleteShop, deletePartition,
-    bindProductTOShop, readBindProduct, setShopOrder } = require('../models/shopManage_model')
-const { generateUUID } = require('../models/encryption');
+import { readShop, readPartition, createShop, createPartition, updateShop, deleteShop, deletePartition,
+    bindProductTOShop, readBindProduct, setShopOrder } from '../models/shopManage_model';
 
 module.exports = class Shop {
 
@@ -17,11 +15,14 @@ module.exports = class Shop {
             })
         })
         await readShop(options, size, page).then(result => {
-            result.data.forEach(item => {
-                item.shopPartition = item.shopPartition.split(',').map(item => Number(item))
-                item.shopPartitionName = item.shopPartition.map(item => partitionDict[item])
+            const shopList = result.data.map(item => {
+                const shopPartitionArr = item.shopPartition.split(',').map(item => Number(item))
+                return {
+                    shopPartition: shopPartitionArr,
+                    shopPartitionName: shopPartitionArr.map(item => partitionDict[item])
+                }
             })
-            res.json(result)
+            res.json(shopList)
         })
     }
 
@@ -85,7 +86,6 @@ module.exports = class Shop {
             shopCode: req.body.shopCode,
             shopName: req.body.shopName,
             shopPartition: req.body.shopPartition,
-            updateDate: getCurrentTime(),
         }
         updateShop(id, data).then(result => {
             res.json(result)

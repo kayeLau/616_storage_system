@@ -1,24 +1,21 @@
-const { getCurrentTime } = require('../utils')
-const { getProductItems, createNewProduct, updateProductInformation, deleteProductItem } = require('../models/productManage_model')
-const { getBandProducts } = require('../models/shopManage_model')
-const { verifyToken } = require('../models/verification')
+import { readProduct, readBandProduct, createProduct, updateProduct, deleteProduct } from '../models/productManage_model';
+import { verifyToken } from '../models/verification';
 
 module.exports = class product {
-    async getProductList(req, res, next) {
+    async readProduct(req, res, next) {
         const token = req.headers['token'];
         let options = { 
             freezersNum: req.body.freezersNum, 
             disable: req.body.disable, 
             productName: req.body.productName, 
             summary: req.body.summary, 
-            classify: req.body.classify 
+            classify: req.body.classify,
         }
-        const size = req.body.size
-        const page = req.body.page
+        const size = req.body.size || 999
+        const page = req.body.page || 1
         let bandList = []
         try {
             const tokenResult = await verifyToken(token, true)
-
             if (tokenResult.success === false) {
                 res.json(tokenResult)
                 return
@@ -26,16 +23,14 @@ module.exports = class product {
 
             const auth = tokenResult.userInfo.auth
             if (!(auth === -1 || auth === 2)) {
-                bandList = await getBandProducts({ shopId: tokenResult.userInfo.shopId }, 999, 1)
-                    .then(res => res.resource.map(item => Number(item.productId)))
-                options.department = auth
+                bandList = await readBandProduct({ shopId: tokenResult.userInfo.shopId })
                 options.disable = 0
             }
 
-            await getProductItems(options, size, page).then(result => {
+            await readProduct(options, size, page).then(result => {
                 if (!(auth === -1 || auth === 2)) {
-                    result.resource = result.resource.filter(item => {
-                        let isBand = bandList.indexOf(item.productId) // 禁售商品
+                    result.data = result.data.filter(item => {
+                        const isBand = bandList.indexOf(item.productId) // 禁售商品
                         return isBand === -1 ? true : false
                     })
                 }
@@ -47,7 +42,7 @@ module.exports = class product {
 
     }
 
-    postCreateProduct(req, res, next) {
+    createProduct(req, res, next) {
         const productData = {
             productCode: req.body.productCode,
             productName: req.body.productName,
@@ -59,18 +54,16 @@ module.exports = class product {
             disable: req.body.disable,
             summary: req.body.summary,
             prompt: 0,
-            createDate: getCurrentTime(),
-            updateDate: getCurrentTime()
         }
 
-        createNewProduct(productData).then(result => {
+        createProduct(productData).then(result => {
             res.json(result)
         }).catch(err => {
             next(err)
         })
     }
 
-    postUpdateProduct(req, res, next) {
+    updateProduct(req, res, next) {
         const productId = req.body.productId
         const productData = {
             classify: req.body.classify,
@@ -82,20 +75,19 @@ module.exports = class product {
             disable: req.body.disable,
             summary: req.body.summary,
             prompt: req.body.prompt,
-            updateDate: getCurrentTime()
         }
 
-        updateProductInformation(productId, productData).then(result => {
+        updateProduct(productId, productData).then(result => {
             res.json(result)
         }).catch(err => {
             next(err)
         })
     }
 
-    postDeleteProduct(req, res, next) {
+    deleteProduct(req, res, next) {
         const productId = req.body.productId
 
-        deleteProductItem(productId).then(result => {
+        deleteProduct(productId).then(result => {
             res.json(result)
         }).catch(err => {
             next(err)

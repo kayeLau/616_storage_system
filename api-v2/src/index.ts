@@ -36,12 +36,12 @@ startApp();
 // router
 const usersRouter = require('./routes/member');
 const shopsRouter = require('./routes/shop')
-// const productsRouter = require('./routes/product')
+const productsRouter = require('./routes/product')
 // const ordersRouter = require('./routes/order')
 const settingRouter = require('./routes/setting')
 app.use('/member', usersRouter);
 app.use('/shop',shopsRouter)
-// app.use('/products',productsRouter)
+app.use('/product',productsRouter)
 // app.use('/orders',ordersRouter)
 app.use('/setting',settingRouter)
 

@@ -49,9 +49,9 @@ export async function createShop(data) {
     const maxShopOrder = maxShop.shopOrder !== null ? maxShop.shopOrder++ : 0; 
 
     if (!existingShop) {
-        const newMember = shopRepository.create({ ...data , shopOrder:maxShopOrder });
-        await shopRepository.save(newMember);
-        return newMember;
+        const newShop = shopRepository.create({ ...data , shopOrder:maxShopOrder });
+        await shopRepository.save(newShop);
+        return newShop;
     } else {
         return {
             msg: "創建項已存在",

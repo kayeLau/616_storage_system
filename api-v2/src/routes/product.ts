@@ -5,13 +5,13 @@ const ProductModifyMethod = require('../controllers/product_controller')
 
 const productModifyMethod = new ProductModifyMethod()
 
-router.post('/getProductList',productModifyMethod.getProductList)
+router.post('/readProduct',productModifyMethod.readProduct)
 
-router.post('/createProduct',productModifyMethod.postCreateProduct)
+router.post('/createProduct',productModifyMethod.createProduct)
 
-router.post('/updateProduct',productModifyMethod.postUpdateProduct)
+router.post('/updateProduct',productModifyMethod.updateProduct)
 
-router.post('/deleteProduct',productModifyMethod.postDeleteProduct)
+router.post('/deleteProduct',productModifyMethod.deleteProduct)
 
 
 module.exports = router;
