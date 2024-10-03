@@ -17,6 +17,7 @@ export async function readProduct(options, size, page) {
     .getMany()
     .then((result) => {
         return {
+            success:true,
             data: result,
             page,
             size,
@@ -42,7 +43,7 @@ export async function createProduct(data) {
     if (!existingProduct) {
         const newProduct = productRepository.create({ ...data });
         await productRepository.save(newProduct);
-        return newProduct;
+        return { ...newProduct, success: true };
     } else {
         return {
             msg: "創建項已存在",
@@ -58,6 +59,10 @@ export function updateProduct(productId, data) {
         .set({ ...data })
         .where("product.productId = :productId", { productId })
         .execute()
+        .then(() => { return { success: true } })
+        .catch((err) => { 
+            return Promise.reject({ success: false, message: err.message })
+        })
 }
 
 export function deleteProduct(productId) {
@@ -67,4 +72,8 @@ export function deleteProduct(productId) {
     .from(Product)
     .where("product.productId = :productId", { productId })
     .execute()
+    .then(() => { return { success: true } })
+    .catch((err) => { 
+        return Promise.reject({ success: false, message: err.message })
+    })
 }

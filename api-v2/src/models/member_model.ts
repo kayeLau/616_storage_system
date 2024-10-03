@@ -15,10 +15,7 @@ export async function toRegister(data) {
     if (!existingMember) {
         const newMember = memberRepository.create({ ...data });
         await memberRepository.save(newMember);
-        return {
-            ...newMember,
-            success: true
-        };
+        return { ...newMember, success: true };
     } else {
         return {
             msg: "創建項已存在",
@@ -27,13 +24,17 @@ export async function toRegister(data) {
     }
 }
 
-export function updateMenber(id, data) {
+export function updateMember(id, data) {
     return AppDataSource.getRepository(Member)
         .createQueryBuilder()
         .update(Member)
         .set({ ...data })
         .where("id = :id", { id })
         .execute()
+        .then(() => { return { success: true } })
+        .catch((err) => { 
+            return Promise.reject({ success: false, message: err.message })
+        })
 }
 
 export function deleteMember(id) {
@@ -43,9 +44,13 @@ export function deleteMember(id) {
         .from(Member)
         .where("id = :id", { id })
         .execute()
+        .then(() => { return { success: true } })
+        .catch((err) => { 
+            return Promise.reject({ success: false, message: err.message })
+        })
 }
 
-export function readMembers(options, size, page) {
+export function readMember(options, size, page) {
     const { conditions, parameters } = optionsGenerater(options, "member")
     return AppDataSource.getRepository(Member)
         .createQueryBuilder("member")
@@ -56,6 +61,7 @@ export function readMembers(options, size, page) {
         .getMany()
         .then((result) => {
             return {
+                success: true,
                 data: result,
                 page,
                 size,
@@ -63,12 +69,12 @@ export function readMembers(options, size, page) {
         })
 }
 
-export function readMember(id) {
-    return AppDataSource.getRepository(Member)
-        .createQueryBuilder("member")
-        .where("member.id = :id", id)
-        .getOne()
-}
+// function readMember(id) {
+//     return AppDataSource.getRepository(Member)
+//         .createQueryBuilder("member")
+//         .where("member.id = :id", id)
+//         .getOne()
+// }
 
 export async function toLogin(memberData) {
     const targetUser = AppDataSource.getRepository(Member)
@@ -96,8 +102,7 @@ export async function toLogin(memberData) {
             }
         }
         const token = jwt.sign({ data: res.id }, config.secret, { expiresIn: '5h' });
-        console.log(jwt)
-        updateMenber(res.id, { online: 1, ipAddress: memberData.ip })
+        updateMember(res.id, { online: 1, ipAddress: memberData.ip })
         return {
             success: true,
             token,

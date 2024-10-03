@@ -18,11 +18,15 @@ module.exports = class Shop {
             const shopList = result.data.map(item => {
                 const shopPartitionArr = item.shopPartition.split(',').map(item => Number(item))
                 return {
+                    ...item,
                     shopPartition: shopPartitionArr,
                     shopPartitionName: shopPartitionArr.map(item => partitionDict[item])
                 }
             })
-            res.json(shopList)
+            res.json({
+                success: true,
+                data: shopList
+            })
         })
     }
 
@@ -30,18 +34,14 @@ module.exports = class Shop {
     readPartition(req, res, next) {
         readPartition().then(result => {
             res.json(result)
-        }).catch(err => {
-            next(err)
         })
     }
 
     // 創建店舖資料
     async createShop(req, res, next) {
         if (!req.body.shopName || !req.body.shopCode) {
-            res.json({
-                success: false,
-                msg: '缺少商店名稱或商店編號'
-            })
+            res.json({ success: false, msg: '缺少商店名稱或商店編號' })
+            return
         }
         const shopData = {
             shopCode: req.body.shopCode,
@@ -59,10 +59,8 @@ module.exports = class Shop {
     // 創建分區
     createPartition(req, res, next) {
         if (!req.body.partitionName) {
-            res.json({
-                success: false,
-                msg: '缺少分區名稱'
-            })
+            res.json({ success: false, msg: '缺少分區名稱' })
+            return
         }
         const data = { partitionName: req.body.partitionName }
         createPartition(data).then(result => {
@@ -75,10 +73,8 @@ module.exports = class Shop {
     // 更改店舖資料
     updateShop(req, res, next) {
         if (!req.body.shopName || !req.body.shopCode) {
-            res.json({
-                success: false,
-                msg: '缺少商店名稱或商店編號'
-            })
+            res.json({ success: false, msg: '缺少商店名稱或商店編號' })
+            return
         }
         const id = req.body.shopId
         const data = {

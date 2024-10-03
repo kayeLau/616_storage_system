@@ -18,21 +18,20 @@ export async function readShop(options, size, page) {
         .getMany()
         .then((result) => {
             return {
+                success: true,
                 data: result,
                 page,
                 size,
             };
         })
-    }
+}
 
 export function readPartition() {
     return partitionRepository
         .createQueryBuilder()
         .getMany()
         .then((result) => {
-            return {
-                data: result
-            };
+            return { success: true, data: result };
         })
 }
 
@@ -46,12 +45,12 @@ export async function createShop(data) {
         .select("MAX(shop.shopOrder)", "shopOrder")
         .getRawOne();
 
-    const maxShopOrder = maxShop.shopOrder !== null ? maxShop.shopOrder++ : 0; 
+    const maxShopOrder = maxShop.shopOrder !== null ? maxShop.shopOrder++ : 0;
 
     if (!existingShop) {
-        const newShop = shopRepository.create({ ...data , shopOrder:maxShopOrder });
+        const newShop = shopRepository.create({ ...data, shopOrder: maxShopOrder });
         await shopRepository.save(newShop);
-        return newShop;
+        return { ...newShop, success: true };
     } else {
         return {
             msg: "創建項已存在",
@@ -68,7 +67,7 @@ export async function createPartition(data) {
     if (!existingPartition) {
         const newPartition = partitionRepository.create({ ...data });
         await partitionRepository.save(newPartition);
-        return newPartition;
+        return { ...newPartition, success: true };
     } else {
         return {
             msg: "創建項已存在",
@@ -79,17 +78,21 @@ export async function createPartition(data) {
 
 export async function updateShop(shopId, data) {
     const existingShop = await shopRepository.createQueryBuilder()
-    .where("shop.shopName = :shopName", { shopName: data.shopName })
-    .orWhere("shop.shopCode = :shopCode", { shopCode: data.shopCode })
-    .getOne()
+        .where("shop.shopName = :shopName", { shopName: data.shopName })
+        .orWhere("shop.shopCode = :shopCode", { shopCode: data.shopCode })
+        .getOne()
 
     if (!existingShop) {
         return shopRepository
-        .createQueryBuilder()
-        .update(Shop)
-        .set({ ...data })
-        .where("shop.shopId = :shopId", { shopId })
-        .execute()
+            .createQueryBuilder()
+            .update(Shop)
+            .set({ ...data })
+            .where("shop.shopId = :shopId", { shopId })
+            .execute()
+            .then((result) => {
+                return { success: true, data: result };
+            })
+            
     } else {
         return {
             msg: "已存在重複的店舖",
@@ -105,6 +108,10 @@ export function deleteShop(shopId) {
         .from(Shop)
         .where("shop.shopId = :shopId", { shopId })
         .execute()
+        .then(() => { return { success: true } })
+        .catch((err) => { 
+            return Promise.reject({ success: false, message: err.message })
+        })
 }
 
 export function deletePartition(id) {
@@ -114,23 +121,34 @@ export function deletePartition(id) {
         .from(Partition)
         .where("id = :id", { id })
         .execute()
+        .then(() => { return { success: true } })
+        .catch((err) => { 
+            return Promise.reject({ success: false, message: err.message })
+        })
 }
 
 export function readBindProduct(options) {
     return shopProductRepository
-    .createQueryBuilder()
-    .where("shopId = :shopId", options)
-    .getMany()
+        .createQueryBuilder()
+        .where("shopId = :shopId", options)
+        .getMany()
+        .then((result) => {
+            return { success: true, data: result };
+        })
 }
 
-export async function bindProductTOShop(shopId,productList) {
+export async function bindProductTOShop(shopId, productList) {
     await deleteShopPartition(shopId)
-    return shopProductRepository 
-    .createQueryBuilder()
-    .insert()
-    .into(ShopProduct)
-    .values(productList)
-    .execute();
+    return shopProductRepository
+        .createQueryBuilder()
+        .insert()
+        .into(ShopProduct)
+        .values(productList)
+        .execute()
+        .then(() => { return { success: true } })
+        .catch((err) => { 
+            return Promise.reject({ success: false, message: err.message })
+        })
 }
 
 async function deleteShopPartition(shopId) {
@@ -140,16 +158,25 @@ async function deleteShopPartition(shopId) {
         .from(ShopProduct)
         .where("shopId = :shopId", { shopId })
         .execute()
+        .then(() => { return { success: true } })
+        .catch((err) => { 
+            return Promise.reject({ success: false, message: err.message })
+        })
 }
 
 export async function setShopOrder(shopList) {
     return shopRepository
-    .createQueryBuilder()
-    .update(Shop)
-    .set({ shopOrder: () => "CASE shopId " + 
-        shopList.map(shop => `WHEN ${shop.shopId} THEN '${shopList.shopOrder}'`).join(' ') + 
-        " END"
-    })
-    .whereInIds(shopList.map(shop => shop.shopId))
-    .execute();
+        .createQueryBuilder()
+        .update(Shop)
+        .set({
+            shopOrder: () => "CASE shopId " +
+                shopList.map(shop => `WHEN ${shop.shopId} THEN '${shopList.shopOrder}'`).join(' ') +
+                " END"
+        })
+        .whereInIds(shopList.map(shop => shop.shopId))
+        .execute()
+        .then(() => { return { success: true } })
+        .catch((err) => { 
+            return Promise.reject({ success: false, message: err.message })
+        })
 }

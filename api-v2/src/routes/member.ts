@@ -11,11 +11,11 @@ router.post('/login', userModifyMethod.login);
 
 router.post('/logout', userModifyMethod.logout);
 
-router.post('/update', userModifyMethod.update);
+router.post('/updateMember', userModifyMethod.updateMember);
 
-router.post('/delete', userModifyMethod.delete);
+router.post('/deleteMember', userModifyMethod.deleteMember);
 
-router.post('/read', userModifyMethod.read);
+router.post('/readMember', userModifyMethod.readMember);
 
 // router.post('/readMember', userModifyMethod.readMember);
 
