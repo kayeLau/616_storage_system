@@ -170,7 +170,7 @@ export async function setShopOrder(shopList) {
         .update(Shop)
         .set({
             shopOrder: () => "CASE shopId " +
-                shopList.map(shop => `WHEN ${shop.shopId} THEN '${shopList.shopOrder}'`).join(' ') +
+                shopList.map(shop => `WHEN ${shop.shopId} THEN '${shop.shopOrder}'`).join(' ') +
                 " END"
         })
         .whereInIds(shopList.map(shop => shop.shopId))

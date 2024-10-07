@@ -1,4 +1,3 @@
-import { promises } from 'dns';
 import AppDataSource from '../data-source';
 import { Product } from '../entity/Product';
 import { ShopProduct } from '../entity/ShopProduct';

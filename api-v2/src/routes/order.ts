@@ -5,25 +5,25 @@ const OrderModifyMethod = require('../controllers/order_controller')
 
 const orderModifyMethod = new OrderModifyMethod()
 
-router.post('/getOrderList',orderModifyMethod.getOrderList)
+router.post('/readOrder',orderModifyMethod.readOrder)
 
-router.post('/getOrderDetail',orderModifyMethod.getOrderDetail)
+router.post('/readOrderDetail',orderModifyMethod.readOrderDetail)
 
-router.post('/createOrder',orderModifyMethod.postCreateOrder)
+router.post('/createOrder',orderModifyMethod.createOrder)
 
-router.post('/deleteOrder',orderModifyMethod.postDeleteOrder)
+// router.post('/deleteOrder',orderModifyMethod.deleteOrder)
 
-router.post('/createAdditionOrderItem',orderModifyMethod.postAdditionOrder)
+// router.post('/createAdditionOrder',orderModifyMethod.createAdditionOrder)
 
-router.post('/updateOrderDetailAssignQuantity',orderModifyMethod.postupdateOrderDetailAssignQuantity)
+// router.post('/updateOrderDetailAssignQuantity',orderModifyMethod.updateOrderDetailAssignQuantity)
 
-router.post('/checkOrderRepeated',orderModifyMethod.postCheckOrderRepeated)
+// router.post('/checkOrderRepeated',orderModifyMethod.CheckOrderRepeated)
 
-router.post('/exportDailyMeetSummary',orderModifyMethod.postExportDailyMeetSummary)
+// router.post('/exportDailyMeetSummary',orderModifyMethod.ExportDailyMeetSummary)
 
-router.post('/getDailyOrderStatus',orderModifyMethod.getDailyOrderStatus)
+// router.post('/getDailyOrderStatus',orderModifyMethod.getDailyOrderStatus)
 
-router.post('/postHistoryOrder',orderModifyMethod.postHistoryOrder)
+// router.post('/readHistoryOrder',orderModifyMethod.readHistoryOrder)
 
 
 module.exports = router;

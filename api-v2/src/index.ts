@@ -26,10 +26,10 @@ const startApp = async () => {
 startApp();
 
 // middleware
-// const auth = require('./middleware/auth')
+const auth = require('./middleware/auth')
 // const rateLimiter = require('./middleware/rateLimiter')
 // const helmet = require('helmet')
-// app.use(auth)
+app.use(auth)
 // app.use(helmet())
 // app.use(rateLimiter)
 
@@ -37,12 +37,12 @@ startApp();
 const usersRouter = require('./routes/member');
 const shopsRouter = require('./routes/shop')
 const productsRouter = require('./routes/product')
-// const ordersRouter = require('./routes/order')
+const ordersRouter = require('./routes/order')
 const settingRouter = require('./routes/setting')
 app.use('/member', usersRouter);
 app.use('/shop',shopsRouter)
 app.use('/product',productsRouter)
-// app.use('/orders',ordersRouter)
+app.use('/order',ordersRouter)
 app.use('/setting',settingRouter)
 
 // error handler

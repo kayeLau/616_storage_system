@@ -1,9 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column ,ManyToOne, JoinColumn} from "typeorm"
+import { Shop } from "./Shop"
 
 @Entity()
 export class Order {
 
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     id: string
 
     @Column()
@@ -13,16 +14,16 @@ export class Order {
     orderUserId: string
 
     @Column()
-    orderUserName: number
+    orderUserName: string
 
     @Column()
-    orderShopId: number
+    orderShopId: string
 
     @Column()
     department: number
     
     @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
-    craetDate: Date;
+    createDate: Date;
 
     @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updateDate: Date;
@@ -34,5 +35,9 @@ export class Order {
     orderIndex: number
 
     @Column()
-    state: string
+    state: number
+
+    @ManyToOne(() => Shop)
+    @JoinColumn({ name: "orderShopId", referencedColumnName: "shopId" }) // Join on a different column
+    shop: Shop;
 }

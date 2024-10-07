@@ -15,7 +15,7 @@ async function auth(req, res, next) {
     const token = req.headers['token'];
     const ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
     let userInfo = {}
-    if(req.path === '/users/login'){
+    if(req.path === '/member/login'){
         next()
         return
     }
