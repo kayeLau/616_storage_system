@@ -125,7 +125,7 @@ async function fatchList() {
     if (typeof props.getList === 'function') {
         await props.getList(props.params).then(res => {
             if (res.success) {
-                data.value = res.resource
+                data.value = res.data
                 _params.total = res.total
                 result = res
             } else {

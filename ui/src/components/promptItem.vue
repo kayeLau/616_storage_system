@@ -15,7 +15,7 @@
     </div>
 </template>
 <script setup>
-import { getProductList, updateProduct } from '../request/products';
+import { readProduct, updateProduct } from '../request/products';
 import { ref, onMounted } from 'vue';
 
 let productOptions = ref([])
@@ -27,11 +27,11 @@ function getProducts() {
         size: 999,
         page: 1
     }
-    getProductList(params).then(res => {
+    readProduct(params).then(res => {
         productOptions.value = []
         promptItems.value = []
         if (res.success) {
-            res.resource.forEach(item => {
+            res.data.forEach(item => {
                 if (item.prompt === 0) {
                     productOptions.value.push({
                         value: item.productId,

@@ -18,7 +18,7 @@
 <script setup>
 import { reactive , defineProps , computed , defineEmits} from "vue";
 import draggable from "vuedraggable";
-import { getShopList, postSetShopOrder } from '../request/shops';
+import { readShop, setShopOrder } from '../request/shops';
 
 const props = defineProps({
     shopOrderDialogVisible:Boolean
@@ -49,17 +49,17 @@ const onEnd = () => {
             shopOrder:index
         }
     })
-    postSetShopOrder({shopList}).then(res => {
+    setShopOrder({shopList}).then(res => {
         if (res.success) {
-            console.log(res.resource)
+            console.log(res.data)
         }
     })
 };
 
 function fetchShopList() {
-    getShopList({ size: 999, page: 1 }).then(res => {
+    readShop({ size: 999, page: 1 }).then(res => {
         if (res.success) {
-            state.list = res.resource.map(item => {
+            state.list = res.data.map(item => {
                 return {
                     name: item.shopName,
                     id: item.shopId

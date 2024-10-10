@@ -1,16 +1,16 @@
 import request from '@/utils/request'
 
-export function getOrderList(data){
+export function readMember(data){
     return request({
-        url: '/orders/getOrderList',
+        url: '/order/readOrder',
         method: 'post',
         data,
       });
 }
 
-export function getOrderDetail(data){
+export function readOrderDetail(data){
     return request({
-        url: '/orders/getOrderDetail',
+        url: '/order/readOrderDetail',
         method: 'post',
         data,
       });
@@ -18,7 +18,7 @@ export function getOrderDetail(data){
 
 export function createOrder(data){
   return request({
-      url: '/orders/createOrder',
+      url: '/order/createOrder',
       method: 'post',
       data,
     });
@@ -26,7 +26,7 @@ export function createOrder(data){
 
 export function createAdditionOrderItem(data){
   return request({
-      url: '/orders/createAdditionOrderItem',
+      url: '/order/createAdditionOrderItem',
       method: 'post',
       data,
     });
@@ -34,15 +34,15 @@ export function createAdditionOrderItem(data){
 
 export function checkOrderRepeated(data){
   return request({
-      url: '/orders/checkOrderRepeated',
+      url: '/order/checkOrderRepeated',
       method: 'post',
       data,
     });
 }
 
-export function updateOrderDetailAssignQuantity(data){
+export function updateAssignQuantity(data){
   return request({
-      url: '/orders/updateOrderDetailAssignQuantity',
+      url: '/order/updateAssignQuantity',
       method: 'post',
       data,
     });
@@ -56,7 +56,7 @@ export function deleteOrder(data){
     });
 }
 
-export function postExportDailyMeetSummary(data){
+export function exportDailyMeetSummary(data){
   return request({
       url: '/orders/exportDailyMeetSummary',
       method: 'post',

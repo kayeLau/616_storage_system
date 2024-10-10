@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function getProductList(data){
+export function readProduct(data){
     return request({
-        url: '/products/getProductList',
+        url: '/product/readProduct',
         method: 'post',
         data,
       });
@@ -10,7 +10,7 @@ export function getProductList(data){
 
 export function createProduct(data){
   return request({
-      url: '/products/createProduct',
+      url: '/product/createProduct',
       method: 'post',
       data,
     });
@@ -18,7 +18,7 @@ export function createProduct(data){
 
 export function updateProduct(data){
   return request({
-      url: '/products/updateProduct',
+      url: '/product/updateProduct',
       method: 'post',
       data,
     });
@@ -26,7 +26,7 @@ export function updateProduct(data){
 
 export function deleteProduct(data){
   return request({
-      url: '/products/deleteProduct',
+      url: '/product/deleteProduct',
       method: 'post',
       data,
     });

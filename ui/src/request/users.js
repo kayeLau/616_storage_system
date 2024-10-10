@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function getUsersList(data){
+export function readMember(data){
     return request({
-        url: '/users/getUsersList',
+        url: '/member/readMember',
         method: 'post',
         data,
       });
@@ -10,7 +10,7 @@ export function getUsersList(data){
 
 export function login(data){
   return request({
-      url: '/users/login',
+      url: '/member/login',
       method: 'post',
       data,
     });
@@ -18,7 +18,7 @@ export function login(data){
 
 export function logout(data){
   return request({
-      url: '/users/logout',
+      url: '/member/logout',
       method: 'post',
       data,
     });
@@ -26,23 +26,23 @@ export function logout(data){
 
 export function register(data){
   return request({
-      url: '/users/register',
+      url: '/member/register',
       method: 'post',
       data,
     });
 }
 
-export function updateUserInfo(data){
+export function updateMember(data){
   return request({
-      url: '/users/update',
+      url: '/member/updateMember',
       method: 'post',
       data,
     });
 }
 
-export function deleteUser(data){
+export function deleteMember(data){
   return request({
-      url: '/users/deleteUser',
+      url: '/user/deleteMember',
       method: 'post',
       data,
     });

@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-card class="Ktable-container">
-      <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params" :getList="getProductList"
+      <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params" :getList="readProduct"
         :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
     </el-card>
     <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
@@ -11,7 +11,7 @@
   </div>
 </template>
 <script setup>
-import { getProductList, updateProduct, createProduct, deleteProduct } from '../request/products'
+import { readProduct, updateProduct, createProduct, deleteProduct } from '../request/products'
 import { freezersNumDict, classifyDict, departmentDict, dictToOptions, productDisable, productSummary } from '../request/dict'
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
@@ -266,10 +266,10 @@ function excelToJson(file){
 }
 
 function exportProductExcel() {
-  getProductList({ size: 999, page: 1 }).then(res => {
+  readProduct({ size: 999, page: 1 }).then(res => {
     if (res.success) {
       let jsonData = []
-      jsonData = res.resource.map(item => {
+      jsonData = res.data.map(item => {
         return [
           productDisable[item.disable],
           item.productId,

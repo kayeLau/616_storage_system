@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function getSettingList(data){
+export function readSetting(data){
     return request({
-        url: '/setting/getSettingList',
+        url: '/setting/read',
         method: 'post',
         data,
       });
@@ -10,7 +10,7 @@ export function getSettingList(data){
 
 export function updateSetting(data){
   return request({
-      url: '/setting/updateSetting',
+      url: '/setting/update',
       method: 'post',
       data,
     });

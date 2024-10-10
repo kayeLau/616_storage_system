@@ -53,7 +53,7 @@
     <div class="pagination">
       <div>
         <div>
-          <el-button v-if="userInfo.auth === -1" type="primary" @click="updateAssignQuantity()" icon="Coin" plain>按下單數量分配</el-button>
+          <el-button v-if="userInfo.auth === -1" type="primary" @click="sumbitAssignQuantity()" icon="Coin" plain>按下單數量分配</el-button>
           <el-button v-if="userInfo.auth === -1 || userInfo.auth === 2" type="success" icon="Coin" plain @click="submitOrderItem">提交</el-button>
           <el-button v-if="userInfo.auth === -1 || userInfo.auth === 2" type="success" @click="insertOrderItem" icon="CirclePlus" plain>新增</el-button>
         </div>
@@ -66,7 +66,7 @@
 
 <script setup>
 import { defineProps, reactive, ref, watch, defineEmits, computed } from 'vue';
-import { updateOrderDetailAssignQuantity, createAdditionOrderItem } from '../request/orders';
+import { updateAssignQuantity, createAdditionOrderItem } from '../request/orders';
 import { orderStateDict, orderMode, orderStateColor, freezersNumDict, dictToFilterOptions } from '../request/dict';
 import { ElMessage } from 'element-plus'
 import { getStorge } from '../utils/auth'
@@ -223,7 +223,7 @@ async function addAdditionOrderItem(orderList) {
 }
 
 // 提交分配數量
-async function updateAssignQuantity(row) {
+async function sumbitAssignQuantity(row) {
   let assignQuantitys = generateAssignQuantityParams(row)
   if (!assignQuantitys.length) {
     ElMessage({ type: 'warning', message: '請至少選擇一個目標' })
@@ -231,7 +231,7 @@ async function updateAssignQuantity(row) {
   }
   let orderCode = _data.orderCode
   let orderId = _data.id
-  await updateOrderDetailAssignQuantity({ assignQuantitys, orderId , orderCode}).then(res => {
+  await updateAssignQuantity({ assignQuantitys, orderId , orderCode}).then(res => {
     if (res.success) {
       ElMessage({ type: 'success', message: '操作成功：資料已存入數據庫' })
     } else {

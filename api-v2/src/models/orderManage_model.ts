@@ -124,8 +124,8 @@ export async function createOrder(data) {
 }
 
 // 倉庫追加時用
-export function createOrderDetail(orderList) {
-    orderRepository.save(orderList)
+export async function createOrderDetail(orderList) {
+    await orderRepository.save(orderList)
     return { success: true }
 }
 

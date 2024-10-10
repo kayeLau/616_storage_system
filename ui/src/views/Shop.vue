@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-card class="Ktable-container">
-      <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params" :getList="getShopList"
+      <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params" :getList="readShop"
         :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
     </el-card>
     <bandList :dialogVisible="bandListDialogVisible" @closeDialog="manageBandProduct" :shopId="shopId"></bandList>
@@ -14,7 +14,7 @@
   </div>
 </template>
 <script setup>
-import { getShopList, updateShop, createShop, deleteShop, getPartitionList, createPartition, deletePartitionItem } from '../request/shops';
+import { readShop, updateShop, createShop, deleteShop, readPartition, createPartition, deletePartition } from '../request/shops';
 import { shopType, dictToOptions } from '../request/dict';
 import bandList from '../components/bandList.vue';
 import Ktable from '../components/table.vue';
@@ -78,9 +78,9 @@ const editFormRules = {
 }
 
 function getPartitionItems() {
-  getPartitionList().then(res => {
+  readPartition().then(res => {
     if (res.success) {
-      editFormColumns.value[3].options = res.resource.map(item => {
+      editFormColumns.value[3].options = res.data.map(item => {
         return {
           label: item.partitionName,
           value: item.id
@@ -90,7 +90,7 @@ function getPartitionItems() {
   })
 }
 function deleteSelectItem(partitionId) {
-  deletePartitionItem({ id: partitionId }).then(res => {
+  deletePartition({ id: partitionId }).then(res => {
     if (res.success) {
       JsonFormRef.value.resetFields(['shopPartition'])
       getPartitionItems()

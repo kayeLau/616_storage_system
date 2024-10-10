@@ -2,7 +2,7 @@
   <div>
     <el-card class="Ktable-container">
       <Ktable ref='KtableRef2' isExpand :columns="columns" :operations="operations" :params="params"
-        :tableRowClassName="tableRowClassName" :getList="getOrderList" :expandChange="expandChange"
+        :tableRowClassName="tableRowClassName" :getList="readMember" :expandChange="expandChange"
         :searchFormColumns="searchFormColumns" :customBtn="customBtn" :expandHeader="{}" :expandColumns="{}"
         :products="products" :expandRowKeys="expandRowKeys"></Ktable>
     </el-card>
@@ -31,9 +31,9 @@
 
 <script setup>
 import orderDetailList from '../components/orderDetailList.vue';
-import { getProductList } from '../request/products';
-import { getShopList } from '../request/shops'
-import { getOrderList, getDailyOrderStatus, postExportDailyMeetSummary, postHistoryOrder, getOrderDetail } from '../request/orders';
+import { readProduct } from '../request/products';
+import { readShop } from '../request/shops'
+import { readMember, getDailyOrderStatus, exportDailyMeetSummary, postHistoryOrder, readOrderDetail } from '../request/orders';
 import { departmentDict, orderStateDict, freezersNumDict } from '../request/dict';
 import { exportExcel } from '../utils/export';
 import Ktable from '../components/table.vue';
@@ -45,12 +45,12 @@ const userInfo = computed(() => {
   let user = getStorge('userInfo')
   return user ? JSON.parse(user) : {}
 })
-// getshopList
+// readShop
 async function fatchShopList() {
   let result = []
-  await getShopList({ size: 999, page: 1 }).then(res => {
+  await readShop({ size: 999, page: 1 }).then(res => {
     if (res.success) {
-      result = res.resource.map(item => {
+      result = res.data.map(item => {
         return { label: item.shopName, value: item.shopId }
       })
     }
@@ -119,7 +119,7 @@ const customBtn = ref([
             fetchDailyOrderStatus()
           }, type: "date"
         }),
-        h(ElButton, { onclick: exportDailyAllSummary, type: 'success', plain: true }, '確定')
+        h(ElButton, { onclick: exportAllSummary, type: 'success', plain: true }, '確定')
       ])
     },
   },
@@ -138,7 +138,7 @@ const customBtn = ref([
             fetchDailyOrderStatus()
           }, type: "date"
         }),
-        h(ElButton, { style: { margin: '0px' }, onclick: exportDailyMeetSummary, type: 'success', plain: true }, '確定')
+        h(ElButton, { style: { margin: '0px' }, onclick: exportMeatSummary, type: 'success', plain: true }, '確定')
       ])
     },
   },
@@ -151,13 +151,13 @@ const customBtn = ref([
   }
 ])
 
-function exportDailyMeetSummary() {
-  postExportDailyMeetSummary({ exportDate: defaultExportDate.value, exportType: 1 }).then(res => {
+function exportMeatSummary() {
+  exportDailyMeetSummary({ exportDate: defaultExportDate.value, exportType: 1 }).then(res => {
     if (res.success) {
       const date = new Date()
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
-      let shopName = res.resource.shopName
-      let products = res.resource.products
+      let shopName = res.data.shopName
+      let products = res.data.products
       let jsonData = products.map((product) => {
         let summary = product.orderItems.reduce((prev, acc) => prev + acc) + product.unit
         let row = shopName.map((item, columnIndex) => {
@@ -177,12 +177,12 @@ function exportDailyMeetSummary() {
   })
 }
 
-function exportDailyAllSummary() {
-  postExportDailyMeetSummary({ exportDate: defaultExportDate.value, exportType: 0 }).then(res => {
+function exportAllSummary() {
+  exportDailyMeetSummary({ exportDate: defaultExportDate.value, exportType: 0 }).then(res => {
     if (res.success) {
       const date = new Date()
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
-      let products = res.resource.products
+      let products = res.data.products
       if (userInfo.value.auth === 3) {
         products = products.filter(item => item.freezersNum === 1 || item.freezersNum === 3 || item.freezersNum === 4)
       }
@@ -230,9 +230,9 @@ async function exportOrderExcel(index, row) {
   const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
   const todayF = String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear()
   let children = []
-  await getOrderDetail({ orderId: row.id }).then(res => {
+  await readOrderDetail({ orderId: row.id }).then(res => {
     if (res.success) {
-      children = res.resource
+      children = res.data
     }
   })
   const shipping = {
@@ -308,12 +308,12 @@ const ODparams = {
 
 let orderDetailShow = ref(false)
 function showDetailHandle(index, row) {
-  getOrderDetail({ orderId: row.id }).then(res => {
+  readOrderDetail({ orderId: row.id }).then(res => {
     if (res.success) {
       currentRow.value = {
         orderCode: row.orderCode,
         id: row.id,
-        children: res.resource
+        children: res.data
       }
       orderDetailShow.value = !orderDetailShow.value
     }
@@ -337,9 +337,9 @@ let historyParams = ref({})
 let expandRowKeys = ref([])
 async function expandChange(row, expandRow) {
   if (expandRow.length) {
-    await getOrderDetail({ orderId: row.id }).then(res => {
+    await readOrderDetail({ orderId: row.id }).then(res => {
       if (res.success) {
-        row.children = res.resource
+        row.children = res.data
       }
     })
     expandRowKeys.value = expandRow.map(item => item.id)
@@ -395,9 +395,9 @@ let loading = ref(false)
 async function refreshList() {
   loading.value = true
   await KtableRef2.value.fatchList()
-  await getOrderDetail({ orderId: currentRow.value.id }).then(res => {
+  await readOrderDetail({ orderId: currentRow.value.id }).then(res => {
     if (res.success) {
-      currentRow.value.children = res.resource
+      currentRow.value.children = res.data
     }
   })
   loading.value = false
@@ -411,10 +411,10 @@ function getProducts() {
     size: 999,
     page: 1
   }
-  getProductList(params).then(res => {
+  readProduct(params).then(res => {
     if (res.success) {
-      products.value = res.resource
-      productsOption = res.resource.map(item => {
+      products.value = res.data
+      productsOption = res.data.map(item => {
         return {
           value: item.productCode,
           label: item.productCode

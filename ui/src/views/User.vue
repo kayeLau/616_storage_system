@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-card class="Ktable-container">
-            <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params" :getList="getUsersList"
+            <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params" :getList="readMember"
                 :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
         </el-card>
         <el-drawer v-model="jsonFormShow" title="員工資料" direction="rtl">
@@ -14,8 +14,8 @@
 </template>
 
 <script setup>
-import { getShopList, getPartitionList, createPartition, deletePartitionItem } from '../request/shops'
-import { getUsersList, register, updateUserInfo, deleteUser } from '../request/users'
+import { readShop, readPartition, createPartition, deletePartition } from '../request/shops'
+import { readMember, register, updateMember, deleteMember } from '../request/users'
 import { authDict, dictToOptions } from '../request/dict'
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
@@ -99,7 +99,7 @@ function authChange(auth) {
     }
 }
 function deleteSelectItem(partitionId) {
-    deletePartitionItem({ id: partitionId }).then(res => {
+    deletePartition({ id: partitionId }).then(res => {
         if (res.success) {
             JsonFormRef.value.resetFields(['shopPartition'])
             getPartitionItems()
@@ -192,7 +192,7 @@ function createHandle() {
 
 function editHandle(index, row) {
     editFormModel.value = { ...row, auth: String(row.auth) }
-    JsonFormComfireCallBack.value = updateUserInfo
+    JsonFormComfireCallBack.value = updateMember
     authChange(editFormModel.value.auth)
     editFormColumns.value[0].disabled = true
     editFormColumns.value[1].disabled = true
@@ -200,7 +200,7 @@ function editHandle(index, row) {
 }
 
 function deleteHandle(index, row) {
-    deleteUser({ id: row.id }).then(res => {
+    deleteMember({ id: row.id }).then(res => {
         if (res.success) {
             KtableRef.value.fatchList()
         }
@@ -211,9 +211,9 @@ function deleteHandle(index, row) {
 //#region dict
 // 獲取分區分店字典
 async function getPartitionItems() {
-    await getPartitionList().then(res => {
+    await readPartition().then(res => {
         if (res.success) {
-            editFormColumns.value[4].options = res.resource.map(item => {
+            editFormColumns.value[4].options = res.data.map(item => {
                 return {
                     label: item.partitionName,
                     value: item.id
@@ -225,9 +225,9 @@ async function getPartitionItems() {
 getPartitionItems()
 // 獲取分店分店字典
 async function fatchShopList() {
-    await getShopList({ size: 999, page: 1 }).then(res => {
+    await readShop({ size: 999, page: 1 }).then(res => {
         if (res.success) {
-            const dict = res.resource.map(item => {
+            const dict = res.data.map(item => {
                 return {
                     label: item.shopName,
                     value: item.shopId

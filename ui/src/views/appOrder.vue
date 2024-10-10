@@ -39,7 +39,7 @@
 <script setup>
 import cart from '../components/cart.vue'
 import { ref, onMounted } from 'vue';
-import { getProductList } from '../request/products';
+import { readProduct } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
 import { classifyDict, classifySort } from '../request/dict';
 // import { createWs , getWs } from '../utils/ws';
@@ -97,9 +97,9 @@ async function getProducts() {
         size: 999,
         page: 1
     }
-    await getProductList(params).then(res => {
+    await readProduct(params).then(res => {
         if (res.success) {
-            res.resource.forEach(item => {
+            res.data.forEach(item => {
                 const classify = item.classify;
                 const classifyName = classifyDict[item.classify]
                 if (!products.value[classify]) {
@@ -137,8 +137,8 @@ const tabName = ref('')
 
 async function checkExistOrder() {
     await checkOrderRepeated().then(res => {
-        if (res.success && res.resource.children) {
-            res.resource.children.forEach(item => {
+        if (res.success && res.data.children) {
+            res.data.children.forEach(item => {
                 setOrderMap(item)
                 setProductListView(item)
             })

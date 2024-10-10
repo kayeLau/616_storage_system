@@ -11,8 +11,8 @@
     </div>
 </template>
 <script setup>
-import { bindProductToShop , getBindProductList } from '../request/shops';
-import { getProductList } from '../request/products';
+import { bindProductToShop , readBindProduct } from '../request/shops';
+import { readProduct } from '../request/products';
 import { freezersNumDict } from '../request/dict';
 import { onMounted , ref , defineProps , computed , defineEmits } from 'vue';
 import { ElMessage } from 'element-plus';
@@ -42,10 +42,10 @@ function getProducts() {
         size: 999,
         page: 1
     }
-    getProductList(params).then(res => {
+    readProduct(params).then(res => {
         if (res.success) {
             let _data = []
-            res.resource.forEach(item => {
+            res.data.forEach(item => {
                 if(!_data[item.freezersNum]){
                     _data[item.freezersNum] = {
                         id:item.freezersNum,
@@ -76,9 +76,9 @@ function getBindedProductList(){
         size: 999,
         page: 1
     }
-    getBindProductList(params).then(res => {
+    readBindProduct(params).then(res => {
         if(res.success){
-            let bandList = res.resource.map(item => item.productId)
+            let bandList = res.data.map(item => item.productId)
             treeRef.value.setCheckedKeys(bandList)
         }
     })
