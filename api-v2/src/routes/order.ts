@@ -15,11 +15,11 @@ router.post('/createOrder',orderModifyMethod.createOrder)
 
 // router.post('/createAdditionOrder',orderModifyMethod.createAdditionOrder)
 
-// router.post('/updateOrderDetailAssignQuantity',orderModifyMethod.updateOrderDetailAssignQuantity)
+router.post('/updateAssignQuantity',orderModifyMethod.updateAssignQuantity)
 
-// router.post('/checkOrderRepeated',orderModifyMethod.CheckOrderRepeated)
+router.post('/checkOrderRepeated',orderModifyMethod.checkOrderRepeated)
 
-// router.post('/exportDailyMeetSummary',orderModifyMethod.ExportDailyMeetSummary)
+router.post('/exportDailyMeetSummary',orderModifyMethod.exportDailyMeetSummary)
 
 // router.post('/getDailyOrderStatus',orderModifyMethod.getDailyOrderStatus)
 

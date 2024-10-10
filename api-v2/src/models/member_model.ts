@@ -77,6 +77,7 @@ export function readMember(options, size, page) {
 // }
 
 export async function toLogin(memberData) {
+    console.log(memberData)
     const targetUser = AppDataSource.getRepository(Member)
         .createQueryBuilder("member")
         .where("member.name = :name", { name: memberData.name })

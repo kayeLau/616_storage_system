@@ -5,14 +5,14 @@ export function optionsGenerater(options, table) {
         if (value === undefined || value === '' || value === null) continue;
         switch (key) {
             case 'updateDate':
-                conditions.push(`${table}.${key} BETWEEN :updateStart AND :updateEnd`)
+                conditions.push(` ${table}.${key} BETWEEN :updateStart AND :updateEnd `)
                 parameters[key] = {
                     updateStart: options[key][0],
                     updateEnd: options[key][1]
                 };
                 break
             case 'productName':
-                conditions.push(`${table}.${key} LIKE :${key}`)
+                conditions.push(` ${table}.${key} LIKE :${key} `)
                 parameters[key] = `%${value}%`;
                 break
             default:
@@ -23,7 +23,7 @@ export function optionsGenerater(options, table) {
                         parameters[`${key}${index}`] = val;
                     });
                 } else {
-                    conditions.push(`${table}.${key} = :${key}`);
+                    conditions.push(` ${table}.${key} = :${key} `);
                     parameters[key] = value;
                 }
                 break
