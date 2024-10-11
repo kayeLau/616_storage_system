@@ -3,10 +3,9 @@ import { Member } from '../entity/Member';
 import { optionsGenerater } from './base_model';
 const jwt = require('jsonwebtoken');
 const config = require('../config/development_config');
+const memberRepository = AppDataSource.getRepository(Member);
 
 export async function toRegister(data) {
-    const memberRepository = AppDataSource.getRepository(Member);
-
     const existingMember = await memberRepository
         .createQueryBuilder()
         .where("member.name = :name", { name: data.name })
@@ -25,7 +24,7 @@ export async function toRegister(data) {
 }
 
 export function updateMember(id, data) {
-    return AppDataSource.getRepository(Member)
+    return memberRepository
         .createQueryBuilder()
         .update(Member)
         .set({ ...data })
@@ -38,7 +37,7 @@ export function updateMember(id, data) {
 }
 
 export function deleteMember(id) {
-    return AppDataSource.getRepository(Member)
+    return memberRepository
         .createQueryBuilder()
         .delete()
         .from(Member)
@@ -50,9 +49,14 @@ export function deleteMember(id) {
         })
 }
 
-export function readMember(options, size, page) {
+export async function readMember(options, size, page) {
     const { conditions, parameters } = optionsGenerater(options, "member")
-    return AppDataSource.getRepository(Member)
+    const total = await memberRepository
+    .createQueryBuilder("member")
+    .where(conditions.join(" AND "), parameters)
+    .getCount();
+
+    return memberRepository
         .createQueryBuilder("member")
         .leftJoinAndSelect("member.partition", "partition")
         .where(conditions.join(" AND "), parameters)
@@ -65,20 +69,20 @@ export function readMember(options, size, page) {
                 data: result,
                 page,
                 size,
+                total
             };
         })
 }
 
 // function readMember(id) {
-//     return AppDataSource.getRepository(Member)
+//     return memberRepository
 //         .createQueryBuilder("member")
 //         .where("member.id = :id", id)
 //         .getOne()
 // }
 
 export async function toLogin(memberData) {
-    console.log(memberData)
-    const targetUser = AppDataSource.getRepository(Member)
+    const targetUser = memberRepository
         .createQueryBuilder("member")
         .where("member.name = :name", { name: memberData.name })
         .andWhere("member.password = :password", { password: memberData.password })

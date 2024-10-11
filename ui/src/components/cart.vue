@@ -73,20 +73,6 @@ const props = defineProps({
     orderMap: Object
 })
 
-// const emit = defineEmits(['orderDetailChange'])
-// function emitOrderDetailChange(product, type) {
-//     let _product = { ...product }
-//     if (type) {
-//         _product.orderQuantity++
-//     } else {
-//         _product.orderQuantity--
-//     }
-//     emit('orderDetailChange', _product)
-// }
-// const orderItems = computed(() => {
-//     return Object.keys(props.orderMap).length
-// })
-
 const orderList = computed(() => {
     return Object.values(props.orderMap).filter(item => item.orderQuantity !== 0 || item.checked === true || item.prompt === 1)
 })
@@ -119,10 +105,11 @@ async function comfireOrder() {
         if (res.success) {
             ElMessage({ type: 'success', message: '提交成功' })
             drawerSwitch.value = false
-            submitDisabled.value = false
         } else {
             ElMessage({ type: 'error', message: '提交失敗' })
         }
+    }).finally(() => {
+        submitDisabled.value = false
     })
 }
 

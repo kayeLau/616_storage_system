@@ -7,6 +7,11 @@ const shopProductRepository = AppDataSource.getRepository(ShopProduct);
 
 export async function readProduct(options, size, page) {
     const { conditions, parameters } = optionsGenerater(options, "product")
+    const total = await productRepository
+    .createQueryBuilder("product")
+    .where(conditions.join(" AND "), parameters)
+    .getCount();
+
     return productRepository
     .createQueryBuilder()
     .where(conditions.join(" AND "), parameters)
@@ -20,6 +25,7 @@ export async function readProduct(options, size, page) {
             data: result,
             page,
             size,
+            total
         };
     })
 }

@@ -137,8 +137,8 @@ const tabName = ref('')
 
 async function checkExistOrder() {
     await checkOrderRepeated().then(res => {
-        if (res.success && res.data.children) {
-            res.data.children.forEach(item => {
+        if (res.success && res.data) {
+            res.data.detail.forEach(item => {
                 setOrderMap(item)
                 setProductListView(item)
             })

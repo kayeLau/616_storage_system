@@ -24,9 +24,9 @@ export function createOrder(data){
     });
 }
 
-export function createAdditionOrderItem(data){
+export function createAdditionOrder(data){
   return request({
-      url: '/order/createAdditionOrderItem',
+      url: '/order/createAdditionOrder',
       method: 'post',
       data,
     });

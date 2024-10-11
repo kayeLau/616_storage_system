@@ -89,7 +89,7 @@ module.exports = class order {
     }
 
     // 管理員追加訂單
-    additionOrder(req, res, next) {
+    createAdditionOrder(req, res, next) {
         const userInfo = req.userInfo
         let orderList = req.body.orderList
         if (Array.isArray(orderList) && orderList.length) {
@@ -132,11 +132,12 @@ module.exports = class order {
         const data = req.body.assignQuantitys
         const userInfo = req.userInfo
         const orderId = req.body.orderId
-        if (Array.isArray(data)) {
+        try {
             await updateAssignQuantity(data, userInfo)
             await setOrderState(orderId)
-        } else {
-            next(new Error('voild input'))
+            res.json({success:true})
+        } catch(err) {
+            next(err)
         }
     }
 

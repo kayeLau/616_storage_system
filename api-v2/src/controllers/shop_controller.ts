@@ -25,7 +25,10 @@ module.exports = class Shop {
             })
             res.json({
                 success: true,
-                data: shopList
+                data: shopList,
+                total:result.total,
+                page:result.page,
+                size:result.size
             })
         })
     }

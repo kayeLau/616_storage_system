@@ -66,7 +66,7 @@
 
 <script setup>
 import { defineProps, reactive, ref, watch, defineEmits, computed } from 'vue';
-import { updateAssignQuantity, createAdditionOrderItem } from '../request/orders';
+import { updateAssignQuantity, createAdditionOrder } from '../request/orders';
 import { orderStateDict, orderMode, orderStateColor, freezersNumDict, dictToFilterOptions } from '../request/dict';
 import { ElMessage } from 'element-plus'
 import { getStorge } from '../utils/auth'
@@ -93,6 +93,7 @@ const orderInfoMap = computed(() => {
   _temp.forEach(item => {
     map[item.productId] = item
   })
+  console.log(_temp)
   return map
 })
 
@@ -213,7 +214,7 @@ async function submitOrderItem() {
 
 async function addAdditionOrderItem(orderList) {
   if (!orderList.length) { return }
-  await createAdditionOrderItem({ orderList }).then(res => {
+  await createAdditionOrder({ orderList }).then(res => {
     if (res.success) {
       ElMessage({ type: 'success', message: '操作成功：資料已存入數據庫' })
     } else {

@@ -1,20 +1,20 @@
 <template>
     <div style="height: 100%;">
         <el-form :inline="true" :model="_params" class="form-inline" v-if="searchFormColumns.length">
-            <el-form-item v-for='(item, index) of _searchFormColumns' :label="item.label" :key="index">
-                <el-input v-if='item.type === "input"' v-model="_params[item.prop]" clearable style="width: 120px;" />
-                <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable style="width: 140px;"
-                    placeholder="請選擇">
-                    <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value" />
-                </el-select>
-                <el-date-picker v-if='item.type === "datePicker"' v-model="_params[item.prop]" type="daterange"
-                    style="width: 250px;" range-separator="至" start-placeholder="開始時間" end-placeholder="結束時間" clearable
-                    value-format="YYYY-MM-DD HH:mm:ss"
-                    :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]" />
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" size="small" @click="fatchList">查詢</el-button>
-            </el-form-item>
+                <el-form-item v-for='(item, index) of _searchFormColumns' :label="item.label" :key="index">
+                    <el-input v-if='item.type === "input"' v-model="_params[item.prop]" clearable style="width: 120px;" />
+                    <el-select v-if='item.type === "select"' v-model="_params[item.prop]" clearable style="width: 120px;"
+                        placeholder="請選擇">
+                        <el-option v-for="opt in item.options" :key="opt.value" :label="opt.label" :value="opt.value" />
+                    </el-select>
+                    <el-date-picker v-if='item.type === "datePicker"' v-model="_params[item.prop]" type="daterange"
+                        style="width: 250px;" range-separator="至" start-placeholder="開始時間" end-placeholder="結束時間" clearable
+                        value-format="YYYY-MM-DD HH:mm:ss"
+                        :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]" />
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" size="small" @click="fatchList">查詢</el-button>
+                </el-form-item>
         </el-form>
         <!-- tabel -->
         <el-table :data="data" class="table" header-cell-class-name="table-header" row-key="id" :expand-row-keys="expandRowKeys"
@@ -179,7 +179,8 @@ onMounted(() => {
 }
 .form-inline {
     padding-left: 8px;
-    overflow: hidden;
+    overflow-x: hidden;
+    display: flex;
 }
 </style>
 <style scoped>

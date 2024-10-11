@@ -13,7 +13,7 @@ router.post('/createOrder',orderModifyMethod.createOrder)
 
 // router.post('/deleteOrder',orderModifyMethod.deleteOrder)
 
-// router.post('/createAdditionOrder',orderModifyMethod.createAdditionOrder)
+router.post('/createAdditionOrder',orderModifyMethod.createAdditionOrder)
 
 router.post('/updateAssignQuantity',orderModifyMethod.updateAssignQuantity)
 

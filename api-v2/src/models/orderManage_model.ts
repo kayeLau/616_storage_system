@@ -21,7 +21,13 @@ async function getOrderAndGroupBy(options, size, page) {
         .addSelect('MAX(subOrder.orderIndex)', 'maxOrderIndex')
         .groupBy('subOrder.orderCode')
 
-    const results = await orderRepository
+    const total = await orderRepository
+    .createQueryBuilder("order")
+    .where(conditions.join(" AND "), parameters)
+    .innerJoin(`(${subQuery.getQuery()})`, "maxOrders", "maxOrders.orderCode = order.orderCode AND maxOrders.maxOrderIndex = order.orderIndex")
+    .getCount();
+
+    return orderRepository
         .createQueryBuilder("order")
         .select([
             'order.id AS id',
@@ -43,9 +49,13 @@ async function getOrderAndGroupBy(options, size, page) {
         .orderBy("order.updateDate", "DESC")
         .skip((page - 1) * size)
         .take(size)
-        .getRawMany();
-
-    return results;
+        .getRawMany()
+        .then(result => {
+            return {
+                data: result,
+                total
+            }
+        })
 }
 
 // 獲取訂單
@@ -53,7 +63,8 @@ export async function readOrder(options, size, page) {
     return getOrderAndGroupBy(options, size, page).then((result) => {
         return {
             success: true,
-            data: result,
+            data: result.data,
+            total:result.total
         };
     })
 }
@@ -65,7 +76,7 @@ export async function readOrderDetail(orderId) {
         .select([
             'orderDetail.id AS id',
             'orderDetail.orderId AS orderId',
-            'orderDetail.productId AS orderId',
+            'orderDetail.productId AS productId',
             'orderDetail.orderQuantity AS orderQuantity',
             'orderDetail.assignQuantity AS assignQuantity',
             'orderDetail.updateDate AS updateDate',
@@ -73,7 +84,8 @@ export async function readOrderDetail(orderId) {
             'orderDetail.status AS status',
             'orderDetail.remark AS remark',
             'orderDetail.lastEditBy AS lastEditBy',
-            'product.productName AS productName'
+            'product.productName AS productName',
+            'product.productCode AS productCode'
         ])
         .innerJoin(Product, 'product', 'orderDetail.productId = product.productId')
         .where('orderDetail.orderId = :orderId', { orderId })
@@ -110,16 +122,17 @@ export async function createOrder(data) {
     });
     await orderRepository.save(newOrder);
     const orderList = data.orderList.map(item => {
-        return [
-            data.id, // 訂單ID
-            item.productId,
-            item.orderQuantity,
-            item.orderMode,
-            data.updateDate,
-            data.orderUserName // 最後修改人ID
-        ]
+        return {
+            status: 0,
+            orderId: newOrder.id, // 訂單ID
+            productId: item.productId,
+            orderQuantity: item.orderQuantity,
+            orderMode: item.orderMode,
+            remark: item.remark,
+            lastEditBy: data.orderUserName // 最後修改人ID
+        }
     })
-    await orderRepository.save(orderList);
+    await orderDetailRepository.save(orderList);
     return { success: true }
 }
 
@@ -134,11 +147,11 @@ export async function checkOrderRepeated(options) {
     const { conditions, parameters } = optionsGenerater(options, "order");
     const existingOrder = await orderRepository
         .createQueryBuilder()
-        .where(conditions.join('AND'), parameters )
+        .where(conditions.join('AND'), parameters)
         .orderBy("order.orderIndex", "DESC")
         .getOne()
 
-    if(existingOrder){
+    if (existingOrder) {
         return readOrderDetail(existingOrder.id).then(result => {
             return {
                 success: true,
@@ -148,8 +161,8 @@ export async function checkOrderRepeated(options) {
                 }
             }
         })
-    }else{
-        return { success: true , data:null , msg:"當前沒有訂單"}
+    } else {
+        return { success: true, data: null, msg: "當前沒有訂單" }
     }
 }
 
@@ -186,14 +199,13 @@ export function updateAssignQuantity(list, userInfo) {
 // 設置訂單狀態
 export async function setOrderState(orderId) {
     let orderState = 0
-    const incompleteOrderItem = await orderDetailRepository
-        .createQueryBuilder()
-        .select("COUNT(*)", "count")
-        .from(OrderDetail, "orderDetail")
-        .where("orderDetail.orderId = :orderId AND orderDetail.status = 0", { orderId: true })
-        .getRawOne();
+    console.log()
+    const incompleteOrder = await orderDetailRepository
+        .createQueryBuilder("orderDetail")
+        .where("orderDetail.orderId = :orderId AND orderDetail.status = :status", { orderId , status: 0})
+        .getCount();
 
-    if (incompleteOrderItem.length) {
+    if (incompleteOrder > 0) {
         orderState = 1
     }
 
@@ -201,7 +213,7 @@ export async function setOrderState(orderId) {
         .createQueryBuilder()
         .update(Order)
         .set({ state: orderState })
-        .where("orderId = :orderId", { orderId })
+        .where("order.id = :id", { id:orderId })
         .execute()
         .then(() => { return { success: true } })
         .catch((err) => {
@@ -219,7 +231,7 @@ interface summaryProductItem {
 export async function exportOrderMeat(options, size, page, summaryProductIdsMap, shopsList) {
     const order = await getOrderAndGroupBy(options, size, page)
     const summaryProductIds = Object.keys(summaryProductIdsMap)
-    const orderDetail = order.map((item) => {
+    const orderDetail = order.data.map((item) => {
         return orderDetailRepository
             .createQueryBuilder()
             .innerJoin(Shop, 'shop', 'order')
