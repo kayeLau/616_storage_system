@@ -4,7 +4,7 @@
             <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params" :getList="readMember"
                 :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
         </el-card>
-        <el-drawer v-model="jsonFormShow" title="員工資料" direction="rtl">
+        <el-drawer v-model="jsonFormShow" title="員工資料" direction="rtl" :style="{ minWidth: '300px' }">
             <jsonForm ref='JsonFormRef' :formModel="editFormModel" :formColumns="editFormColumns"
                 :comfireCallBack="JsonFormComfireCallBack" :rules="editFormRules" @sumbitSuccess="refreshList"
                 @addSelectItem="addSelectItem">
@@ -124,17 +124,9 @@ const authFormatter = (row, column) => {
 }
 
 const columns = [
-    // {
-    //     props: 'online', label: '狀態', render: (h,row) => {
-    //         const state = onlineStateDict[row.online]
-    //         const stClass = row.online === 0 ? 'offline' : 'online'
-    //         return h('span',{class:stClass},state)
-    //     }
-    // },
     { props: 'name', label: '用戶名稱' },
-    // { props: 'password', label: '用戶密碼' },
     { props: 'auth', label: '用戶角色', formatter: authFormatter },
-    { props: 'shopPartitionName', label: '所屬分區' },
+    { props: 'partitionName', label: '所屬分區'},
     { props: 'shopName', label: '所屬分店', width: 250 },
     { props: 'updateDate', label: '修改時間', width: 250 }
 ]

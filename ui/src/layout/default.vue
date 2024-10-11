@@ -152,8 +152,12 @@ onBeforeUnmount(async () => {
     }
 
     .el-aside {
-        display: none;
+        display: none
     }
+}
+
+.el-main {
+    --el-main-padding: 10px
 }
 
 .header-bar {

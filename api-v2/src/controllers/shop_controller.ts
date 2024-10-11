@@ -134,10 +134,17 @@ module.exports = class Shop {
     // 設置禁售產品
     async bindProductToShop(req, res, next) {
         interface productList {
-            shopId: string;
-            productId: number;
+            id:string,
+            shopId: string,
+            productId: number
         }
-        const productList: Array<productList> = req.body.productList
+        const productList: Array<productList> = req.body.productList.map(item => {
+            return {
+                id:item.shopId + '-' + item.productId,
+                shopId: item.shopId,
+                productId: item.productId
+            }
+        })
         if (!productList.length) {
             return {
                 success: false,
@@ -165,7 +172,7 @@ module.exports = class Shop {
             }
         }
         setShopOrder(shopList).then(result => {
-            if (res.success) {
+            if (result.success) {
                 res.json(result)
             }
         }).catch(err => {

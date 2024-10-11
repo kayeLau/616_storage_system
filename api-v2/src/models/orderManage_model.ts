@@ -14,7 +14,6 @@ async function getOrderAndGroupBy(options, size, page) {
     const { conditions, parameters } = optionsGenerater(options, "order");
     const orderDateRange = await readSettingTimeRange();
     const orderDateStr = orderDateRange[0].substring(0, 10);
-
     const subQuery = orderRepository
         .createQueryBuilder("subOrder")
         .select('subOrder.orderCode', 'orderCode')
@@ -22,12 +21,12 @@ async function getOrderAndGroupBy(options, size, page) {
         .groupBy('subOrder.orderCode')
 
     const total = await orderRepository
-    .createQueryBuilder("order")
-    .where(conditions.join(" AND "), parameters)
-    .innerJoin(`(${subQuery.getQuery()})`, "maxOrders", "maxOrders.orderCode = order.orderCode AND maxOrders.maxOrderIndex = order.orderIndex")
-    .getCount();
+        .createQueryBuilder("order")
+        .where(conditions.join(" AND "), parameters)
+        .innerJoin(`(${subQuery.getQuery()})`, "maxOrders", "maxOrders.orderCode = order.orderCode AND maxOrders.maxOrderIndex = order.orderIndex")
+        .getCount();
 
-    return orderRepository
+    const query = orderRepository
         .createQueryBuilder("order")
         .select([
             'order.id AS id',
@@ -36,8 +35,8 @@ async function getOrderAndGroupBy(options, size, page) {
             'order.orderUserName AS orderUserName',
             'order.orderShopId AS orderShopId',
             'order.department AS department',
-            'order.createDate AS createDate',
-            'order.updateDate AS updateDate',
+            "DATE_FORMAT(order.createDate, '%Y-%m-%d %H:%i:%S') AS createDate",
+            "DATE_FORMAT(order.updateDate, '%Y-%m-%d %H:%i:%S') AS updateDate",
             'order.orderDate AS orderDate',
             'order.orderIndex AS orderIndex',
             'order.state AS state',
@@ -47,15 +46,16 @@ async function getOrderAndGroupBy(options, size, page) {
         .innerJoin(`(${subQuery.getQuery()})`, "maxOrders", "maxOrders.orderCode = order.orderCode AND maxOrders.maxOrderIndex = order.orderIndex")
         .innerJoin(Shop, 'shop', 'order.orderShopId = shop.shopId')
         .orderBy("order.updateDate", "DESC")
-        .skip((page - 1) * size)
-        .take(size)
-        .getRawMany()
-        .then(result => {
-            return {
-                data: result,
-                total
-            }
-        })
+        .offset((page - 1) * size)
+        .limit(size)
+
+    return query.getRawMany().then(result => {
+        return {
+            success: true,
+            data: result,
+            total
+        }
+    })
 }
 
 // 獲取訂單
@@ -64,7 +64,7 @@ export async function readOrder(options, size, page) {
         return {
             success: true,
             data: result.data,
-            total:result.total
+            total: result.total
         };
     })
 }
@@ -79,7 +79,7 @@ export async function readOrderDetail(orderId) {
             'orderDetail.productId AS productId',
             'orderDetail.orderQuantity AS orderQuantity',
             'orderDetail.assignQuantity AS assignQuantity',
-            'orderDetail.updateDate AS updateDate',
+            "DATE_FORMAT(orderDetail.updateDate, '%Y-%m-%d %H:%i:%S') AS updateDate",
             'orderDetail.orderMode AS orderMode',
             'orderDetail.status AS status',
             'orderDetail.remark AS remark',
@@ -136,9 +136,9 @@ export async function createOrder(data) {
     return { success: true }
 }
 
-// 倉庫追加時用
+// 倉庫追加
 export async function createOrderDetail(orderList) {
-    await orderRepository.save(orderList)
+    await orderDetailRepository.save(orderList)
     return { success: true }
 }
 
@@ -173,13 +173,13 @@ export function updateAssignQuantity(list, userInfo) {
         .update(OrderDetail)
         .set({
             orderQuantity: () => "CASE id " +
-                list.map(detail => `WHEN ${detail.id} THEN '${detail.orderQuantity === null ? null : Number(detail.orderQuantity)}'`).join(' ') +
+                list.map(detail => `WHEN ${detail.id} THEN ${detail.orderQuantity === null ? null : Number(detail.orderQuantity)}`).join(' ') +
                 " END",
             assignQuantity: () => "CASE id " +
-                list.map(detail => `WHEN ${detail.id} THEN '${detail.assignQuantity === null ? null : Number(detail.assignQuantity)}'`).join(' ') +
+                list.map(detail => `WHEN ${detail.id} THEN ${detail.assignQuantity === null ? null : Number(detail.assignQuantity)}`).join(' ') +
                 " END",
             status: () => "CASE id " +
-                list.map(detail => `WHEN ${detail.id} THEN '${userInfo.auth === 2 ? 0 : 1}'`).join(' ') +
+                list.map(detail => `WHEN ${detail.id} THEN ${userInfo.auth === 2 ? 0 : 1}`).join(' ') +
                 " END",
             remark: () => "CASE id " +
                 list.map(detail => `WHEN ${detail.id} THEN '${detail.remark || '-'}'`).join(' ') +
@@ -199,10 +199,9 @@ export function updateAssignQuantity(list, userInfo) {
 // 設置訂單狀態
 export async function setOrderState(orderId) {
     let orderState = 0
-    console.log()
     const incompleteOrder = await orderDetailRepository
         .createQueryBuilder("orderDetail")
-        .where("orderDetail.orderId = :orderId AND orderDetail.status = :status", { orderId , status: 0})
+        .where("orderDetail.orderId = :orderId AND orderDetail.status = :status", { orderId, status: 0 })
         .getCount();
 
     if (incompleteOrder > 0) {
@@ -213,7 +212,7 @@ export async function setOrderState(orderId) {
         .createQueryBuilder()
         .update(Order)
         .set({ state: orderState })
-        .where("order.id = :id", { id:orderId })
+        .where("order.id = :id", { id: orderId })
         .execute()
         .then(() => { return { success: true } })
         .catch((err) => {

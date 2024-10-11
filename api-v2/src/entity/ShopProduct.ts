@@ -1,10 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Entity, PrimaryColumn, Column } from "typeorm"
 
 @Entity()
 export class ShopProduct {
 
-    @PrimaryGeneratedColumn()
-    id: number
+    @PrimaryColumn({ type: 'varchar', length: 50 })
+    id: string;
 
     @Column()
     shopId: string

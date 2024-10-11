@@ -95,10 +95,18 @@ module.exports = class order {
         if (Array.isArray(orderList) && orderList.length) {
             const orderId = orderList[0].orderId
             orderList = orderList.map(item => {
-                item.state = item.assignQuantity === null || item.assignQuantity === undefined ? 0 : 1
-                item.lastEditBy = userInfo.name
-                return item
+                return {
+                    orderId:item.orderId,
+                    productId:item.productId,
+                    orderQuantity:item.orderQuantity,
+                    assignQuantity:item.assignQuantity,
+                    orderMode:item.orderMode,
+                    remark:item.remark,
+                    status:item.assignQuantity === null || item.assignQuantity === undefined ? 0 : 1,
+                    lastEditBy:userInfo.name
+                }
             })
+            console.log(orderList)
             createOrderDetail(orderList).then(async result => {
                 await setOrderState(orderId)
                 res.json(result)

@@ -58,7 +58,7 @@ export function deletePartition(data){
 
 export function readBindProduct(data){
   return request({
-      url: '/shops/readBindProduct',
+      url: '/shop/readBindProduct',
       method: 'post',
       data,
     });
@@ -66,7 +66,7 @@ export function readBindProduct(data){
 
 export function bindProductToShop(data){
   return request({
-      url: '/shops/bindProductToShop',
+      url: '/shop/bindProductToShop',
       method: 'post',
       data,
     });
@@ -74,7 +74,7 @@ export function bindProductToShop(data){
 
 export function setShopOrder(data){
   return request({
-      url: '/shops/setShopOrder',
+      url: '/shop/setShopOrder',
       method: 'post',
       data,
     });

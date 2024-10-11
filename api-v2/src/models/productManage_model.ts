@@ -14,11 +14,25 @@ export async function readProduct(options, size, page) {
 
     return productRepository
     .createQueryBuilder()
+    .select([
+        "product.productId AS productId",
+        "product.productCode AS productCode",
+        "product.department AS department",
+        "product.freezersNum AS freezersNum",
+        "product.classify AS classify",
+        "product.productName AS productName",
+        "product.unit AS unit",
+        "product.standard AS standard",
+        "product.disable AS disable",
+        "product.summary AS summary",
+        "product.prompt AS prompt",
+        "DATE_FORMAT(product.updateDate, '%Y-%m-%d %H:%i:%S') AS updateDate"
+    ])
     .where(conditions.join(" AND "), parameters)
     .orderBy("product.productCode", "ASC")
     .skip((page - 1) * size)
     .take(size)
-    .getMany()
+    .getRawMany()
     .then((result) => {
         return {
             success:true,

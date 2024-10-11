@@ -7,18 +7,24 @@ import { hashPassword } from '../models/encryption';
 module.exports = class Member {
     static setUserInfoByRule(data) {
         const userInfoRule = {
-            '-1': ['shopPartition', 'shopId', 'shopName'],
+            '-1': ['shopPartition', 'shopId'],
             '0': ['shopPartition'],
             '1': ['shopPartition'],
-            '2': ['shopId', 'shopName'],
-            '3':['shopPartition', 'shopId', 'shopName']
+            '2': ['shopId'],
+            '3':['shopPartition', 'shopId']
         }
         const userAuth = userInfoRule[data.auth]
         if(userAuth){
             userAuth.forEach(key => {
                 data[key] = null
             });
-            return data
+            return {
+                name:data.name,
+                password:data.password,
+                auth:data.auth,
+                shopPartition:data.shopPartition,
+                shopId:data.shopId,
+            }
         }else{
             return {}
         }

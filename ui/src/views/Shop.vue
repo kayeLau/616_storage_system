@@ -6,7 +6,7 @@
     </el-card>
     <bandList :dialogVisible="bandListDialogVisible" @closeDialog="manageBandProduct" :shopId="shopId"></bandList>
     <shopSort :shopOrderDialogVisible="shopOrderDialogVisible" @closeDialog="switchShopOrderDialogVisible"></shopSort>
-    <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
+    <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl" :style="{ minWidth: '300px' }">
       <jsonForm ref='JsonFormRef' :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules" flag="shop"
         :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList" @addSelectItem="addSelectItem">
       </jsonForm>
@@ -143,15 +143,15 @@ const shopTypeFormatter = (row, column) => {
 
 const columns = [
   { props: 'shopCode', label: '店舖編號' },
-  { props: 'shopName', label: '店舖名稱', width: 250 },
+  { props: 'shopName', label: '店舖名稱', width: 150 },
   {
     props: 'shopPartitionName', label: '所屬分區', width: 250, render: (h, row) => {
       let shopPartitionName = row.shopPartitionName.map(item => h(ElTag, { type: 'info', style: { marginRight: '5px' } }, item))
       return h('div', {} , shopPartitionName)
     }
   },
-  { props: 'shopType', label: '店舖類型', formatter: shopTypeFormatter },
-  { props: 'updateDate', label: '修改時間', width: 250 }
+  { props: 'shopType', label: '店舖類型', formatter: shopTypeFormatter , width: 180 },
+  { props: 'updateDate', label: '修改時間', width: 180 }
 ]
 const operations = {
   width: 360,

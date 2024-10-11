@@ -16,11 +16,21 @@ export async function readShop(options, size, page) {
 
     return shopRepository
         .createQueryBuilder('shop')
+        .select([
+            "shop.shopId AS shopId",
+            "shop.shopCode AS shopCode",
+            "shop.shopName AS shopName",
+            "shop.shopType AS shopType",
+            "shop.shopOrder AS shopOrder",
+            "shop.productCount AS productCount",
+            "shop.shopPartition AS shopPartition",
+            "DATE_FORMAT(shop.updateDate, '%Y-%m-%d %H:%i:%S') AS updateDate"
+        ])
         .where(conditions.join(" AND "), parameters)
         .orderBy("shop.shopOrder", "ASC")
         .skip((page - 1) * size)
         .take(size)
-        .getMany()
+        .getRawMany()
         .then((result) => {
             return {
                 success: true,
@@ -83,28 +93,18 @@ export async function createPartition(data) {
 }
 
 export async function updateShop(shopId, data) {
-    const existingShop = await shopRepository.createQueryBuilder()
-        .where("shop.shopName = :shopName", { shopName: data.shopName })
-        .orWhere("shop.shopCode = :shopCode", { shopCode: data.shopCode })
-        .getOne()
-
-    if (!existingShop) {
-        return shopRepository
-            .createQueryBuilder()
-            .update(Shop)
-            .set({ ...data })
-            .where("shop.shopId = :shopId", { shopId })
-            .execute()
-            .then((result) => {
-                return { success: true, data: result };
-            })
-            
-    } else {
-        return {
-            msg: "已存在重複的店舖",
-            success: false
-        };
-    }
+    return shopRepository
+    .createQueryBuilder()
+    .update(Shop)
+    .set({ ...data })
+    .where("shop.shopId = :shopId", { shopId })
+    .execute()
+    .then((result) => {
+        return { success: true, data: result };
+    })
+    .catch((err) => { 
+        return Promise.reject({ success: false, message: err.message })
+    })
 }
 
 export function deleteShop(shopId) {
@@ -176,7 +176,7 @@ export async function setShopOrder(shopList) {
         .update(Shop)
         .set({
             shopOrder: () => "CASE shopId " +
-                shopList.map(shop => `WHEN ${shop.shopId} THEN '${shop.shopOrder}'`).join(' ') +
+                shopList.map(shop => `WHEN '${shop.shopId}' THEN ${shop.shopOrder}`).join(' ') +
                 " END"
         })
         .whereInIds(shopList.map(shop => shop.shopId))

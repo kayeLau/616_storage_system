@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column , OneToOne , JoinColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column , OneToOne , JoinColumn, ManyToOne } from "typeorm"
 import { Partition } from "./Partition"
+import { Shop } from "./Shop"
 
 @Entity()
 export class Member {
@@ -21,7 +22,6 @@ export class Member {
 
     @Column({ nullable: true })
     shopId: String
-    
 
     @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
     craetDate: Date;
@@ -29,13 +29,17 @@ export class Member {
     @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updateDate: Date;
 
-    @Column()
+    @Column({ nullable: true })
     online: number
 
     @Column({ nullable: true })
     ipAddress: string
 
     @OneToOne(() => Partition)
-    @JoinColumn({ name: "shopPartition", referencedColumnName: "id" }) // Join on a different column
+    @JoinColumn({ name: "shopPartition", referencedColumnName: "id" })
     partition: Partition;
+
+    @ManyToOne(() => Shop)
+    @JoinColumn({ name: "shopId", referencedColumnName: "shopId" })
+    shop: Shop;
 }

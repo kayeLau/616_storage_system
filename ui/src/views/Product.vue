@@ -4,7 +4,7 @@
       <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params" :getList="readProduct"
         :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
     </el-card>
-    <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl">
+    <el-drawer v-model="jsonFormShow" title="店舖資料" direction="rtl" :style="{ minWidth: '300px' }">
       <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules"
         :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList"></jsonForm>
     </el-drawer>

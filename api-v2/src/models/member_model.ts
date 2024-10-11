@@ -58,11 +58,23 @@ export async function readMember(options, size, page) {
 
     return memberRepository
         .createQueryBuilder("member")
-        .leftJoinAndSelect("member.partition", "partition")
+        .leftJoin("member.partition", "partition")
+        .leftJoin("member.shop", "shop")
+        .select([
+            "member.id AS id",
+            "member.name AS name",
+            "member.password AS password",
+            "member.auth AS auth",
+            "member.shopPartition AS shopPartition",
+            "member.shopId AS shopId",
+            "shop.shopName AS shopName",
+            "partition.partitionName AS partitionName",
+            "DATE_FORMAT(member.updateDate, '%Y-%m-%d %H:%i:%S') AS updateDate"
+        ])
         .where(conditions.join(" AND "), parameters)
         .skip((page - 1) * size)
         .take(size)
-        .getMany()
+        .getRawMany()
         .then((result) => {
             return {
                 success: true,

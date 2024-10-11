@@ -58,7 +58,7 @@ export function deleteOrder(data){
 
 export function exportDailyMeetSummary(data){
   return request({
-      url: '/orders/exportDailyMeetSummary',
+      url: '/order/exportDailyMeetSummary',
       method: 'post',
       data,
     });
@@ -66,7 +66,7 @@ export function exportDailyMeetSummary(data){
 
 export function getDailyOrderStatus(data){
   return request({
-      url: '/orders/getDailyOrderStatus',
+      url: '/order/getDailyOrderStatus',
       method: 'post',
       data,
     });
@@ -74,7 +74,7 @@ export function getDailyOrderStatus(data){
 
 export function postHistoryOrder(data){
   return request({
-      url: '/orders/postHistoryOrder',
+      url: '/order/postHistoryOrder',
       method: 'post',
       data,
     });

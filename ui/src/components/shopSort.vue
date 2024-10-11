@@ -19,6 +19,7 @@
 import { reactive , defineProps , computed , defineEmits} from "vue";
 import draggable from "vuedraggable";
 import { readShop, setShopOrder } from '../request/shops';
+import { ElMessage } from 'element-plus';
 
 const props = defineProps({
     shopOrderDialogVisible:Boolean
@@ -51,7 +52,7 @@ const onEnd = () => {
     })
     setShopOrder({shopList}).then(res => {
         if (res.success) {
-            console.log(res.data)
+            ElMessage({ type: 'success', message: '操作成功：資料已存入數據庫' })
         }
     })
 };
