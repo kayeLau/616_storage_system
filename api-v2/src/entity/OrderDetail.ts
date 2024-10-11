@@ -13,19 +13,19 @@ export class OrderDetail {
     @Column()
     productId: number
 
-    @Column()
+    @Column({comment: '下單數量'})
     orderQuantity: number
 
-    @Column({nullable:true})
+    @Column({nullable:true, comment: '分配數量'})
     assignQuantity: number
 
     @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updateDate: Date
 
-    @Column()
+    @Column({comment: '0:前線 1:系統'})
     orderMode: number
     
-    @Column()
+    @Column({comment: '0:未分配 1:已分配'})
     status: number;
 
     @Column({nullable:true})

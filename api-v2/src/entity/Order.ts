@@ -34,7 +34,7 @@ export class Order {
     @Column()
     orderIndex: number
 
-    @Column()
+    @Column({comment: '0:未分配 1:已分配'})
     state: number
 
     @ManyToOne(() => Shop)

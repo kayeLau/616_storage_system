@@ -240,7 +240,6 @@ async function exportOrderExcel(index, row) {
     jsonData: [
       [row.shopCode, row.shopName, '', todayF],
       ['貨品編號', '貨品名稱', '數量/重量', '單位', '包裝規格'],
-      // assuming `row.children` is an array of objects
       ...children.map(item => [
         item.productCode,
         item.productName,

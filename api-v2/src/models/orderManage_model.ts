@@ -85,7 +85,11 @@ export async function readOrderDetail(orderId) {
             'orderDetail.remark AS remark',
             'orderDetail.lastEditBy AS lastEditBy',
             'product.productName AS productName',
-            'product.productCode AS productCode'
+            'product.productCode AS productCode',
+            'product.unit AS unit',
+            'product.standard AS standard',
+            'product.classify AS classify',
+            'product.freezersNum AS freezersNum',
         ])
         .innerJoin(Product, 'product', 'orderDetail.productId = product.productId')
         .where('orderDetail.orderId = :orderId', { orderId })
@@ -204,7 +208,7 @@ export async function setOrderState(orderId) {
         .where("orderDetail.orderId = :orderId AND orderDetail.status = :status", { orderId, status: 0 })
         .getCount();
 
-    if (incompleteOrder > 0) {
+    if (incompleteOrder === 0) {
         orderState = 1
     }
 
