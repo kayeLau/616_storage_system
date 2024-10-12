@@ -167,7 +167,7 @@ export async function checkOrderRepeated(options) {
                 success: true,
                 data: {
                     ...existingOrder,
-                    chilren: result.data
+                    children: result.data
                 }
             }
         })
@@ -195,7 +195,7 @@ export function updateAssignQuantity(list, userInfo) {
                 list.map(detail => `WHEN ${detail.id} THEN '${detail.remark || '-'}'`).join(' ') +
                 " END",
             lastEditBy: () => "CASE id " +
-                list.map(detail => `WHEN ${detail.id} THEN '${detail.name || '-'}'`).join(' ') +
+                list.map(detail => `WHEN ${detail.id} THEN '${userInfo.name || '-'}'`).join(' ') +
                 " END"
         })
         .whereInIds(list.map(detail => detail.id))

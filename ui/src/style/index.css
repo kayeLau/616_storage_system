@@ -71,3 +71,6 @@ body{
     overflow: hidden;
     white-space: nowrap;
 }
+.el-dialog__body{
+    padding: 10px 12px 15px;
+  }

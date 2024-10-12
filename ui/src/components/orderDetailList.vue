@@ -12,7 +12,7 @@
       <el-table-column prop="freezersNum" label="雪房號碼"  width="120" :formatter="freezersNumFormatter" :filter-multiple="false"
         :filtered-value="filteredValue" :filters="dictToFilterOptions(freezersNumDict)"
         :filter-method="filterHandler" />
-      <el-table-column prop="productCode" label="產品" width="250">
+      <el-table-column prop="productCode" label="產品" width="220">
 
         <template #default="scope">
           <el-select v-if='scope.row.mode === "create"' v-model="_data.children[scope.$index].productId" filterable
@@ -23,7 +23,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="orderQuantity" label="下單數量" width="250" align="left">
+      <el-table-column prop="orderQuantity" label="下單數量" width="320" align="left">
         <template #default="scope">
           <div class="flex-row-start">
             <el-input-number v-model="orderInfoMap[scope.row.productId].orderQuantity" :min="0" :controls="false" :disabled="!(userInfo.auth === -1 || userInfo.auth === 2)"/>
@@ -54,7 +54,7 @@
       <div>
         <div>
           <el-button v-if="userInfo.auth === -1" type="primary" @click="sumbitAssignQuantity()" icon="Coin" plain>按下單數量分配</el-button>
-          <el-button v-if="userInfo.auth === -1 || userInfo.auth === 2" type="success" icon="Coin" plain @click="submitOrderItem">提交</el-button>
+          <el-button v-if="userInfo.auth === -1 || userInfo.auth === 2" type="success" icon="Coin" plain @click="submitOrderDetail">提交</el-button>
           <el-button v-if="userInfo.auth === -1 || userInfo.auth === 2" type="success" @click="insertOrderItem" icon="CirclePlus" plain>新增</el-button>
         </div>
       </div>
@@ -199,18 +199,20 @@ function diffOrderInfoMap(){
   return diffList
 }
 
-async function submitOrderItem() {
+// 綜合提交
+async function submitOrderDetail() {
   const createList = _data.children.filter(item => item.mode === 'create' && item.productCode && item.productName && item.orderQuantity !== null)
   let updateList = diffOrderInfoMap()
   await addAdditionOrderItem(createList)
   if (updateList.length) {
-    updateAssignQuantity(updateList)
+    sumbitAssignQuantity(updateList)
   } else {
     emit('refreshList')
   }
   orderInfoMapCopy = JSON.parse(JSON.stringify(orderInfoMap.value))
 }
 
+// 倉庫新增項目
 async function addAdditionOrderItem(orderList) {
   if (!orderList.length) { return }
   await createAdditionOrder({ orderList }).then(res => {
@@ -222,7 +224,7 @@ async function addAdditionOrderItem(orderList) {
   })
 }
 
-// 提交分配數量
+// 按量提交分配數量
 async function sumbitAssignQuantity(row) {
   let assignQuantitys = generateAssignQuantityParams(row)
   if (!assignQuantitys.length) {
@@ -254,7 +256,7 @@ function generateAssignQuantityParams(orderList) {
       item.assignQuantity = item.orderQuantity
     })
   }
-  // 訂單明細
+
   let assignQuantitys = orderList.map(item => {
     return {
       id: item.id,

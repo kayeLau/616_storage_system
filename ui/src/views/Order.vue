@@ -7,7 +7,7 @@
         :products="products" :expandRowKeys="expandRowKeys"></Ktable>
     </el-card>
     <!-- OrderDetail -->
-    <el-dialog v-model="orderDetailShow" width="95%" style="height:80vh;position: relative;" top="10vh">
+    <el-dialog v-model="orderDetailShow" width="95%" class="dialog-body" top="5vh">
       <template #header="{ titleId, titleClass }">
         <div class="my-header">
           <span :id="titleId" :class="titleClass">訂單明細 | {{ currentRow.shopName }}</span>
@@ -20,8 +20,7 @@
       <orderDetailList :data="currentRow" :params="ODparams" @refreshList="refreshList" :products="products" />
     </el-dialog>
     <!-- History -->
-    <el-dialog v-model="historyDetailShow" width="95%" style="height:80vh;position: relative;" top="10vh"
-      destroy-on-close @close="resetexpandRowKeys">
+    <el-dialog v-model="historyDetailShow" width="95%" class="dialog-body" top="5vh" destroy-on-close @close="resetexpandRowKeys" title="訂單明細">
       <Ktable ref='KtableRef3' :columns="columns" isExpand :isIndex="false" :operations="null" :params="historyParams" :expandChange="expandChange"
         :getList="readHistoryOrder" :searchFormColumns="[]" :customBtn="[]" :expandHeader="{}" :expandColumns="{}" :expandRowKeys="expandRowKeys">
       </Ktable>
@@ -430,5 +429,9 @@ onMounted(() => {
   font-weight: bold;
   cursor: pointer;
   color: var(--el-color-primary);
+}
+.dialog-body{
+  height:85vh;
+  position: relative;
 }
 </style>
