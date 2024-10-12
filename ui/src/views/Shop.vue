@@ -159,7 +159,7 @@ const operations = {
   children: [
     { type: "primary", name: '編輯', onClick: editHandle, icon: 'Edit' },
     { type: "warning", name: '管理禁售產品', onClick: manageBandProduct, icon: 'Setting' },
-    { type: "danger", name: '删除', icon: 'Delete', onClick: deleteHandle }
+    {  btnType:"popconfirm", type: "danger", name: '删除', icon: 'Delete', onClick: deleteHandle }
   ]
 }
 const params = {

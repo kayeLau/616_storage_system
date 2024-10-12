@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-card class="Ktable-container">
-      <Ktable ref='KtableRef2' isExpand :columns="columns" :operations="operations" :params="params"
+      <Ktable ref='KtableRef2' isExpand :isIndex="false" :columns="columns" :operations="operations" :params="params"
         :tableRowClassName="tableRowClassName" :getList="readMember" :expandChange="expandChange"
         :searchFormColumns="searchFormColumns" :customBtn="customBtn" :expandHeader="{}" :expandColumns="{}"
         :products="products" :expandRowKeys="expandRowKeys"></Ktable>
@@ -22,8 +22,8 @@
     <!-- History -->
     <el-dialog v-model="historyDetailShow" width="95%" style="height:80vh;position: relative;" top="10vh"
       destroy-on-close @close="resetexpandRowKeys">
-      <Ktable ref='KtableRef3' :columns="columns" isExpand :operations="null" :params="historyParams" :expandChange="expandChange"
-        :getList="postHistoryOrder" :searchFormColumns="[]" :customBtn="[]" :expandHeader="{}" :expandColumns="{}" :expandRowKeys="expandRowKeys">
+      <Ktable ref='KtableRef3' :columns="columns" isExpand :isIndex="false" :operations="null" :params="historyParams" :expandChange="expandChange"
+        :getList="readHistoryOrder" :searchFormColumns="[]" :customBtn="[]" :expandHeader="{}" :expandColumns="{}" :expandRowKeys="expandRowKeys">
       </Ktable>
     </el-dialog>
   </div>
@@ -33,7 +33,7 @@
 import orderDetailList from '../components/orderDetailList.vue';
 import { readProduct } from '../request/products';
 import { readShop } from '../request/shops'
-import { readMember, getDailyOrderStatus, exportDailyMeetSummary, postHistoryOrder, readOrderDetail } from '../request/orders';
+import { readMember, exportDailyMeetSummary, readHistoryOrder, readOrderDetail } from '../request/orders';
 import { departmentDict, orderStateDict, freezersNumDict } from '../request/dict';
 import { exportExcel } from '../utils/export';
 import Ktable from '../components/table.vue';
@@ -77,13 +77,12 @@ function tableRowClassName({ row }) {
 }
 
 const columns = [
-  { props: 'state', label: '訂單狀態', formatter: orderStateFormatter, width: 130 },
-  { props: 'shopName', label: '落單門店' },
-  { props: 'department', label: '落單部門', width: 130, formatter: departmentFormatter },
-  { props: 'orderUserName', label: '落單人', width: 180 },
-  { props: 'orderIndex', label: '落單次數', width: 130, formatter: (row, column) => row[column.property] + 1 },
+  { props: 'state', label: '訂單狀態', formatter: orderStateFormatter },
+  { props: 'shopName', label: '落單門店' , width: 180},
+  { props: 'department', label: '落單部門', width: 100, formatter: departmentFormatter },
+  { props: 'orderUserName', label: '落單人', width: 130 },
+  { props: 'orderIndex', label: '落單次數', width: 100, formatter: (row, column) => row[column.property] + 1 },
   { props: 'createDate', label: '落單時間', width: 180 },
-  // { props: 'updateDate', label: '最後更新時間', width: 180 }
 ]
 
 const operations = {
@@ -116,7 +115,6 @@ const customBtn = ref([
           teleported: false, modelValue: exportDate.value,
           ['onUpdate:modelValue']: (value) => {
             exportDate.value = value
-            fetchDailyOrderStatus()
           }, type: "date"
         }),
         h(ElButton, { onclick: exportAllSummary, type: 'success', plain: true }, '確定')
@@ -135,19 +133,11 @@ const customBtn = ref([
           teleported: false, modelValue: exportDate.value,
           ['onUpdate:modelValue']: (value) => {
             exportDate.value = value
-            fetchDailyOrderStatus()
           }, type: "date"
         }),
         h(ElButton, { style: { margin: '0px' }, onclick: exportMeatSummary, type: 'success', plain: true }, '確定')
       ])
     },
-  },
-  {
-    type: 'progress',
-    width: '250px',
-    percentage: 0,
-    disabled: (row) => row.status === 0, hide: userInfo.value.auth !== -1,
-    label: '已下單門店'
   }
 ])
 
@@ -211,16 +201,6 @@ function exportAllSummary() {
         jsonData
       }
       exportExcel({ exportDate: [dailyMeetSummary], header: '1', hpt: 30, wpt: 2.5 })
-    }
-  })
-}
-
-function fetchDailyOrderStatus() {
-  getDailyOrderStatus({ exportDate: defaultExportDate.value }).then(res => {
-    if (res.success) {
-      let total = searchFormColumns.value[1].options.length
-      let current = res.total
-      customBtn.value[2].percentage = (current / total) * 100
     }
   })
 }
@@ -419,7 +399,6 @@ function getProducts() {
           label: item.productCode
         }
       })
-      // console.log(productsOption)
       editFormColumns.value[0].options = productsOption
     } else {
       products.value = []
@@ -430,7 +409,6 @@ function getProducts() {
 onMounted(() => {
   getProducts()
   fatchShopList()
-  fetchDailyOrderStatus()
 })
 
 </script>

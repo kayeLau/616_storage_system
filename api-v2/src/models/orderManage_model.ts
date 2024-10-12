@@ -37,7 +37,8 @@ async function getOrderAndGroupBy(options, size, page) {
             'order.department AS department',
             "DATE_FORMAT(order.createDate, '%Y-%m-%d %H:%i:%S') AS createDate",
             "DATE_FORMAT(order.updateDate, '%Y-%m-%d %H:%i:%S') AS updateDate",
-            'order.orderDate AS orderDate',
+            "DATE_FORMAT(order.orderDate, '%Y-%m-%d ') AS orderDate",
+            "IF(order.orderDate = '" + orderDateStr + "',1,0) AS isToday",
             'order.orderIndex AS orderIndex',
             'order.state AS state',
             'shop.shopName AS shopName'
@@ -63,7 +64,10 @@ export async function readOrder(options, size, page) {
     return getOrderAndGroupBy(options, size, page).then((result) => {
         return {
             success: true,
-            data: result.data,
+            data: result.data.map(item => {
+                item.children = []
+                return item
+            }),
             total: result.total
         };
     })
@@ -90,6 +94,7 @@ export async function readOrderDetail(orderId) {
             'product.standard AS standard',
             'product.classify AS classify',
             'product.freezersNum AS freezersNum',
+            'product.prompt AS prompt',
         ])
         .innerJoin(Product, 'product', 'orderDetail.productId = product.productId')
         .where('orderDetail.orderId = :orderId', { orderId })
@@ -124,6 +129,7 @@ export async function createOrder(data) {
         orderCode: data.orderCode,
         orderIndex: existingOrder ? ++existingOrder.orderIndex : 0
     });
+
     await orderRepository.save(newOrder);
     const orderList = data.orderList.map(item => {
         return {
@@ -161,7 +167,7 @@ export async function checkOrderRepeated(options) {
                 success: true,
                 data: {
                     ...existingOrder,
-                    detail: { ...result.data }
+                    chilren: result.data
                 }
             }
         })
@@ -225,28 +231,17 @@ export async function setOrderState(orderId) {
 }
 
 // 導出肉類總表
-interface summaryProductItem {
-    productName: string,
-    freezersNum: number,
-    unit: string,
-    orderItems: Array<number>
-}
 export async function exportOrderMeat(options, size, page, summaryProductIdsMap, shopsList) {
     const order = await getOrderAndGroupBy(options, size, page)
     const summaryProductIds = Object.keys(summaryProductIdsMap)
     const orderDetail = order.data.map((item) => {
-        return orderDetailRepository
-            .createQueryBuilder()
-            .innerJoin(Shop, 'shop', 'order')
-            .where('orderDetail.orderId = :orderId', { orderId: item.id })
-            .getMany()
-            .then(res => {
-                let index = shopsList.indexOf(item.shopName)
-                summaryProductIds.forEach(summaryProductId => {
-                    let target = res.find(item => item.productId === Number(summaryProductId))
-                    summaryProductIdsMap[summaryProductId].orderItems[index] = target ? target.orderQuantity : 0
-                })
+        return readOrderDetail(item.id).then(res => {
+            let index = shopsList.indexOf(item.shopName)
+            summaryProductIds.forEach(summaryProductId => {
+                let target = res.data.find(item => item.productId === Number(summaryProductId))
+                summaryProductIdsMap[summaryProductId].orderItems[index] = target ? target.orderQuantity : 0
             })
+        })
     })
     await Promise.all(orderDetail)
     let products = Object.values(summaryProductIdsMap) as Product[]
@@ -255,5 +250,47 @@ export async function exportOrderMeat(options, size, page, summaryProductIdsMap,
         success: true,
         data: { products, shopName: shopsList }
     }
+}
+
+export async function readHistoryOrder(options, size, page) {
+    const total = await orderRepository
+        .createQueryBuilder("order")
+        .where('order.orderCode = :orderCode', { orderCode: options.orderCode })
+        .getCount();
+
+    return orderRepository
+        .createQueryBuilder("order")
+        .select([
+            'order.id AS id',
+            'order.orderCode AS orderCode',
+            'order.orderUserId AS orderUserId',
+            'order.orderUserName AS orderUserName',
+            'order.orderShopId AS orderShopId',
+            'order.department AS department',
+            "DATE_FORMAT(order.createDate, '%Y-%m-%d %H:%i:%S') AS createDate",
+            "DATE_FORMAT(order.updateDate, '%Y-%m-%d %H:%i:%S') AS updateDate",
+            'order.orderIndex AS orderIndex',
+            'order.state AS state',
+            'shop.shopName AS shopName'
+        ])
+        .where('order.orderCode = :orderCode', { orderCode: options.orderCode })
+        .innerJoin(Shop, 'shop', 'order.orderShopId = shop.shopId')
+        .orderBy("order.orderIndex", "DESC")
+        .skip((page - 1) * size)
+        .take(size)
+        .getRawMany()
+        .then((result) => {
+            return {
+                data:result.map(item => {
+                    item.children = []
+                    return item
+                }),
+                success: true,
+                total
+            }
+        })
+        .catch((err) => {
+            return Promise.reject({ success: false, message: err.message })
+        })
 }
 

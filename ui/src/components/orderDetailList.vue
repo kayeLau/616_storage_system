@@ -93,7 +93,6 @@ const orderInfoMap = computed(() => {
   _temp.forEach(item => {
     map[item.productId] = item
   })
-  console.log(_temp)
   return map
 })
 

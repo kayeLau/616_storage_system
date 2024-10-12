@@ -72,9 +72,9 @@ export function getDailyOrderStatus(data){
     });
 }
 
-export function postHistoryOrder(data){
+export function readHistoryOrder(data){
   return request({
-      url: '/order/postHistoryOrder',
+      url: '/order/readHistoryOrder',
       method: 'post',
       data,
     });

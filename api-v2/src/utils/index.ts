@@ -32,25 +32,23 @@ export function getTodayTimeRange(){
 }
 
 export async function readSettingTimeRange(){
-    let startTime = '08:00:00'
-    let endTime = '07:59:59'
+    let defaultTime = '08:00:00'
     await readSetting({name:'lastOrder'}).then(res => {
-            let timeSetting = res
-            startTime = String(timeSetting) + ':00:00'
-            endTime = fillZero(Number(timeSetting) - 1) + ':59:59'
+            let timeSetting = res.data.value
+            defaultTime = String(timeSetting) + ':00:00'
     })
     const date = new Date();
     const currentTime = fillZero(new Date().getHours()) + ':00:00'
     let start,end
 
-    if (currentTime <= startTime) {
-        end = dateFormat(date) + ' ' + endTime //2024-04-21 07:59:59
+    if (currentTime < defaultTime) {
+        end = dateFormat(date) + ' ' + defaultTime
         date.setDate(date.getDate() - 1)
-        start = dateFormat(date) + ' ' + startTime // 2024
+        start = dateFormat(date) + ' ' + defaultTime
     } else {
-        start = dateFormat(date) + ' ' + startTime
+        start = dateFormat(date) + ' ' + defaultTime
         date.setDate(date.getDate() + 1)
-        end = dateFormat(date) + ' ' + endTime
+        end = dateFormat(date) + ' ' + defaultTime
     }
     return [start,end]
 }

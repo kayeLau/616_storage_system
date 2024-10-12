@@ -42,7 +42,7 @@ export function updateMember(data){
 
 export function deleteMember(data){
   return request({
-      url: '/user/deleteMember',
+      url: '/member/deleteMember',
       method: 'post',
       data,
     });

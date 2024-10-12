@@ -186,7 +186,7 @@ const operations = {
   size: "small",
   children: [
     { type: "primary", name: '編輯', icon: 'Edit', onClick: editHandle },
-    { type: "danger", name: '删除', icon: 'Delete', onClick: deleteHandle }
+    {  btnType:"popconfirm", type: "danger", name: '删除', icon: 'Delete', onClick: deleteHandle }
   ]
 }
 const params = {

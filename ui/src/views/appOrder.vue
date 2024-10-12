@@ -42,8 +42,6 @@ import { ref, onMounted } from 'vue';
 import { readProduct } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
 import { classifyDict, classifySort } from '../request/dict';
-// import { createWs , getWs } from '../utils/ws';
-// import { getStorge } from '../utils/auth';
 
 let loading = ref(true)
 let orderMap = ref({})
@@ -138,46 +136,13 @@ const tabName = ref('')
 async function checkExistOrder() {
     await checkOrderRepeated().then(res => {
         if (res.success && res.data) {
-            res.data.detail.forEach(item => {
+            res.data.children.forEach(item => {
                 setOrderMap(item)
                 setProductListView(item)
             })
         }
     })
 }
-// ws
-// function sendOrderWs() {
-//     const userInfo = JSON.parse(getStorge('userInfo'))
-//     const ws = getWs()
-//     ws.send(JSON.stringify({
-//         shopId: userInfo.shopId,
-//         auth: userInfo.auth,
-//         orderList: Object.values(orderMap.value).filter(item => item.orderQuantity !== 0)
-//     }))
-// }
-
-// function syncOrder(message){
-//     const userInfo = JSON.parse(getStorge('userInfo'))
-//     if(message.shopId === userInfo.shopId && message.auth === userInfo.auth){
-//         console.log(message.orderList)
-//         message.orderList.forEach(item => {
-//             setOrderMap(item)
-//             setProductListView(item)
-//         })
-//     }
-// }
-
-//接收 Server 發送的訊息
-// function setWebsocket() {
-//     const token = getStorge('token')
-//     const ws = createWs(token)
-//     ws.addEventListener('message', (event) => {
-//         const message = JSON.parse(event.data);
-//         console.log('收到消息：', message);
-//         syncOrder(message)
-//     });
-// }
-// setWebsocket()
 
 onMounted(async () => {
     await getProducts()

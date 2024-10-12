@@ -17,7 +17,7 @@
     </div>
 </template>
 <script setup>
-import { readSetting, updateSetting } from '../request/setting'
+import { updateSetting ,readAllSetting } from '../request/setting'
 import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus'
 import promptItem from '../components/promptItem.vue'
@@ -46,7 +46,7 @@ function setDialogShow(num){
 const editFormModels = ref({})
 
 function fatchList() {
-    readSetting({ size: 999, page: 1 }).then(res => {
+    readAllSetting().then(res => {
         if (res.success) {
             res.data.forEach(item => {
                 editFormModels.value[item.name] = item.value

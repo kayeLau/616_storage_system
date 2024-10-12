@@ -1,9 +1,8 @@
-import { updateSetting, readSetting } from '../models/settingManage_model';
-import { getCurrentTime } from '../utils';
+import { updateSetting, readSetting , readAllSetting } from '../models/settingManage_model';
 
 module.exports = class Setting {
 
-    read(req, res, next) {
+    readSetting(req, res, next) {
         const options = req.body.name ? { name: req.body.name } : {}
         readSetting(options).then(result => {
             res.json(result)
@@ -13,12 +12,20 @@ module.exports = class Setting {
 
     }
 
-    update(req, res, next) {
+    readAllSetting(req, res, next) {
+        readAllSetting().then(result => {
+            res.json(result)
+        }).catch(err => {
+            next(err)
+        })
+
+    }
+
+    updateSetting(req, res, next) {
         const data = {
             name: req.body.name,
             value: req.body.value,
             id: req.body.id,
-            updateDate: getCurrentTime()
         }
 
         updateSetting(data).then(result => {

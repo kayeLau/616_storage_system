@@ -1,7 +1,8 @@
 import { readSettingTimeRange } from '../utils';
-import { readOrder, readOrderDetail, createOrder, createOrderDetail, 
+import { readOrder, readOrderDetail, createOrder, createOrderDetail, readHistoryOrder,
     updateAssignQuantity, setOrderState, exportOrderMeat , checkOrderRepeated} from '../models/orderManage_model';
 import { readShop } from '../models/shopManage_model';
+import { readProduct } from '../models/productManage_model';
 
 interface orderData {
     orderList: Array<orderList>,
@@ -70,6 +71,7 @@ module.exports = class order {
         const userInfo = req.userInfo
         const orderDateRange = await readSettingTimeRange()
         const dateStr = orderDateRange[0].substring(0, 10).replaceAll('-', '')
+        console.log(orderDateRange)
 
         const orderData: orderData = {
             orderList: req.body.orderList || [],
@@ -157,13 +159,12 @@ module.exports = class order {
         let orderedShops = new Set()
 
         await readOrder({ orderDate: exportDate }, 999, 1).then(result => {
+            console.log(result)
             result.data.forEach(item => orderedShops.add(item.shopName))
         })
-        const shopsList = await readShop({}, 999, 1).then(result => {
-            return result.data.map(item => item.shopName).filter(item => orderedShops.has(item))
-        })
+        const shopsList = Array.from(orderedShops)
 
-        await readOrderDetail({ summary: exportType }).then(result => {
+        await readProduct({ summary: exportType }, 999, 1).then(result => {
             result.data.forEach(item =>
                 summaryProductIdsMap[item.productId] = {
                     productName: item.productName,
@@ -172,8 +173,6 @@ module.exports = class order {
                     orderItems: new Array(shopsList.length).fill(0)
                 }
             )
-        }).catch(err => {
-            next(err)
         })
 
         await exportOrderMeat({ orderDate: exportDate }, 999, 1, summaryProductIdsMap, shopsList).then(result => {
@@ -185,11 +184,11 @@ module.exports = class order {
         })
     }
 
-    async postHistoryOrder(req, res, next) {
+    async readHistoryOrder(req, res, next) {
         const options = { orderCode: req.body.orderCode }
         const size = req.body.size
         const page = req.body.page
-        readOrder(options, size, page).then(result => {
+        readHistoryOrder(options, size, page).then(result => {
             res.json(result)
         }).catch(err => {
             next(err)
