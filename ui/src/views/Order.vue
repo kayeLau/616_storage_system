@@ -76,12 +76,12 @@ function tableRowClassName({ row }) {
 }
 
 const columns = [
-  { props: 'state', label: '訂單狀態', formatter: orderStateFormatter },
+  { props: 'state', label: '訂單狀態', formatter: orderStateFormatter ,width: 100},
   { props: 'shopName', label: '落單門店' , width: 180},
   { props: 'department', label: '落單部門', width: 100, formatter: departmentFormatter },
   { props: 'orderUserName', label: '落單人', width: 130 },
-  { props: 'orderIndex', label: '落單次數', width: 100, formatter: (row, column) => row[column.property] + 1 },
-  { props: 'createDate', label: '落單時間', width: 180 },
+  { props: 'orderIndex', label: '落單次數', formatter: (row, column) => row[column.property] + 1 },
+  { props: 'createDate', label: '落單時間' , width: 180},
 ]
 
 const operations = {

@@ -8,6 +8,7 @@ import { ShopProduct } from "./entity/ShopProduct"
 import { Product } from "./entity/Product"
 import { Order } from "./entity/Order"
 import { OrderDetail } from "./entity/OrderDetail"
+import { Inventory } from "./entity/Inventory"
 
 const AppDataSource = new DataSource({
     type: "mysql",
@@ -18,7 +19,7 @@ const AppDataSource = new DataSource({
     database: "616_storage_system",
     synchronize: true,
     logging: false,
-    entities: [Setting, Member, Partition, Shop , ShopProduct, Product, Order, OrderDetail],
+    entities: [Setting, Member, Partition, Shop , ShopProduct, Product, Order, OrderDetail, Inventory],
     migrations: [],
     subscribers: [],
 })
