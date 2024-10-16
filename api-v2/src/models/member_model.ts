@@ -31,7 +31,7 @@ export function updateMember(id, data) {
         .where("id = :id", { id })
         .execute()
         .then(() => { return { success: true } })
-        .catch((err) => { 
+        .catch((err) => {
             return Promise.reject({ success: false, message: err.message })
         })
 }
@@ -44,7 +44,7 @@ export function deleteMember(id) {
         .where("id = :id", { id })
         .execute()
         .then(() => { return { success: true } })
-        .catch((err) => { 
+        .catch((err) => {
             return Promise.reject({ success: false, message: err.message })
         })
 }
@@ -52,9 +52,9 @@ export function deleteMember(id) {
 export async function readMember(options, size, page) {
     const { conditions, parameters } = optionsGenerater(options, "member")
     const total = await memberRepository
-    .createQueryBuilder("member")
-    .where(conditions.join(" AND "), parameters)
-    .getCount();
+        .createQueryBuilder("member")
+        .where(conditions.join(" AND "), parameters)
+        .getCount();
 
     return memberRepository
         .createQueryBuilder("member")
@@ -94,14 +94,14 @@ export async function readMember(options, size, page) {
 // }
 
 export async function toLogin(memberData) {
-    const targetUser = memberRepository
-        .createQueryBuilder("member")
-        .where("member.name = :name", { name: memberData.name })
-        .andWhere("member.password = :password", { password: memberData.password })
-        .getOne()
+    try {
+        const targetUser = await memberRepository
+            .createQueryBuilder("member")
+            .where("member.name = :name", { name: memberData.name })
+            .andWhere("member.password = :password", { password: memberData.password })
+            .getOne()
 
-    return targetUser.then(res => {
-        if (!res) {
+        if (!targetUser) {
             return {
                 success: false,
                 msg: "請輸入正確的帳號或密碼。"
@@ -109,27 +109,35 @@ export async function toLogin(memberData) {
         }
 
         if (!memberData.isForceLogin) {
-            if (res.ipAddress && res.ipAddress !== memberData.ip) {
+            if (targetUser.ipAddress && targetUser.ipAddress !== memberData.ip) {
                 return {
                     success: false,
-                    msg: "用戶" + res.ipAddress + "正在使用",
-                    ip: res.ipAddress,
+                    msg: "用戶" + targetUser.ipAddress + "正在使用",
+                    ip: targetUser.ipAddress,
                     isUsing: true
-                }
+                };
             }
         }
-        const token = jwt.sign({ data: res.id }, config.secret, { expiresIn: '5h' });
-        updateMember(res.id, { online: 1, ipAddress: memberData.ip })
+
+        const token = jwt.sign({ data: targetUser.id }, config.secret, { expiresIn: '5h' });
+        await updateMember(targetUser.id, { online: 1, ipAddress: memberData.ip });
         return {
             success: true,
             token,
             userInfo: {
-                name: res.name,
-                shopId: res.shopId,
-                // shopName: res.shopName, todo
-                auth: res.auth,
+                name: targetUser.name,
+                shopId: targetUser.shopId,
+                // shopName: targetUser.shopName, // Uncomment when needed
+                auth: targetUser.auth,
             },
-            msg: "歡迎 " + res.name + " 的登入！",
-        }
-    })
+            msg: "歡迎 " + targetUser.name + " 的登入！",
+        };
+
+    } catch (err) {
+        console.error('Login error:', err);
+        return {
+            success: false,
+            msg:err.message
+        };
+    }
 }

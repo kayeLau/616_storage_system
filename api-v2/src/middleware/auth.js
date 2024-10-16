@@ -37,6 +37,8 @@ async function auth(req, res, next) {
             res.json(tokenResult)
             return
         }
+    }).catch(err => {
+        next(err)
     })
 }
 

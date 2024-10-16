@@ -39,11 +39,13 @@ const shopsRouter = require('./routes/shop')
 const productsRouter = require('./routes/product')
 const ordersRouter = require('./routes/order')
 const settingRouter = require('./routes/setting')
+const inventoryRouter = require('./routes/inventory')
 app.use('/member', usersRouter);
 app.use('/shop',shopsRouter)
 app.use('/product',productsRouter)
 app.use('/order',ordersRouter)
 app.use('/setting',settingRouter)
+app.use('/inventory',inventoryRouter)
 
 // error handler
 app.use(function(err, req, res, next) {

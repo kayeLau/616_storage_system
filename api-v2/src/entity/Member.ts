@@ -8,7 +8,7 @@ export class Member {
     @PrimaryGeneratedColumn("uuid")
     id: string
 
-    @Column()
+    @Column({ length: 20 })
     name: string
 
     @Column()
@@ -32,7 +32,7 @@ export class Member {
     @Column({ nullable: true })
     online: number
 
-    @Column({ nullable: true })
+    @Column({ nullable: true , length: 10 })
     ipAddress: string
 
     @OneToOne(() => Partition)

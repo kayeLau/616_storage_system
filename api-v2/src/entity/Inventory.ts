@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column , JoinColumn, ManyToOne } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, Index } from "typeorm"
 import { Product } from "./Product"
 import { Shop } from "./Shop"
 
@@ -8,22 +8,25 @@ export class Inventory {
     @PrimaryGeneratedColumn()
     id: number
 
+    @Column({ length: 50, unique: true })
+    uniqueCode: string
+
     @Column()
     productId: number
 
-    @Column()
+    @Column({ length: 36 })
     shopId: string
 
     @Column()
     remain: number
 
-    @Column()
+    @Column({ length: 6 })
     month: string
 
     @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updateDate: Date;
 
-    @Column()
+    @Column({ length: 10 })
     editBy: string
 
     @ManyToOne(() => Shop)

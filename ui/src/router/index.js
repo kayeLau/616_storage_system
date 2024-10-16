@@ -66,6 +66,15 @@ const routes = [
     }]
   },
   {
+    path: '/inventory',
+    component: layout,
+    children:[{
+      path:'',
+      name: 'Inventory',
+      component: () => import('../views/Inventory.vue')
+    }]
+  },
+  {
     path: '/login',
     component: () => import('../views/Login.vue'),
   },

@@ -115,6 +115,12 @@ const menus = [
         auth: [0, 1]
     },
     {
+        name: "盤點",
+        path: 'inventory',
+        icon: 'Iphone',
+        auth: [-1]
+    },
+    {
         name: "設定",
         path: 'setting',
         icon: 'Setting',
