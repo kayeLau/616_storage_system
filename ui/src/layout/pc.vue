@@ -12,25 +12,6 @@
                         </div>
                         <el-button type="primary" style="width: 100%" @click="logOutbyUser">登出</el-button>
                     </el-card>
-                    <el-drawer v-model="phoneNavShow" direction="rtl" size="40%">
-                        <div class="phone-nav">
-                            <div>
-                                <router-link v-for='(item, index) of menus' :key='index' :to="item.path">
-                                    <div class="phone-nav-link">
-                                        <el-icon>
-                                            <component :is='item.icon'></component>
-                                        </el-icon>
-                                        <span >{{ item.name }}</span>
-                                    </div>
-                                </router-link>
-                            </div>
-                            <div>
-                                <div>{{ authDict[userInfo.auth] }}</div>
-                                <div>{{ userInfo.name }}</div>
-                                <el-button type="primary" style="width: 100%" @click="logOutbyUser">登出</el-button>
-                            </div>
-                        </div>
-                    </el-drawer>
                 </div>
             </el-header>
 
@@ -110,7 +91,7 @@ const menus = [
     },
     {
         name: "落單",
-        path: 'appOrder',
+        path: 'appFood',
         icon: 'Iphone',
         auth: [0, 1]
     },
@@ -135,15 +116,9 @@ const menus = [
 ].filter(item => item.auth.includes(userInfo.value.auth))
 
 let avatarDetailShow = ref(false)
-let phoneNavShow = ref(false)
-function avatarNavHandle() {
-    let screenWidth = window.screen.width
-    if (screenWidth <= 760) {
-        phoneNavShow.value = !phoneNavShow.value
-    } else {
-        avatarDetailShow.value = !avatarDetailShow.value
-    }
 
+function avatarNavHandle() {
+    avatarDetailShow.value = !avatarDetailShow.value
 }
 
 onBeforeUnmount(async () => {
@@ -152,16 +127,10 @@ onBeforeUnmount(async () => {
 </script>
 
 <style>
-@media only screen and (max-width: 760px) {
-    .el-main {
-        --el-main-padding: 0
-    }
-
-    .el-aside {
-        display: none
-    }
+.common-layout{
+    height: 100vh;
+    overflow: hidden;
 }
-
 .el-main {
     --el-main-padding: 10px
 }
@@ -223,29 +192,5 @@ onBeforeUnmount(async () => {
     padding-right: 8px;
     position: relative;
     height: calc(100vh - 60px);
-}
-
-.phone-nav {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.phone-nav-link {
-    color: #000;
-}
-
-.phone-nav a {
-    text-decoration: none;
-}
-
-.phone-nav-link {
-    color: #000;
-    padding-bottom: 10px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 3px;
 }
 </style>

@@ -1,6 +1,6 @@
 import { readInventory, createInventory, updateInventory } from '../models/inventory_model';
 import { readProduct } from '../models/productManage_model';
-import { readShop } from '../models/shopManage_model';
+// import { readShop } from '../models/shopManage_model';
 
 interface createInventory {
     shopId: string,
@@ -20,17 +20,18 @@ interface updateInventory {
 module.exports = class Inventony {
     // 獲取盤點列表
     async readInventory(req, res, next) {
-        const options = { shopId: req.body.shopId }
-        const size = parseInt(req.body.size) || 999
-        const page = parseInt(req.body.page) || 1
+        const options = { 
+            freezersNum: req.body.freezersNum,
+            classify: req.body.classify
+        }
+
         try {
-            const product = await readProduct({}, 999, 1)
-            const shop = await readShop({}, 999, 1)
-            const inventory = await readInventory(options, size, page)
+            const product = await readProduct(options, 999, 1)
+            // const shop = await readShop({}, 999, 1)
+            const inventory = await readInventory({})
             res.json({
                 success: true,
                 product: product.data,
-                shop: shop.data,
                 inventory: inventory.data
             })
         } catch (err) {

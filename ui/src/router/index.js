@@ -1,14 +1,17 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import layout from '../layout/default.vue'
+import pcLayout from '../layout/pc.vue'
+import phoneLayout from '../layout/phone.vue'
+const screenWidth = window.screen.width
+const layout = screenWidth > 750 ? pcLayout : phoneLayout
 
 const routes = [
   {
-    path: '/appOrder',
+    path: '/appFood',
     component: layout,
     children:[{
       path:'',
-      name: 'appOrder',
-      component: () => import('../views/appOrder.vue')
+      name: 'appFood',
+      component: () => import('../views/appFood.vue')
     }]
   },
   {

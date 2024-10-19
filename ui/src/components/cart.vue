@@ -124,24 +124,8 @@ function verifySubmit() {
 
 </script>
 <style>
-@media only screen and (min-width: 960px) {
-    .detail-box {
-        border-radius: 10px;
-    }
-
-    .cart-bar {
-        width: 40% !important;
-    }
-}
-
 .cart-bar {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    z-index: 100;
-    transform: translateX(-50%);
-    height: 40px;
-    width: 80%;
+    height: 45px;
     box-sizing: border-box;
 }
 
@@ -161,8 +145,6 @@ function verifySubmit() {
     background-color: aliceblue;
     color: var(--el-color-primary);
     box-shadow: 0 0 5px #ccc;
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
 }
 
 .cart-right {
@@ -172,11 +154,9 @@ function verifySubmit() {
     color: #fff;
     box-shadow: 0 0 5px #ccc;
     text-align: center;
-    line-height: 40px;
+    line-height: 45px;
     font-weight: 600;
     font-size: 20px;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
 }
 
 .detail-box {

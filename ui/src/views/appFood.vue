@@ -1,6 +1,5 @@
 <template>
-    <div style="position: relative;">
-        <div class="tool-bar"></div>
+    <div style="position: relative;height: 100%;overflow: hidden;">
         <el-skeleton :loading="loading" animated>
             <template #template>
                 <div class="product-skeleton">
@@ -9,7 +8,7 @@
                     <el-skeleton-item variant="text" style="width: 50%" />
                 </div>
             </template>
-            <el-tabs v-model="tabName" class="product-tabs" type="border-card">
+            <el-tabs v-model="tabName" class="product-tabs" type="border-card" :tabPosition="tabPosition">
                 <el-tab-pane v-for="(item, index) of products" :label="item.label" :name="item.name" :key="index">
                     <template #default>
                         <div class="product-list">
@@ -20,9 +19,8 @@
                                 <div class="product-row">
                                     <!-- <div class="product-standard">{{ product.standard }}</div> -->
                                     <div class="order-quantity">
-                                        <span style="padding-right: 10px;">{{ product.standard }}</span>
-                                        <el-input-number v-model="product.orderQuantity" :min="0"
-                                            @change="orderChange(product)" />
+                                        <div style="padding-right: 10px;">{{ product.standard }}</div>
+                                        <el-input-number v-model="product.orderQuantity" :min="0" @change="orderChange(product)" />
                                     </div>
                                 </div>
                             </div>
@@ -38,11 +36,15 @@
 
 <script setup>
 import cart from '../components/cart.vue'
-import { ref, onMounted } from 'vue';
+import { ref, onMounted , computed } from 'vue';
 import { readProduct } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
 import { classifyDict, classifySort } from '../request/dict';
 
+const tabPosition = computed(() => {
+    const screenWidth = window.screen.width
+    return screenWidth > 750 ? "top" : "left"
+})
 let loading = ref(true)
 let orderMap = ref({})
 const products = ref([
@@ -154,15 +156,6 @@ onMounted(async () => {
 </script>
 
 <style>
-@media only screen and (max-width: 960px) {
-    .product-list {
-        height: calc(100vh - 130px) !important;
-    }
-
-    .product-list::-webkit-scrollbar {
-        width: 0 !important;
-    }
-}
 
 .product-name {
     font-weight: 600;
@@ -179,12 +172,12 @@ onMounted(async () => {
 }
 
 .product-tabs {
-    height: 100%;
+    height: calc(100vh - 105px);
+    overflow: hidden;
 }
 
 .product-li {
     padding: 10px;
-    height: 65px;
     background-color: #fff;
     border-bottom: rgba(0, 0, 0, 0.1) 1px solid;
 }
@@ -192,7 +185,7 @@ onMounted(async () => {
 .product-list {
     padding-right: 10px;
     width: 100%;
-    height: calc(100vh - 180px);
+    height: calc(100vh - 130px);
     overflow-y: scroll;
 }
 .product-skeleton{
@@ -202,6 +195,13 @@ onMounted(async () => {
 }
 
 .order-quantity {
-    float: right;
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+}
+.el-tabs__item{
+    --el-tabs-header-height: 50px;
 }
 </style>

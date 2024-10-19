@@ -1,31 +1,63 @@
 <template>
-    <Ktable ref='KtableRef' :isIndex="false" :columns="columns" :operations="operations" :params="params"
-        :getList="getInventory" :searchFormColumns="searchFormColumns" :customBtn="[]"></Ktable>
+    <el-card class="Ktable-container">
+        <Ktable ref='KtableRef' :isIndex="false" :columns="columns" :operations="null" :params="params"
+            :getList="getInventory" :searchFormColumns="searchFormColumns" :customBtn="[]"></Ktable>
+    </el-card>
 </template>
 <script setup>
-import { readInventory } from '../request/orders';
+import { readInventory } from '../request/inventory';
 import Ktable from '../components/table.vue';
+import { ref } from 'vue';
+import { classifyDict, freezersNumDict, dictToOptions } from '../request/dict';
 
-const columns = [
-    { props: 'state', label: '訂單狀態', width: 100 },
-    { props: 'shopName', label: '落單門店', width: 180 },
-    { props: 'department', label: '落單部門', width: 100 },
-    { props: 'orderUserName', label: '落單人', width: 130 },
-    { props: 'orderIndex', label: '落單次數', formatter: (row, column) => row[column.property] + 1 },
-    { props: 'createDate', label: '落單時間', width: 180 },
-]
-
-const operations = null
+let columns = ref([])
 
 const params = {
     size: 20,
     page: 1,
 }
 
+const searchFormColumns = ref([
+    // {
+    //     type: 'datePicker',
+    //     prop: 'updateDate',
+    //     label: '盤點月份:',
+    // },
+    {
+        type: 'select',
+        prop: 'freezersNum',
+        label: '雪房號碼:',
+        options: dictToOptions(freezersNumDict),
+    },
+    {
+        type: 'select',
+        prop: 'classify',
+        label: '分類:',
+        options: dictToOptions(classifyDict),
+    }
+])
+
 async function getInventory() {
-    await readInventory(params).then(res => {
+    return await readInventory(params).then(res => {
         if (res.success) {
-            return res.inventory
+            const _columns = [{
+                props: 'shopName',
+                label: '店舖名稱',
+                width: 130,
+            }]
+            res.product.forEach(item => {
+                _columns.push({
+                    props: item.productCode,
+                    label: item.productName,
+                    width: item.productName.length * 28,
+                    formatter:(row, column)=>{
+                        let cell = row[column.property]
+                        return cell ? cell : 0
+                    }
+                })
+            })
+            columns.value = _columns
+            return { data: res.inventory, success: true }
         }
     })
 }

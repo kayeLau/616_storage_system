@@ -3,17 +3,12 @@ import { Inventory } from '../entity/Inventory';
 import { optionsGenerater } from './base_model';
 const inventoryRepository = AppDataSource.getRepository(Inventory);
 
-export async function readInventory(options, size, page) {
+export async function readInventory(options) {
     const { conditions, parameters } = optionsGenerater(options, "inventory")
-    const total = await inventoryRepository
-        .createQueryBuilder("inventory")
-        .where(conditions.join(" AND "), parameters)
-        .getCount();
 
     return inventoryRepository
         .createQueryBuilder('inventory')
         .leftJoin("inventory.shop", "shop")
-        .leftJoin("inventory.product", "product")
         .select([
             "inventory.id AS id",
             "inventory.shopId AS shopId",
@@ -23,25 +18,25 @@ export async function readInventory(options, size, page) {
             "inventory.month AS month",
             "inventory.editBy AS editBy",
             "shop.shopName As shopName",
-            "product.productCode As productCode",
-            "product.productName As productName",
-            "product.unit As unit",
-            "product.standard As standard",
-            "product.classify As classify",
-            "product.freezersNum As freezersNum",
             "DATE_FORMAT(inventory.updateDate, '%Y-%m-%d %H:%i:%S') AS updateDate"
         ])
         .where(conditions.join(" AND "), parameters)
-        .skip((page - 1) * size)
-        .take(size)
         .getRawMany()
         .then((result) => {
+            const data = {}
+            result.forEach(item => {
+                if(!data[item.shopId]){
+                    data[item.shopId] = {
+                        shopId:item.shopId,
+                        shopName:item.shopName,
+                        id:item.id
+                    }
+                }
+                data[item.shopId][item.productCode] = item.remain
+            })
             return {
                 success: true,
-                data: result,
-                page,
-                size,
-                total
+                data:Object.values(data)
             };
         })
 }
