@@ -17,7 +17,7 @@
                     </template>
                     <div v-for="(item, index) of item.children" :key="'s' + index" class="detail-container">
                         <h3>{{ item.productCode }} - {{ item.productName }}</h3>
-                        <div style="text-align: right;">{{ item.assignQuantity }} / {{ item.orderQuantity }}</div>
+                        <div style="text-align: right;">{{ item.assignQuantity }} / {{ item.orderQuantity }} {{ item.unit }}</div>
                         <div>{{ item.standard }}</div>
                     </div>
                 </el-collapse-item>

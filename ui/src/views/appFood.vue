@@ -9,7 +9,12 @@
                 </div>
             </template>
             <el-tabs v-model="tabName" class="product-tabs" type="border-card" tabPosition="left">
-                <el-tab-pane v-for="(item, index) of products" :label="item.label" :name="item.name" :key="index">
+                <el-tab-pane v-for="(item, index) of products" :name="item.name" :key="index">
+                    <template #label>
+                        <el-badge :value="badges[index]" :hidden="badges[index] <= 0 ? true : false">
+                            <span>{{ item.label }}</span>
+                        </el-badge>
+                    </template>
                     <template #default>
                         <div class="product-list">
                             <div v-for="(product, sIndex) of Object.values(item.children)" :key="sIndex"
@@ -20,7 +25,8 @@
                                     <!-- <div class="product-standard">{{ product.standard }}</div> -->
                                     <div class="order-quantity">
                                         <div style="padding-right: 10px;">{{ product.standard }}</div>
-                                        <el-input-number v-model="product.orderQuantity" :min="0" @change="orderChange(product)" />
+                                        <el-input-number v-model="product.orderQuantity" :min="0"
+                                            @change="orderChange(product)" />
                                     </div>
                                 </div>
                             </div>
@@ -36,7 +42,7 @@
 
 <script setup>
 import cart from '../components/cart.vue'
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, unref } from 'vue';
 import { readProduct } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
 import { classifyDict, classifySort } from '../request/dict';
@@ -54,25 +60,32 @@ const products = ref([
         children: {}
     }
 ])
+const badges = ref([])
 
 // 購物車項目改變
 function orderDetailChange(product) {
     setMustOrderChecked(product)
     setOrderMap(product)
     setProductListView(product)
-    // sendOrderWs()
 }
 
 // 加購
 function orderChange(product) {
     setMustOrderChecked(product)
     setOrderMap(product)
-    // sendOrderWs()
 }
 
+// 添加到訂單Map
 function setOrderMap(product) {
     const productId = product.productId
-    orderMap.value[productId] = product
+    const classify = product.classify
+    const orderQuantity = product.orderQuantity
+    if (!orderMap.value[productId]) {
+        badges[classify]++
+    } else if (orderQuantity === 0) {
+        badges[classify]--
+    }
+    orderMap.value[productId] = unref(product)
 }
 
 function setMustOrderChecked(product) {
@@ -81,6 +94,7 @@ function setMustOrderChecked(product) {
     }
 }
 
+// 回顯已存在的訂單
 function setProductListView(product) {
     const target = products.value.find(item => item.name === (product.classify));
     target.children[product.productId] = product
@@ -109,6 +123,7 @@ async function getProducts() {
                         children: {}
                     }
                 }
+                // 必點
                 if (item.prompt) {
                     const _item = {
                         ...item,
@@ -128,17 +143,20 @@ async function getProducts() {
             });
             products.value = products.value
                 .sort((a, b) => classifySort.indexOf(a.name) - classifySort.indexOf(b.name))
-                .filter(item => Object.keys(item.children).length)
-
+                .filter(item => Object.keys(item.children).length);
+            badges.value = new Array(products.value.length).fill(0)
         }
     })
 }
+
 const tabName = ref('')
 
+// 獲取當天已存在的訂單
 async function checkExistOrder() {
     await checkOrderRepeated().then(res => {
         if (res.success && res.data) {
             res.data.children.forEach(item => {
+                badges.value[item.classify]++
                 setOrderMap(item)
                 setProductListView(item)
             })
@@ -156,7 +174,6 @@ onMounted(async () => {
 </script>
 
 <style>
-
 .product-name {
     font-weight: 600;
 }
@@ -188,7 +205,8 @@ onMounted(async () => {
     height: calc(100vh - 130px);
     overflow-y: scroll;
 }
-.product-skeleton{
+
+.product-skeleton {
     padding: 10px;
     height: calc(100vh - 150px);
     background-color: #fff;
@@ -201,7 +219,8 @@ onMounted(async () => {
     align-items: flex-end;
     gap: 5px;
 }
-.el-tabs__item{
+
+.el-tabs__item {
     --el-tabs-header-height: 50px;
 }
 </style>
