@@ -5,30 +5,32 @@
 @import "./ststistic.css";
 @import "./transition.css";
 
-:root{
-    --background-color:#f2f6fc;
-    --menu-hover-bg-color:#e2ecfc;
-    --menu-active-bg-color:#d3e3fd;
+:root {
+    --background-color: #f2f6fc;
+    --menu-hover-bg-color: #e2ecfc;
+    --menu-active-bg-color: #d3e3fd;
 }
 
-*{
-    padding:0;
-    margin:0;
+* {
+    padding: 0;
+    margin: 0;
 }
 
-body{
-   background-color: var(--background-color); 
+body {
+    background-color: var(--background-color);
 }
 
-.btn-group{
+.btn-group {
     padding-top: 10px;
     display: flex;
     justify-content: flex-end;
 }
-.el-dialog__body{
+
+.el-dialog__body {
     height: 100%;
     box-sizing: border-box;
 }
+
 *::-webkit-scrollbar {
     width: 0.4em;
 }
@@ -39,10 +41,11 @@ body{
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: var(--el-color-info-light-5);
-  border-radius: 20px;
+    background-color: var(--el-color-info-light-5);
+    border-radius: 20px;
 }
-.flex-row-center{
+
+.flex-row-center {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -50,27 +53,37 @@ body{
     text-align: center;
 }
 
-.flex-row-start{
+.flex-row-start {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     gap: 5px;
 }
-.dialog{
+
+.dialog {
     border-radius: 10px;
     height: 70vh;
     overflow: hidden;
 }
-.title{
+
+.title {
     padding-bottom: 15px;
     font-size: large;
     font-weight: 700;
     color: var(--el-color-primary);
 }
-.text-overflow{
+
+.text-overflow {
     overflow: hidden;
     white-space: nowrap;
 }
-.el-dialog__body{
+
+.el-dialog__body {
     padding: 10px 12px 15px;
-  }
+}
+
+.logo {
+    width: 235px;
+    height: 28px;
+    background-size: contain;
+}

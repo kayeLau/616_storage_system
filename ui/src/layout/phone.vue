@@ -1,15 +1,13 @@
 <template>
     <div class="common-layout">
-        <el-container>
+        <el-container style="height: 100%;">
             <el-header class="header-bar">
-                <img src="../assets/616_logo.png" alt="616_logo" class='logo' @click="avatarNavHandle">
-                <div class="avatar">
-                    <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
-                </div>
+                <el-avatar @click="avatarNavHandle" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+                <img src="../assets/616_logo.png" alt="616_logo" class='logo'>
                 <el-drawer v-model="phoneNavShow" direction="ltr" size="80%">
                     <div class="phone-nav">
                         <div>
-                            <router-link v-for='(item, index) of menus' :key='index' :to="item.path">
+                            <router-link v-for='(item, index) of menus' :key='index' :to="item.path" @click="avatarNavHandle">
                                 <div class="phone-nav-link">
                                     <el-icon>
                                         <component :is='item.icon'></component>
@@ -25,7 +23,7 @@
                     </div>
                 </el-drawer>
             </el-header>
-            <el-container>
+            <el-container style="overflow:hidden ;">
                 <el-main>
                     <router-view />
                 </el-main>
@@ -56,7 +54,7 @@ const userInfo = computed(() => {
 const menus = [
     {
         name: "訂單管理",
-        path: 'order',
+        path: 'appOrder',
         icon: 'Tickets',
         auth: [-1, 1, 0, 2, 3]
     },
@@ -116,27 +114,20 @@ onBeforeUnmount(async () => {
 })
 </script>
 
-<style>
+<style scoped>
 .common-layout{
     height: 100vh;
     overflow: hidden;
 }
 .el-main {
-    --el-main-padding: 0
+    --el-main-padding: 0;
 }
 
 .header-bar {
     padding: 8px 20px;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.logo {
-    width: 235px;
-    height: 28px;
-    background-size: contain;
-
+    align-items: flex-end;
+    justify-content: flex-start;
 }
 
 .avatar {

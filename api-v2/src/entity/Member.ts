@@ -32,7 +32,7 @@ export class Member {
     @Column({ nullable: true })
     online: number
 
-    @Column({ nullable: true , length: 10 })
+    @Column({ nullable: true , length: 50 })
     ipAddress: string
 
     @OneToOne(() => Partition)

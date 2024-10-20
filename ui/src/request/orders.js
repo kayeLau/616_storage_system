@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function readMember(data){
+export function readOrder(data){
     return request({
         url: '/order/readOrder',
         method: 'post',

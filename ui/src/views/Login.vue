@@ -6,7 +6,8 @@
                 <div class="login-form">
                     <h1>Sign In</h1>
                     <input type="text" placeholder="用戶名稱" v-model="loginInfo.userName" @keydown.enter="toLogin(false)">
-                    <input type="password" placeholder="用戶密碼" v-model="loginInfo.password" @keydown.enter="toLogin(false)">
+                    <input type="password" placeholder="用戶密碼" v-model="loginInfo.password"
+                        @keydown.enter="toLogin(false)">
                     <button @click="toLogin(false)">Sign In</button>
                 </div>
             </div>
@@ -60,7 +61,7 @@ function toLogin(force = false) {
             if (res.success === true) {
                 setToken(res.token)
                 setStorge('userInfo', res.userInfo)
-                toHome()
+                toHome(res.userInfo)
             } else if (res.isUsing) {
                 ipAddress.value = res.ip
                 dialogVisible.value = true
@@ -75,21 +76,21 @@ function toLogin(force = false) {
     }
 }
 
-function toHome() {
-    router.push({
-        path: '/order'
-    })
+function toHome(userInfo) {
+    const path = userInfo.auth === 0 || userInfo.auth === 1 ? '/appFood' : '/order';
+    router.push({ path })
 }
 
 </script>
-<style>
+<style scoped>
 @media screen and (max-width: 750px) {
-#container {
-    flex-direction: column;
-    width: 80vw;
-  }
+    #container {
+        flex-direction: column;
+        width: 80vw;
+    }
 }
-.logo{
+
+.logo {
     padding-top: 10px;
     padding-left: 10px;
 }
@@ -175,5 +176,4 @@ function toHome() {
     padding: 0 30px;
     text-align: center;
 }
-
 </style>

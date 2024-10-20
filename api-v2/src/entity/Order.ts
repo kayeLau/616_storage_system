@@ -7,19 +7,19 @@ export class Order {
     @PrimaryGeneratedColumn("uuid")
     id: string
 
-    @Column()
+    @Column({ length: 50 })
     orderCode: string
 
-    @Column()
+    @Column({ length: 36 })
     orderUserId: string
 
-    @Column()
+    @Column({ length: 50 })
     orderUserName: string
 
-    @Column()
+    @Column({ length: 36 })
     orderShopId: string
 
-    @Column()
+    @Column({comment: '所属部門'})
     department: number
     
     @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })

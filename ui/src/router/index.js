@@ -24,6 +24,24 @@ const routes = [
     }]
   },
   {
+    path: '/appOrder',
+    component: layout,
+    children:[{
+      path:'',
+      name: 'appOrder',
+      component: () => import('../views/appOrder.vue')
+    }]
+  },
+  {
+    path: '/appOrderDetail/:orderCode',
+    component: layout,
+    children:[{
+      path:'',
+      name: 'appOrderDetail',
+      component: () => import('../views/appOrderDetail.vue')
+    }]
+  },
+  {
     path: '/shop',
     component: layout,
     children:[{

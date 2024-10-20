@@ -2,7 +2,7 @@
   <div>
     <el-card class="Ktable-container">
       <Ktable ref='KtableRef2' isExpand :isIndex="false" :columns="columns" :operations="operations" :params="params"
-        :tableRowClassName="tableRowClassName" :getList="readMember" :expandChange="expandChange"
+        :tableRowClassName="tableRowClassName" :getList="readOrder" :expandChange="expandChange"
         :searchFormColumns="searchFormColumns" :customBtn="customBtn" :expandHeader="{}" :expandColumns="{}"
         :products="products" :expandRowKeys="expandRowKeys"></Ktable>
     </el-card>
@@ -32,7 +32,7 @@
 import orderDetailList from '../components/orderDetailList.vue';
 import { readProduct } from '../request/products';
 import { readShop } from '../request/shops'
-import { readMember, exportDailyMeetSummary, readHistoryOrder, readOrderDetail } from '../request/orders';
+import { readOrder, exportDailyMeetSummary, readHistoryOrder, readOrderDetail } from '../request/orders';
 import { departmentDict, orderStateDict, freezersNumDict } from '../request/dict';
 import { exportExcel } from '../utils/export';
 import Ktable from '../components/table.vue';

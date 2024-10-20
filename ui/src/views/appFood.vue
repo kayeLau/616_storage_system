@@ -8,7 +8,7 @@
                     <el-skeleton-item variant="text" style="width: 50%" />
                 </div>
             </template>
-            <el-tabs v-model="tabName" class="product-tabs" type="border-card" :tabPosition="tabPosition">
+            <el-tabs v-model="tabName" class="product-tabs" type="border-card" tabPosition="left">
                 <el-tab-pane v-for="(item, index) of products" :label="item.label" :name="item.name" :key="index">
                     <template #default>
                         <div class="product-list">
@@ -36,15 +36,15 @@
 
 <script setup>
 import cart from '../components/cart.vue'
-import { ref, onMounted , computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { readProduct } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
 import { classifyDict, classifySort } from '../request/dict';
 
-const tabPosition = computed(() => {
-    const screenWidth = window.screen.width
-    return screenWidth > 750 ? "top" : "left"
-})
+// const tabPosition = computed(() => {
+//     const screenWidth = window.screen.width
+//     return screenWidth > 750 ? "top" : "left"
+// })
 let loading = ref(true)
 let orderMap = ref({})
 const products = ref([

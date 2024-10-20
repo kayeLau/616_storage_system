@@ -126,13 +126,14 @@ onBeforeUnmount(async () => {
 })
 </script>
 
-<style>
+<style scoped>
 .common-layout{
     height: 100vh;
     overflow: hidden;
 }
 .el-main {
-    --el-main-padding: 10px
+    --el-main-padding: 0 10px;
+    height: 100%;
 }
 
 .header-bar {
