@@ -11,9 +11,7 @@
             <el-tabs v-model="tabName" class="product-tabs" type="border-card" tabPosition="left">
                 <el-tab-pane v-for="(item, index) of products" :name="item.name" :key="index">
                     <template #label>
-                        <el-badge :value="badges[index]" :hidden="badges[index] <= 0 ? true : false">
                             <span>{{ item.label }}</span>
-                        </el-badge>
                     </template>
                     <template #default>
                         <div class="product-list">
@@ -60,7 +58,6 @@ const products = ref([
         children: {}
     }
 ])
-const badges = ref([])
 
 // 購物車項目改變
 function orderDetailChange(product) {
@@ -78,13 +75,6 @@ function orderChange(product) {
 // 添加到訂單Map
 function setOrderMap(product) {
     const productId = product.productId
-    const classify = product.classify
-    const orderQuantity = product.orderQuantity
-    if (!orderMap.value[productId]) {
-        badges[classify]++
-    } else if (orderQuantity === 0) {
-        badges[classify]--
-    }
     orderMap.value[productId] = unref(product)
 }
 
@@ -144,7 +134,6 @@ async function getProducts() {
             products.value = products.value
                 .sort((a, b) => classifySort.indexOf(a.name) - classifySort.indexOf(b.name))
                 .filter(item => Object.keys(item.children).length);
-            badges.value = new Array(products.value.length).fill(0)
         }
     })
 }
@@ -156,7 +145,6 @@ async function checkExistOrder() {
     await checkOrderRepeated().then(res => {
         if (res.success && res.data) {
             res.data.children.forEach(item => {
-                badges.value[item.classify]++
                 setOrderMap(item)
                 setProductListView(item)
             })

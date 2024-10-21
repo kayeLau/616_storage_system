@@ -86,7 +86,7 @@ const menus = [
     {
         name: "盤點",
         path: 'inventory',
-        icon: 'Iphone',
+        icon: 'Box',
         auth: [-1]
     },
     {

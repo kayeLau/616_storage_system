@@ -1,8 +1,5 @@
-const createError = require('http-errors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const logger = require('morgan');
-// require('./models/create_tabel')
 const Express = require('express')
 const app = Express();
 require("reflect-metadata");
@@ -12,13 +9,10 @@ import { initializeDatabase } from './data-source';
 // app.set('views', path.join(__dirname, 'views'));
 // app.set('view engine', 'ejs');
 
-app.use(logger('dev'));
 app.use(Express.json());
 app.use(Express.static(path.join(__dirname, 'public')));
 app.use(Express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-
 
 const startApp = async () => {
     await initializeDatabase();
@@ -27,11 +21,16 @@ startApp();
 
 // middleware
 const auth = require('./middleware/auth')
-// const rateLimiter = require('./middleware/rateLimiter')
-// const helmet = require('helmet')
+const rateLimiter = require('./middleware/rateLimiter')
+const helmet = require('helmet')
+const log = require("./utils/log");
 app.use(auth)
-// app.use(helmet())
-// app.use(rateLimiter)
+app.use(helmet())
+app.use(rateLimiter)
+app.use((req, res, next) => {
+  log.info(`${req.method} ${req.url} ${JSON.stringify(req.body)}`);
+  next();
+});
 
 // router
 const usersRouter = require('./routes/member');

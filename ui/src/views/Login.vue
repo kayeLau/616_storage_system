@@ -1,14 +1,15 @@
 <template>
     <div id="login">
         <div class="container" id="container">
-            <div class="form-container sign-in">
+            <div class="form-container">
                 <img src="../assets/616_logo.png" alt="616_logo" class='logo'>
                 <div class="login-form">
-                    <h1>Sign In</h1>
+                    <div class="phone-title">616智能倉務系統</div>
+                    <h1>Welcome</h1>
                     <input type="text" placeholder="用戶名稱" v-model="loginInfo.userName" @keydown.enter="toLogin(false)">
                     <input type="password" placeholder="用戶密碼" v-model="loginInfo.password"
                         @keydown.enter="toLogin(false)">
-                    <button @click="toLogin(false)">Sign In</button>
+                    <button @click="toLogin(false)">登入</button>
                 </div>
             </div>
             <div class="toggle-container">
@@ -19,7 +20,7 @@
                 </div>
             </div>
         </div>
-        <el-dialog v-model="dialogVisible" title="強制退出登陸" width="500" top="25vh">
+        <el-dialog v-model="dialogVisible" title="強制退出登陸" width="500" top="30vh" style="max-width: 95vw;">
             <span>此用戶正在設備
                 <span style="font-weight: 700;color: var(--el-color-primary);">{{ ipAddress }}</span>
                 上登陸,是否強制退出登陸
@@ -76,8 +77,9 @@ function toLogin(force = false) {
     }
 }
 
-function toHome(userInfo) {
-    const path = userInfo.auth === 0 || userInfo.auth === 1 ? '/appFood' : '/order';
+function toHome() {
+    const screenWidth = window.screen.width
+    const path = screenWidth > 750 ? '/order' : '/appOrder';
     router.push({ path })
 }
 
@@ -87,6 +89,17 @@ function toHome(userInfo) {
     #container {
         flex-direction: column;
         width: 80vw;
+    }
+    .phone-title{
+        display: block;
+        font-size: 30px;
+        font-weight: 600;
+        color: #512da8;
+    }
+}
+@media screen and (min-width: 750px) {
+    .phone-title{
+        display: none;
     }
 }
 
@@ -107,6 +120,7 @@ function toHome(userInfo) {
 }
 
 .container {
+    position: relative;
     background-color: #fff;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
     width: 768px;
@@ -123,7 +137,6 @@ function toHome(userInfo) {
     border-radius: 8px;
     font-weight: 600;
     letter-spacing: 0.5px;
-    text-transform: uppercase;
     margin-top: 10px;
     cursor: pointer;
 }
