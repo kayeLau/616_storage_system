@@ -72,8 +72,8 @@ export async function readMember(options, size, page) {
             "DATE_FORMAT(member.updateDate, '%Y-%m-%d %H:%i:%S') AS updateDate"
         ])
         .where(conditions.join(" AND "), parameters)
-        .skip((page - 1) * size)
-        .take(size)
+        .offset((page - 1) * size)
+        .limit(size)
         .getRawMany()
         .then((result) => {
             return {

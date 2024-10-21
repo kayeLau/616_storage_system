@@ -6,7 +6,7 @@ export class Setting {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column()
+    @Column({length: 50})
     name: string
 
     @Column()

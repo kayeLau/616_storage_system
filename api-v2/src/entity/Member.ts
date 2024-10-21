@@ -20,11 +20,11 @@ export class Member {
     @Column({ nullable: true })
     shopPartition: number
 
-    @Column({ nullable: true })
+    @Column({ nullable: true , length:36 })
     shopId: String
 
     @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
-    craetDate: Date;
+    createDate: Date;
 
     @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updateDate: Date;

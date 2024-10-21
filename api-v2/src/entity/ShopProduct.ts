@@ -6,7 +6,7 @@ export class ShopProduct {
     @PrimaryColumn({ type: 'varchar', length: 50 })
     id: string;
 
-    @Column()
+    @Column({length: 36})
     shopId: string
 
     @Column()

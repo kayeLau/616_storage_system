@@ -1,0 +1,11 @@
+info: [Oct-22-2024 00:37:09]: POST /order/readOrder {"size":20,"page":1,"updateDate":["2024-10-21 00:00:00","2024-10-22 23:59:59"]}
+info: [Oct-22-2024 00:37:09]: POST /product/readProduct {"size":999,"page":1}
+info: [Oct-22-2024 00:37:09]: POST /shop/readShop {"size":999,"page":1}
+info: [Oct-22-2024 00:37:16]: POST /order/readHistoryOrder {"size":99,"page":1,"orderCode":"d98a4e3d-6ee6-47f5-9c5c-0c598c803a67-20241021"}
+info: [Oct-22-2024 00:37:24]: POST /order/readHistoryOrder {"size":99,"page":1,"orderCode":"09c4bfbc-bc1f-4bb9-8618-5d73bdf0ea51-20241021"}
+info: [Oct-22-2024 00:37:26]: POST /order/readHistoryOrder {"size":99,"page":1,"orderCode":"b81327a3-c600-4f5f-82c0-1fa0ccdb18ec-20241021"}
+info: [Oct-22-2024 00:37:29]: POST /order/readHistoryOrder {"size":99,"page":1,"orderCode":"f9b6396c-a755-44bf-bfc9-db4457586a5c-20241021"}
+info: [Oct-22-2024 00:37:33]: POST /order/readHistoryOrder {"size":99,"page":1,"orderCode":"7aa2bdf3-2098-47d4-ae4a-3d61664b1e0c-20241021"}
+info: [Oct-22-2024 00:37:35]: POST /order/readHistoryOrder {"size":99,"page":1,"orderCode":"e103f4cf-1e55-43f0-9320-eade2db83cc5-20241021"}
+info: [Oct-22-2024 00:37:48]: POST /order/readOrder {"size":20,"page":1,"updateDate":["2024-10-01 00:00:00","2024-10-22 23:59:59"],"total":6}
+info: [Oct-22-2024 00:37:52]: POST /order/readOrderDetail {"orderId":"8e1e0f0a-1fd4-4456-b665-4c5c664b40f3"}

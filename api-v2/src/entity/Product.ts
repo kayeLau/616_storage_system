@@ -7,7 +7,7 @@ export class Product {
     @PrimaryGeneratedColumn()
     productId: number
 
-    @Column()
+    @Column({length: 20})
     productCode: string
 
     @Column()
@@ -19,13 +19,13 @@ export class Product {
     @Column()
     classify: number
 
-    @Column()
+    @Column({length: 50})
     productName: string
 
-    @Column()
+    @Column({length: 20})
     unit: string
 
-    @Column()
+    @Column({length: 50})
     standard: string
 
     @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })

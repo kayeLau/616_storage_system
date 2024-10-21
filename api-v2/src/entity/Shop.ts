@@ -7,10 +7,10 @@ export class Shop {
     @PrimaryGeneratedColumn("uuid")
     shopId: string
 
-    @Column()
+    @Column({length: 20})
     shopCode: string
 
-    @Column()
+    @Column({length: 50})
     shopName: string
 
     @Column()
@@ -22,7 +22,7 @@ export class Shop {
     @Column({ nullable: true })
     productCount: number
 
-    @Column()
+    @Column({length: 50})
     shopPartition: string
 
     @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
