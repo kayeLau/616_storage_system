@@ -114,7 +114,7 @@ export async function readOrderDetail(orderId) {
 // 創建訂單
 export async function createOrder(data) {
     const existingOrder = await orderRepository
-        .createQueryBuilder()
+        .createQueryBuilder('order')
         .select('MAX(order.orderIndex)', 'orderIndex')
         .where("order.orderCode = :orderCode", { orderCode: data.orderCode })
         .getRawOne()
@@ -156,7 +156,7 @@ export async function createOrderDetail(orderList) {
 export async function checkOrderRepeated(options) {
     const { conditions, parameters } = optionsGenerater(options, "order");
     const existingOrder = await orderRepository
-        .createQueryBuilder()
+        .createQueryBuilder('order')
         .where(conditions.join('AND'), parameters)
         .orderBy("order.orderIndex", "DESC")
         .getOne()
@@ -179,7 +179,7 @@ export async function checkOrderRepeated(options) {
 // 設置訂單細項
 export function updateAssignQuantity(list, userInfo) {
     return orderDetailRepository
-        .createQueryBuilder()
+        .createQueryBuilder("orderDetail")
         .update(OrderDetail)
         .set({
             orderQuantity: () => "CASE id " +

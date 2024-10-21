@@ -24,7 +24,7 @@ export async function verifyToken(token, getUser = false): Promise<verifyTokenRe
             if (!err && decode.exp > time) {
                 if (getUser) {
                     const userInfo: UserInfo = await memberRepository
-                        .createQueryBuilder()
+                        .createQueryBuilder("member")
                         .where('member.id = :id', { id: decode.data })
                         .getOne()
                     return {

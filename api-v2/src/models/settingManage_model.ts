@@ -4,7 +4,7 @@ import { Setting } from '../entity/Setting';
 
 export function updateSetting(data) {
     return AppDataSource.getRepository(Setting)
-        .createQueryBuilder()
+        .createQueryBuilder('setting')
         .update(Setting)
         .set({ name: data.name, value: data.value })
         .where("setting.name = :name", { name: data.name })

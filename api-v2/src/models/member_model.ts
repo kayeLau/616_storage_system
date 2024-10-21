@@ -7,7 +7,7 @@ const memberRepository = AppDataSource.getRepository(Member);
 
 export async function toRegister(data) {
     const existingMember = await memberRepository
-        .createQueryBuilder()
+        .createQueryBuilder("member")
         .where("member.name = :name", { name: data.name })
         .getOne()
 

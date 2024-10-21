@@ -13,7 +13,7 @@ export async function readProduct(options, size, page) {
     .getCount();
 
     return productRepository
-    .createQueryBuilder()
+    .createQueryBuilder("product")
     .select([
         "product.productId AS productId",
         "product.productCode AS productCode",
@@ -46,7 +46,7 @@ export async function readProduct(options, size, page) {
 
 export async function readBandProduct(options){
     return shopProductRepository
-    .createQueryBuilder()
+    .createQueryBuilder("shopProduct")
     .where("shopProduct.shopId = :shopId",{ shopId:options.shopId })
     .getMany()
     .then((result) => {
@@ -55,7 +55,7 @@ export async function readBandProduct(options){
 }
 
 export async function createProduct(data) {
-    const existingProduct = await productRepository.createQueryBuilder()
+    const existingProduct = await productRepository.createQueryBuilder("product")
         .where("product.productCode = :productCode", { productCode: data.productCode })
         .getOne()
 

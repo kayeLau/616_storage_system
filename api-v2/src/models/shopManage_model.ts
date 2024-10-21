@@ -44,7 +44,7 @@ export async function readShop(options, size, page) {
 
 export function readPartition() {
     return partitionRepository
-        .createQueryBuilder()
+        .createQueryBuilder("partition")
         .getMany()
         .then((result) => {
             return { success: true, data: result };
@@ -52,12 +52,12 @@ export function readPartition() {
 }
 
 export async function createShop(data) {
-    const existingShop = await shopRepository.createQueryBuilder()
+    const existingShop = await shopRepository.createQueryBuilder("shop")
         .where("shop.shopName = :shopName", { shopName: data.shopName })
         .andWhere("shop.shopCode = :shopCode", { shopCode: data.shopCode })
         .getOne()
 
-    const maxShop = await shopRepository.createQueryBuilder()
+    const maxShop = await shopRepository.createQueryBuilder("shop")
         .select("MAX(shop.shopOrder)", "shopOrder")
         .getRawOne();
 
@@ -76,7 +76,7 @@ export async function createShop(data) {
 }
 
 export async function createPartition(data) {
-    const existingPartition = await partitionRepository.createQueryBuilder()
+    const existingPartition = await partitionRepository.createQueryBuilder("partition")
         .where("partition.partitionName = :partitionName", { partitionName: data.partitionName })
         .getOne()
 
@@ -135,8 +135,8 @@ export function deletePartition(id) {
 
 export function readBindProduct(options) {
     return shopProductRepository
-        .createQueryBuilder()
-        .where("shopId = :shopId", options)
+        .createQueryBuilder("shop")
+        .where("shop.shopId = :shopId", options)
         .getMany()
         .then((result) => {
             return { success: true, data: result };
