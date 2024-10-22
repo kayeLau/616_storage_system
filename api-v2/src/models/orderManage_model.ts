@@ -41,7 +41,8 @@ async function getOrderAndGroupBy(options, size, page) {
             "IF(order.orderDate = '" + orderDateStr + "',1,0) AS isToday",
             'order.orderIndex AS orderIndex',
             'order.state AS state',
-            'shop.shopName AS shopName'
+            'shop.shopName AS shopName',
+            'shop.shopCode AS shopCode'
         ])
         .where(conditions.join(" AND "), parameters)
         .innerJoin(`(${subQuery.getQuery()})`, "maxOrders", "maxOrders.orderCode = order.orderCode AND maxOrders.maxOrderIndex = order.orderIndex")

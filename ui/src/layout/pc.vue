@@ -32,7 +32,7 @@
                         </component>
                     </el-menu>
                     <div class="version">
-                        v1.0.0.4
+                        v1.0.1.0
                     </div>
                 </el-aside>
 
