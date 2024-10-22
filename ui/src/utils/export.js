@@ -1,9 +1,121 @@
-import FileSaver from 'file-saver'
-import * as XLSX from 'xlsx'
-import XLSXStyle from 'xlsx-style-medalsoft'
+import FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
+import XLSXStyle from 'xlsx-style-medalsoft';
 import JSZip from 'jszip';
-import { classifyDict, departmentDict, freezersNumDict, productDisable, productSummary, exchangeKeyValue } from '../request/dict'
+import { getStorge } from '../utils/auth';
+import { exportDailyMeetSummary, readOrderDetail } from '../request/orders';
+import { classifyDict, departmentDict, freezersNumDict, productDisable, productSummary, exchangeKeyValue } from '../request/dict';
 
+export function exportMeatSummary(defaultExportDate) {
+  exportDailyMeetSummary({ exportDate: defaultExportDate, exportType: 1 }).then(res => {
+    if (res.success) {
+      const date = new Date()
+      const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
+      let shopName = res.data.shopName
+      let products = res.data.products
+      let jsonData = products.map((product) => {
+        let summary = product.orderItems.reduce((prev, acc) => prev + acc) + product.unit
+        let row = shopName.map((item, columnIndex) => {
+          let order = product.orderItems[columnIndex]
+          return order + product.unit
+        })
+        return [product.productName, ...row, product.productName, summary]
+      })
+      jsonData.unshift(['產品名稱', ...shopName, '產品名稱', '出貨總數'])
+
+      const dailyMeetSummary = {
+        sheetNames: today + '工埸鮮肉匯總表',
+        jsonData
+      }
+      exportExcel({ exportDate: [dailyMeetSummary], usezip: false, zipFileName: '', hpt: 40, wpt: 3, header: '1' })
+    }
+  })
+}
+
+export function exportAllSummary(defaultExportDate) {
+  let user = getStorge('userInfo')
+  let userInfo = user ? JSON.parse(user) : {}
+  exportDailyMeetSummary({ exportDate: defaultExportDate, exportType: 0 }).then(res => {
+    if (res.success) {
+      const date = new Date()
+      const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
+      let products = res.data.products
+      if (userInfo.auth === 3) {
+        products = products.filter(item => item.freezersNum === 1 || item.freezersNum === 3 || item.freezersNum === 4)
+      }
+      let jsonData = []
+      let rowIndex = 0
+      let jindex = 0
+      // 產品
+      products.map((product) => {
+        let summary = product.orderItems.reduce((prev, acc) => prev + acc)
+        if (summary > 0) {
+          let freezersNum = freezersNumDict[product.freezersNum]
+          if (rowIndex % 2 === 1) {
+            jsonData[jindex] = [...jsonData[jindex], ' ', product.productName, freezersNum, summary, product.unit]
+            jindex++
+          } else {
+            jsonData[jindex] = [product.productName, freezersNum, summary, product.unit]
+          }
+          rowIndex++
+        }
+      })
+      const header = rowIndex > 0 ? ['產品名稱', '雪房編號', '出貨數量', '單位', ' ', '產品名稱', '雪房編號', '出貨數量', '單位'] : ['產品名稱', '雪房編號', '出貨數量', '單位']
+      jsonData.unshift(header)
+
+      const dailyMeetSummary = {
+        sheetNames: today + '出貨匯總表',
+        jsonData
+      }
+      exportExcel({ exportDate: [dailyMeetSummary], header: '1', hpt: 30, wpt: 2.5 })
+    }
+  })
+}
+
+export async function exportOrderExcel(index, row) {
+  const date = new Date()
+  const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
+  const todayF = String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear()
+  let children = []
+  await readOrderDetail({ orderId: row.id }).then(res => {
+    if (res.success) {
+      children = res.data
+    }
+  })
+  const shipping = {
+    sheetNames: today + row.shopName + '出貨表',
+    jsonData: [
+      [row.shopCode, row.shopName, '', todayF],
+      ['貨品編號', '貨品名稱', '數量/重量', '單位', '包裝規格'],
+      ...children.map(item => [
+        item.productCode,
+        item.productName,
+        item.assignQuantity,
+        item.unit,
+        item.standard,
+      ])
+    ]
+  };
+
+  const delivery = {
+    sheetNames: today + row.shopName + '送貨單',
+    jsonData: [
+      [row.shopName, row.orderUserName[0], '', '', '', row.updateDate],
+      ['貨品名稱', '分配數量', '單位', '下單數量', '包裝規格', '備注'],
+      ...children.map(item => [
+        item.productName,
+        item.assignQuantity,
+        item.unit,
+        item.orderQuantity,
+        item.standard,
+        item.remark
+      ])
+    ]
+  }
+  exportExcel({ exportDate: [shipping, delivery], usezip: true, zipFileName: String(today + row.shopName), header: '2', wpt: 3 })
+}
+
+/* ========================= base ========================= */
 export function xlsxToJson(fileBinaryString) {
   const workBook = XLSX.read(fileBinaryString, { type: 'binary' })
   const _classifyDict = exchangeKeyValue(classifyDict)
@@ -33,12 +145,11 @@ export function xlsxToJson(fileBinaryString) {
     })
   })
 
-  console.log(result)
   let fileData = new Blob([JSON.stringify(result)], { type: 'application/json' })
   FileSaver.saveAs(fileData, 'db.json')
 }
 
-export function exportExcel({ exportDate, usezip = false, zipFileName, hpt, header, wpt }) {
+function exportExcel({ exportDate, usezip = false, zipFileName, hpt, header, wpt }) {
   let zip = new JSZip();
   exportDate.forEach(item => {
     let jsonWorkSheet = XLSX.utils.json_to_sheet(item.jsonData, { skipHeader: true });
@@ -111,7 +222,7 @@ function autoWidth(worksheet, wpt = 2.2) {
     if (value) {
       // console.log(col,worksheet[cell].v)
       maxWidth[col] = Math.max(maxWidth[col] || 0, typeof value === 'string' ? value.length : (value.toString()).length);
-      if(col === 'C'){
+      if (col === 'C') {
         console.log(maxWidth[col])
         // console.log(worksheet[cell].v)
       }

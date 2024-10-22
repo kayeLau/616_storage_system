@@ -87,6 +87,15 @@ const routes = [
     }]
   },
   {
+    path: '/appInventory',
+    component: layout,
+    children:[{
+      path:'',
+      name: 'appInventory',
+      component: () => import('../views/appInventory.vue')
+    }]
+  },
+  {
     path: '/inventory',
     component: layout,
     children:[{

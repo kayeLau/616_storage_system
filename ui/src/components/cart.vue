@@ -14,23 +14,23 @@
             </div>
         </div>
         <Transition name="side-in">
-        <div class="detail-box" v-show="detailBoxSwitch">
-            <div class="order-list">
-                <div v-for="(product, index) of orderList" :key="index" class="order-item">
-                    <div class="product-name" style="flex: 1;">{{ product.productName }}</div>
-                    <div style="color: #cfcfcf;font-size: 14px;padding-right: 8px;">{{ product.standard }}</div>
-                    <div>
-                        <!-- <el-icon @click="emitOrderDetailChange(product, true)">
+            <div class="detail-box" v-show="detailBoxSwitch">
+                <div class="order-list">
+                    <div v-for="(product, index) of orderList" :key="index" class="order-item">
+                        <div class="product-name" style="flex: 1;">{{ product.productName }}</div>
+                        <div style="color: #cfcfcf;font-size: 14px;padding-right: 8px;">{{ product.standard }}</div>
+                        <div>
+                            <!-- <el-icon @click="emitOrderDetailChange(product, true)">
                             <CirclePlusFilled />
                         </el-icon> -->
-                        {{ product.orderQuantity }}
-                        <!-- <el-icon @click="emitOrderDetailChange(product, false)">
+                            {{ product.orderQuantity }}
+                            <!-- <el-icon @click="emitOrderDetailChange(product, false)">
                             <RemoveFilled />
                         </el-icon> -->
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         </Transition>
         <div class="cart-cover" v-show="detailBoxSwitch" @click="detailBoxSwitch = !detailBoxSwitch"></div>
         <el-drawer v-model="drawerSwitch" direction="ltr" :z-index="120" :withHeader="false" size="100%"
@@ -45,23 +45,25 @@
                 </el-card>
 
                 <div class="order-list" style="height: 60vh;">
-                    <div v-for="(product, index) of orderList" :key="index" class="order-item"  
-                    :style="product.orderQuantity === null ? 'background-color: var(--el-color-danger-light-7)' : ''">
+                    <div v-for="(product, index) of orderList" :key="index" class="order-item"
+                        :style="product.orderQuantity === null ? 'background-color: var(--el-color-danger-light-7)' : ''">
                         <div class="product-name" style="width: 50%;">{{ product.productName }}</div>
                         <div style="width: 30%;">{{ product.standard }}</div>
                         <div style="width: 20%;text-align: end;">{{ product.orderQuantity }}</div>
                     </div>
                 </div>
 
-                <el-button round style="justify-self: flex-end;" type="primary" @click="comfireOrder" :disabled="submitDisabled">確定訂單</el-button>
+                <el-button round style="justify-self: flex-end;" type="primary" @click="comfireHandle"
+                    :disabled="submitDisabled">確定訂單</el-button>
             </div>
         </el-drawer>
     </div>
 </template>
 <script setup>
 import { defineProps, computed, ref } from 'vue';
-import { getStorge } from '../utils/auth'
-import { createOrder } from '../request/orders'
+import { getStorge } from '../utils/auth';
+import { createOrder } from '../request/orders';
+import { createInventory } from '../request/inventory';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 const userInfo = computed(() => {
@@ -70,7 +72,8 @@ const userInfo = computed(() => {
 })
 
 const props = defineProps({
-    orderMap: Object
+    orderMap: Object,
+    flag:String
 })
 
 const orderList = computed(() => {
@@ -86,6 +89,14 @@ function jumpToOrderComfire() {
     }
 }
 
+function comfireHandle(){
+    if(props.flag === 'order'){
+        comfireOrder()
+    }else if(props.flag === 'inventory'){
+        comfireInventory()
+    }
+}
+
 let submitDisabled = ref(false)
 async function comfireOrder() {
     if (!verifySubmit()) {
@@ -93,7 +104,7 @@ async function comfireOrder() {
             '訂單中存在錯誤的產品數量,請檢查',
             'Warning',
             {
-                showCancelButton:false,
+                showCancelButton: false,
                 confirmButtonText: '確定',
                 type: 'warning',
             }
@@ -102,6 +113,20 @@ async function comfireOrder() {
     }
     submitDisabled.value = true
     await createOrder({ orderList: orderList.value }).then(res => {
+        if (res.success) {
+            ElMessage({ type: 'success', message: '提交成功' })
+            drawerSwitch.value = false
+        } else {
+            ElMessage({ type: 'error', message: '提交失敗' })
+        }
+    }).finally(() => {
+        submitDisabled.value = false
+    })
+}
+
+async function comfireInventory() {
+    submitDisabled.value = true
+    await createInventory({ orderList: orderList.value }).then(res => {
         if (res.success) {
             ElMessage({ type: 'success', message: '提交成功' })
             drawerSwitch.value = false

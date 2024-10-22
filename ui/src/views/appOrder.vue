@@ -14,9 +14,15 @@
         </div>
         <div class="gary-color">落單員工 : {{ item.orderUserName }}</div>
         <div class="gary-color">落單時間 : {{ item.createDate }}</div>
-        <el-button class='detail-btn' type="primary" plain @click="toOrderDetail(item.orderCode)">詳情</el-button>
+        <el-button class='detail-btn' icon="View" type="primary" plain @click="toOrderDetail(item.orderCode)">詳情</el-button>
+        <el-button class='detail-btn' icon="Printer" type="success" plain @click="exportOrderExcel(index, item)">導出</el-button>
       </el-card>
     </el-scrollbar>
+    <div class="export-float-bar">
+      <el-date-picker v-model="exportDate" value-format="YYYY-MM-DD" style="width: 130px;padding-right: 12px;"/>
+      <el-button class='detail-btn' type="success" plain @click="exportAllSummary(exportDate)">導出匯總表</el-button>
+      <el-button class='detail-btn' type="success" plain @click="exportMeatSummary(exportDate)">導出鮮肉匯總表</el-button>
+    </div>
   </div>
 </template>
 <script setup>
@@ -24,6 +30,7 @@ import { readOrder } from '../request/orders';
 import { orderStateDict } from '../request/dict';
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { exportMeatSummary, exportAllSummary, exportOrderExcel } from '../utils/export';
 const router = useRouter()
 
 const defaultDateRange = computed(() => {
@@ -33,6 +40,15 @@ const defaultDateRange = computed(() => {
   let startDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0') + ' 00:00:00'
   return [startDate, endDate]
 })
+
+const exportDate = ref()
+const defaultExportDate = () => {
+  let date = new Date()
+  date.setDate(date.getDate() - 1)
+  return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
+}
+exportDate.value = defaultExportDate()
+
 
 const params = ref({
   size: 20,
@@ -107,5 +123,16 @@ onMounted(() => {
 
 .warning-card {
   background-color: var(--el-color-warning-light-9);
+}
+.export-float-bar{
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 5px 10px;
+  background-color: var(--background-color);
+  position: fixed;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 </style>

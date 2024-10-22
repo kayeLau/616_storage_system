@@ -124,11 +124,11 @@ const authFormatter = (row, column) => {
 }
 
 const columns = [
-    { props: 'name', label: '用戶名稱' },
+    { props: 'name', label: '用戶名稱' , width: 140},
     { props: 'auth', label: '用戶角色', formatter: authFormatter },
     { props: 'partitionName', label: '所屬分區'},
-    { props: 'shopName', label: '所屬分店', width: 250 },
-    { props: 'updateDate', label: '修改時間', width: 250 }
+    { props: 'shopName', label: '所屬分店', width: 200 },
+    { props: 'updateDate', label: '修改時間', width: 180 }
 ]
 const operations = {
     width: 200,
