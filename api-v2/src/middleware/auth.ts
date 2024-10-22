@@ -10,11 +10,14 @@ const { verifyToken } = require('../models/verification')
 //     '/orders/exportDailyMeetSummary':[0,1,2],
 //     '/orders/getDailyOrderStatus':[],
 // }
+interface UserInfo {
+    ipAddress?:String
+}
 
 async function auth(req, res, next) {
     const token = req.headers['token'];
     const ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-    let userInfo = {}
+    let userInfo:UserInfo = {}
     if(req.path === '/member/login'){
         next()
         return

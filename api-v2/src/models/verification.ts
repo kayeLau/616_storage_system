@@ -6,7 +6,8 @@ const memberRepository = AppDataSource.getRepository(Member);
 
 interface UserInfo {
     shopId: String,
-    auth: Number
+    auth: Number,
+    ipAddress?:String
 }
 
 interface verifyTokenResult {

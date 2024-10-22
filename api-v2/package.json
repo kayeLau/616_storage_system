@@ -30,7 +30,6 @@
    "scripts": {
       "test": "mocha",
       "dev": "nodemon --exec ts-node ./bin/www",
-      "typeorm": "typeorm-ts-node-commonjs",
-      "prod": "set NODE_ENV=production && pm2 start ts-node bin/www --name='616storage'"
+      "typeorm": "typeorm-ts-node-commonjs"
    }
 }
