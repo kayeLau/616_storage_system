@@ -71,7 +71,6 @@ module.exports = class order {
         const userInfo = req.userInfo
         const orderDateRange = await readSettingTimeRange()
         const dateStr = orderDateRange[0].substring(0, 10).replaceAll('-', '')
-        console.log(orderDateRange)
 
         const orderData: orderData = {
             orderList: req.body.orderList || [],
@@ -158,10 +157,14 @@ module.exports = class order {
         let orderedShops = new Set()
 
         await readOrder({ orderDate: exportDate }, 999, 1).then(result => {
-            console.log(result)
             result.data.forEach(item => orderedShops.add(item.shopName))
         })
-        const shopsList = Array.from(orderedShops)
+        //排序
+        const shopsList = await readShop({}, 999, 1).then(result => {
+            if (result.success) {
+                return result.data.map(item => item.shopName).filter(item => orderedShops.has(item))
+            }
+        })
 
         await readProduct({ summary: exportType }, 999, 1).then(result => {
             result.data.forEach(item =>
