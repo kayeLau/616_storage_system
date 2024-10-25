@@ -17,7 +17,7 @@ export class Inventory {
     @Column({ length: 36 })
     shopId: string
 
-    @Column()
+    @Column({type: 'float' })
     remain: number
 
     @Column({ length: 6 })

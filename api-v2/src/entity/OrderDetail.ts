@@ -18,10 +18,10 @@ export class OrderDetail {
   @Column()
   productId: number;
 
-  @Column({ comment: "下單數量" })
+  @Column({ comment: "下單數量" , type: 'float' })
   orderQuantity: number;
 
-  @Column({ nullable: true, comment: "分配數量" })
+  @Column({ nullable: true, comment: "分配數量" , type: 'float' })
   assignQuantity: number;
 
   @Column({
