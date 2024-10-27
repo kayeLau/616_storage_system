@@ -9,8 +9,7 @@
                         </el-icon>
                     </el-badge>
                 </div>
-                <div class="cart-right" @click='jumpToOrderComfire'
-                    :style="{ backgroundColor: orderList.length ? '' : '#ccc' }">落单</div>
+                <div class="cart-right" @click='jumpToOrderComfire' :style="cartBtnColor">{{ comfireWord }}</div>
             </div>
         </div>
         <Transition name="side-in">
@@ -34,8 +33,8 @@
         </Transition>
         <div class="cart-cover" v-show="detailBoxSwitch" @click="detailBoxSwitch = !detailBoxSwitch"></div>
         <el-drawer v-model="drawerSwitch" direction="ltr" :z-index="120" :withHeader="false" size="100%"
-            style="background: linear-gradient(var(--el-color-primary) 0%, #f2f6fc 50%);">
-            <div class="order-comfirm">
+            :style="comfireBgColor">
+            <div class=" order-comfirm">
                 <div class="arrow-left" @click="drawerSwitch = !drawerSwitch"><el-icon>
                         <ArrowLeftBold />
                     </el-icon>返回</div>
@@ -53,14 +52,14 @@
                     </div>
                 </div>
 
-                <el-button round style="justify-self: flex-end;" type="primary" @click="comfireHandle"
-                    :disabled="submitDisabled">確定訂單</el-button>
+                <el-button round type="primary" @click="comfireHandle" class="comfire-btn" :disabled="submitDisabled"
+                    :style="cartBtnColor">確定{{ comfireWord }}</el-button>
             </div>
         </el-drawer>
     </div>
 </template>
 <script setup>
-import { defineProps, computed, ref } from 'vue';
+import { defineProps, computed, ref , defineEmits } from 'vue';
 import { getStorge } from '../utils/auth';
 import { createOrder } from '../request/orders';
 import { createInventory } from '../request/inventory';
@@ -73,11 +72,33 @@ const userInfo = computed(() => {
 
 const props = defineProps({
     orderMap: Object,
-    flag:String
+    flag: String
 })
+
+const emits = defineEmits(['sumbit'])
 
 const orderList = computed(() => {
     return Object.values(props.orderMap).filter(item => item.orderQuantity !== 0 || item.checked === true || item.prompt === 1)
+})
+
+const comfireWord = computed(() => {
+    return props.flag === 'order' ? '落單' : '盤點'
+})
+
+const comfireBgColor = computed(() => {
+    return {
+        background: props.flag === 'order' ? 'linear-gradient(var(--el-color-primary) 0%, #f2f6fc 50%)'
+            : 'linear-gradient(var(--el-color-warning) 0%, #f2f6fc 50%)'
+    }
+})
+
+const cartBtnColor = computed(() => {
+    return {
+        backgroundColor: !orderList.value.length ? '#ccc' :
+            props.flag === 'order' ? 'var(--el-color-primary)' :
+                props.flag === 'inventory' ? 'var(--el-color-warning)' :
+                    ''
+    }
 })
 
 let detailBoxSwitch = ref(false)
@@ -89,15 +110,19 @@ function jumpToOrderComfire() {
     }
 }
 
-function comfireHandle(){
-    if(props.flag === 'order'){
-        comfireOrder()
-    }else if(props.flag === 'inventory'){
-        comfireInventory()
+let submitDisabled = ref(false)
+async function comfireHandle() {
+    submitDisabled.value = true
+    if (props.flag === 'order') {
+        await comfireOrder()
+    } else if (props.flag === 'inventory') {
+        await comfireInventory()
     }
+    submitDisabled.value = false
+    emits('sumbit')
 }
 
-let submitDisabled = ref(false)
+
 async function comfireOrder() {
     if (!verifySubmit()) {
         ElMessageBox.confirm(
@@ -111,30 +136,41 @@ async function comfireOrder() {
         )
         return
     }
-    submitDisabled.value = true
-    await createOrder({ orderList: orderList.value }).then(res => {
+    const _orderList = orderList.value.map(item => {
+        return {
+            orderId:item.orderId,
+            productId:item.productId,
+            orderQuantity:item.orderQuantity,
+            assignQuantity:item.assignQuantity,
+            orderMode:item.orderMode,
+            remark:item.remark,
+        }
+    })
+    await createOrder({ orderList:_orderList }).then(res => {
         if (res.success) {
             ElMessage({ type: 'success', message: '提交成功' })
             drawerSwitch.value = false
         } else {
             ElMessage({ type: 'error', message: '提交失敗' })
         }
-    }).finally(() => {
-        submitDisabled.value = false
     })
 }
 
 async function comfireInventory() {
-    submitDisabled.value = true
-    await createInventory({ orderList: orderList.value }).then(res => {
+    const inventoryList = orderList.value.map(item => {
+        return {
+            id:item.id,
+            productId: item.productId,
+            orderQuantity: item.orderQuantity,
+        }
+    })
+    await createInventory({ inventoryList }).then(res => {
         if (res.success) {
             ElMessage({ type: 'success', message: '提交成功' })
             drawerSwitch.value = false
         } else {
             ElMessage({ type: 'error', message: '提交失敗' })
         }
-    }).finally(() => {
-        submitDisabled.value = false
     })
 }
 
@@ -168,6 +204,7 @@ function verifySubmit() {
     height: 100%;
     width: 70%;
     background-color: aliceblue;
+    border-left: #ccc 1px solid;
     color: var(--el-color-primary);
     box-shadow: 0 0 5px #ccc;
 }
@@ -175,7 +212,6 @@ function verifySubmit() {
 .cart-right {
     height: 100%;
     width: 30%;
-    background-color: var(--el-color-primary);
     color: #fff;
     box-shadow: 0 0 5px #ccc;
     text-align: center;
@@ -236,5 +272,9 @@ function verifySubmit() {
     display: flex;
     align-items: center;
     font-weight: 600;
+}
+
+.comfire-btn {
+    border: none;
 }
 </style>

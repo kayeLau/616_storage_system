@@ -34,7 +34,7 @@
             </el-tabs>
         </el-skeleton>
 
-        <cart v-show="!loading" flag="order" :orderMap="orderMap" @orderDetailChange="orderDetailChange"></cart>
+        <cart v-show="!loading" flag="order" :orderMap="orderMap" @orderDetailChange="orderDetailChange" @sumbit="checkExistOrder"></cart>
     </div>
 </template>
 
@@ -45,10 +45,6 @@ import { readProduct } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
 import { classifyDict, classifySort } from '../request/dict';
 
-// const tabPosition = computed(() => {
-//     const screenWidth = window.screen.width
-//     return screenWidth > 750 ? "top" : "left"
-// })
 let loading = ref(true)
 let orderMap = ref({})
 const products = ref([

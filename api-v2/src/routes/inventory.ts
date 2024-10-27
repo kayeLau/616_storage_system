@@ -11,4 +11,6 @@ router.post('/createInventory',inventoryModifyMethod.createInventory)
 
 router.post('/updateInventory',inventoryModifyMethod.updateInventory)
 
+router.post('/checkInventoryRepeated',inventoryModifyMethod.checkInventoryRepeated)
+
 module.exports = router;

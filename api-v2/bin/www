@@ -3,8 +3,9 @@
 /**
  * Module dependencies.
  */
-
-var app = require('../dist/index');
+const isProd = process.env.NODE_ENV === 'production';
+console.log(isProd)
+var app = require(isProd ? '../dist/index' : '../src/index');
 var debug = require('debug')('member:server');
 var http = require('http');
 

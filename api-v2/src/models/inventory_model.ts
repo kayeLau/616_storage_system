@@ -11,10 +11,9 @@ export async function readInventory(options) {
         .leftJoin("inventory.shop", "shop")
         .select([
             "inventory.id AS id",
-            "inventory.shopId AS shopId",
             "inventory.productId AS productId",
             "inventory.shopId AS shopId",
-            "inventory.remain AS remain",
+            "inventory.orderQuantity AS orderQuantity",
             "inventory.month AS month",
             "inventory.editBy AS editBy",
             "shop.shopName As shopName",
@@ -29,10 +28,11 @@ export async function readInventory(options) {
                     data[item.shopId] = {
                         shopId:item.shopId,
                         shopName:item.shopName,
-                        id:item.id
+                        id:item.id,
+                        children:{}
                     }
                 }
-                data[item.shopId][item.productCode] = item.remain
+                data[item.shopId].children[item.productId] = item.orderQuantity
             })
             return {
                 success: true,
@@ -41,15 +41,36 @@ export async function readInventory(options) {
         })
 }
 
+// 檢查重複
+export async function checkOrderRepeated(options) {
+    const { conditions, parameters } = optionsGenerater(options, "inventory")
+
+    return inventoryRepository
+        .createQueryBuilder('inventory')
+        .leftJoin("inventory.product", "product")
+        .select([
+            "inventory.id AS id",
+            "inventory.productId AS productId",
+            "inventory.shopId AS shopId",
+            "inventory.orderQuantity AS orderQuantity",
+            "inventory.month AS month",
+            "product.classify AS classify",
+            "product.productCode AS productCode",
+            "product.productName AS productName",
+            "product.standard AS standard",
+        ])
+        .where(conditions.join(" AND "), parameters)
+        .getRawMany()
+        .then(result => {
+            return {
+                success: true,
+                data:result
+            }
+        })
+}
+
 export async function createInventory(data) {
-    await inventoryRepository
-    .createQueryBuilder()
-    .insert()
-    .into(Inventory)
-    .values(data)
-    .orIgnore()
-    .updateEntity(false)
-    .execute();
+    await inventoryRepository.save(data)
     return { success: true };
 }
 
@@ -58,8 +79,8 @@ export function updateInventory(list, userInfo) {
         .createQueryBuilder()
         .update(Inventory)
         .set({
-            remain: () => "CASE id " +
-                list.map(detail => `WHEN ${detail.id} THEN ${detail.remain}`).join(' ') +
+            orderQuantity: () => "CASE id " +
+                list.map(detail => `WHEN ${detail.id} THEN ${detail.orderQuantity}`).join(' ') +
                 " END",
             editBy: () => "CASE id " +
                 list.map(detail => `WHEN ${detail.id} THEN ${userInfo.name}`).join(' ') +

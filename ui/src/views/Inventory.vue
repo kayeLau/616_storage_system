@@ -47,7 +47,7 @@ async function getInventory() {
             }]
             res.product.forEach(item => {
                 _columns.push({
-                    props: item.productCode,
+                    props: item.productId,
                     label: item.productName,
                     width: item.productName.length * 28,
                     formatter:(row, column)=>{
@@ -57,7 +57,15 @@ async function getInventory() {
                 })
             })
             columns.value = _columns
-            return { data: res.inventory, success: true }
+            const _inventory = res.inventory.map(item => {
+                return {
+                    shopId:item.shopId,
+                    shopName:item.shopName,
+                    id:item.id,
+                    ...item.children
+                }
+            })
+            return { data: _inventory, success: true }
         }
     })
 }

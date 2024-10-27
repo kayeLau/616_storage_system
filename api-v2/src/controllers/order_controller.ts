@@ -18,9 +18,12 @@ interface orderList {
     id: string, // 訂單ID
     productId: number,
     orderQuantity: number,
+    assignQuantity?:string,
     orderMode: number,
     updateDate: string,
-    orderUserName: string // 最後修改人ID
+    orderId:string,
+    remark?:string,
+    lastEditBy?:string
 }
 
 interface summaryProductIdsMap {

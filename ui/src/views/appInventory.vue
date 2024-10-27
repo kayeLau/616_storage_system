@@ -33,14 +33,14 @@
             </el-tabs>
         </el-skeleton>
 
-        <cart v-show="!loading" flag="inventory" :orderMap="orderMap" @orderDetailChange="orderDetailChange"></cart>
+        <cart v-show="!loading" flag="inventory" :orderMap="orderMap" @orderDetailChange="orderDetailChange" @sumbit="getInventory"></cart>
     </div>
 </template>
 
 <script setup>
 import cart from '../components/cart.vue'
 import { ref, onMounted, unref } from 'vue';
-import { readInventory } from '../request/inventory';
+import { checkInventoryRepeated } from '../request/inventory';
 import { classifyDict, classifySort } from '../request/dict';
 
 let loading = ref(true)
@@ -67,16 +67,13 @@ function setOrderMap(product) {
 // 回顯已存在的訂單
 function setProductView(product) {
     const target = products.value.find(item => item.name === (product.classify));
-    target.children[product.productId] = product
+    target.children[product.productId].orderQuantity = product.orderQuantity
+    target.children[product.productId].id = product.id
 }
 
 // 獲取本月盤點明細
 async function getInventory() {
-    const params = {
-        size: 999,
-        page: 1
-    }
-    await readInventory(params).then(res => {
+    await checkInventoryRepeated().then(res => {
         if (res.success) {
             getProducts(res.product)
             getInventoryDetail(res.inventory)
@@ -110,11 +107,10 @@ function getProducts(product) {
 
 // 獲取當天已存在的訂單
 async function getInventoryDetail(inventory) {
-    inventory.forEach(item => {
+    for (let item of inventory) {
         setOrderMap(item)
         setProductView(item)
-    })
-
+    }
 }
 
 const tabName = ref('')

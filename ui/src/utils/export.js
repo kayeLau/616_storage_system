@@ -149,7 +149,7 @@ export function xlsxToJson(fileBinaryString) {
   FileSaver.saveAs(fileData, 'db.json')
 }
 
-function exportExcel({ exportDate, usezip = false, zipFileName, hpt, header, wpt }) {
+export function exportExcel({ exportDate, usezip = false, zipFileName, hpt, header, wpt }) {
   let zip = new JSZip();
   exportDate.forEach(item => {
     let jsonWorkSheet = XLSX.utils.json_to_sheet(item.jsonData, { skipHeader: true });

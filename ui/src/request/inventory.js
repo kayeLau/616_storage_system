@@ -22,4 +22,12 @@ export function updateInventory(data) {
         method: 'post',
         data,
     });
+
+}
+export function checkInventoryRepeated(data) {
+    return request({
+        url: '/inventory/checkInventoryRepeated',
+        method: 'post',
+        data,
+    });
 }
