@@ -15,7 +15,7 @@ app.use(Express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 const startApp = async () => {
-    await initializeDatabase();
+  await initializeDatabase();
 };
 startApp();
 
@@ -28,7 +28,8 @@ app.use(auth)
 app.use(helmet())
 app.use(rateLimiter)
 app.use((req, res, next) => {
-  log.info(`${req.method} ${req.url} ${JSON.stringify(req.body)}`);
+  const userName = req.userInfo ? req.userInfo.name : '';
+  log.info(`${req.method} ${userName} ${req.url} ${JSON.stringify(req.body)}`);
   next();
 });
 
@@ -39,15 +40,17 @@ const productsRouter = require('./routes/product')
 const ordersRouter = require('./routes/order')
 const settingRouter = require('./routes/setting')
 const inventoryRouter = require('./routes/inventory')
+const apiRouter = require('./routes/api')
 app.use('/member', usersRouter);
-app.use('/shop',shopsRouter)
-app.use('/product',productsRouter)
-app.use('/order',ordersRouter)
-app.use('/setting',settingRouter)
-app.use('/inventory',inventoryRouter)
+app.use('/shop', shopsRouter)
+app.use('/product', productsRouter)
+app.use('/order', ordersRouter)
+app.use('/setting', settingRouter)
+app.use('/inventory', inventoryRouter)
+app.use('/api', apiRouter)
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   console.log(err)
   res.status(500);
   res.json(err)

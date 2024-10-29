@@ -2,6 +2,12 @@ export const onlineStateDict = {
     0:"離線",
     1:"在線",
 }
+export const apiAccessDict = {
+    0:"廚房",
+    1:"樓面",
+    2:"區經",
+    3:"工埸",
+}
 export const authDict = {
     '-1':"管理員",
     0:"前線廚房",

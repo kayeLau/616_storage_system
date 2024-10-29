@@ -1,4 +1,3 @@
-// const { updateItem, getItems } = require('./base_model')
 import AppDataSource from '../data-source';
 import { Setting } from '../entity/Setting';
 

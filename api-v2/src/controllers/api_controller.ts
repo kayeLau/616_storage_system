@@ -1,0 +1,39 @@
+import { updateApi, readApi , createApi } from '../models/apiManage_model';
+
+module.exports = class Setting {
+
+    readApi(req, res, next) {
+        readApi().then(result => {
+            res.json(result)
+        }).catch(err => {
+            next(err)
+        })
+
+    }
+
+    updateApi(req, res, next) {
+        const data = {
+            access: req.body.access,
+            id:req.body.id,
+        }
+
+        updateApi(data).then(result => {
+            res.json(result)
+        }).catch(err => {
+            next(err)
+        })
+    }
+
+    createApi(req, res, next) {
+        const data = {
+            name: req.body.name,
+            url:req.body.url
+        }
+
+        createApi(data).then(result => {
+            res.json(result)
+        }).catch(err => {
+            next(err)
+        })
+    }
+}

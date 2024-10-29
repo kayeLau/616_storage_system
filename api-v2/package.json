@@ -7,6 +7,7 @@
       "@types/node": "^16.11.10",
       "chai": "^5.1.1",
       "chai-http": "^5.1.1",
+      "cross-env": "^7.0.3",
       "ts-node": "10.9.1",
       "typescript": "4.5.2"
    },
@@ -29,8 +30,9 @@
    },
    "scripts": {
       "test": "mocha",
-      "dev": "nodemon --exec ts-node ./bin/www",
+      "dev": "cross-env NODE_ENV=development nodemon --exec ts-node ./bin/www",
       "typeorm": "typeorm-ts-node-commonjs",
-      "prod_restart": "set NODE_ENV=production && pm2 restart 616storage"
+      "prod": "pm2 start ./bin/www --name=616storage",
+      "prod_restart": "pm2 restart 616storage"
    }
 }
