@@ -21,7 +21,7 @@ export function readApi() {
         .getMany()
         .then(result => {
             return {
-                data: result,
+                data: result.filter(item => item.access !== '*'),
                 success: true
             }
         })

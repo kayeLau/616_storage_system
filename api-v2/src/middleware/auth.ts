@@ -1,15 +1,4 @@
-const { verifyToken } = require('../models/verification')
-// const authMap = {
-//     '/orders/getOrderList':[-1,0,1,2],
-//     '/orders/createOrder':[0,1],
-//     '/orders/updateOrder':[-1,0,1,2],
-//     '/orders/deleteOrder':[-1,0,1,2],
-//     '/orders/createAdditionOrderItem':[],
-//     '/orders/updateOrderDetailAssignQuantity':[0,1,2],
-//     '/orders/checkOrderRepeated':[],
-//     '/orders/exportDailyMeetSummary':[0,1,2],
-//     '/orders/getDailyOrderStatus':[],
-// }
+import { verifyToken } from '../models/verification'
 interface UserInfo {
     ipAddress?:String
 }
