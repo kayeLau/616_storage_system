@@ -9,17 +9,18 @@ import { Product } from "./entity/Product"
 import { Order } from "./entity/Order"
 import { OrderDetail } from "./entity/OrderDetail"
 import { Inventory } from "./entity/Inventory"
+import { Api } from "./entity/Api"
 
 const AppDataSource = new DataSource({
     type: "mysql",
     host: "localhost",
     port: 3306,
     username: "root",
-    password: "iqaqeq18",
+    password: "Iqaqeq18",
     database: "616_storage_system",
     synchronize: true,
     logging: false,
-    entities: [Setting, Member, Partition, Shop , ShopProduct, Product, Order, OrderDetail, Inventory],
+    entities: [Setting, Member, Partition, Shop , ShopProduct, Product, Order, OrderDetail, Inventory, Api],
     migrations: [],
     subscribers: [],
 })

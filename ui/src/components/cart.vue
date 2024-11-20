@@ -46,9 +46,11 @@
                 <div class="order-list" style="height: 60vh;">
                     <div v-for="(product, index) of orderList" :key="index" class="order-item"
                         :style="product.orderQuantity === null ? 'background-color: var(--el-color-danger-light-7)' : ''">
-                        <div class="product-name" style="width: 50%;">{{ product.productName }}</div>
-                        <div style="width: 30%;">{{ product.standard }}</div>
-                        <div style="width: 20%;text-align: end;">{{ product.orderQuantity }}</div>
+                        <div style="width: 80%;">
+                            <div class="product-name">{{ product.productCode }} - {{ product.productName }}</div>
+                            <div class="product-standard">{{ product.standard }}</div>
+                        </div>
+                        <div style="width: 20%;text-align: end;">{{ product.orderQuantity }}{{ product.unit }}</div>
                     </div>
                 </div>
 
@@ -78,7 +80,9 @@ const props = defineProps({
 const emits = defineEmits(['sumbit'])
 
 const orderList = computed(() => {
-    return Object.values(props.orderMap).filter(item => item.orderQuantity !== 0 || item.checked === true || item.prompt === 1)
+    return Object.values(props.orderMap)
+        .filter(item => item.orderQuantity !== 0 || item.checked === true || item.prompt === 1)
+        .sort((a,b) => a.classify - b.classify )
 })
 
 const comfireWord = computed(() => {
@@ -253,7 +257,7 @@ function verifySubmit() {
 }
 
 .order-item {
-    padding: 5px 10px;
+    padding: 10px 10px;
     display: flex;
     justify-content: flex-start;
     align-items: center;

@@ -83,18 +83,18 @@ const menus = [
         icon: 'Iphone',
         auth: [0, 1]
     },
-    {
-        name: "倉存管理",
-        path: 'inventory',
-        icon: 'Box',
-        auth: [-1, 1, 0, 2, 3]
-    },
-    {
-        name: "盤點",
-        path: 'appInventory',
-        icon: 'Box',
-        auth: [0, 1]
-    },
+    // {
+    //     name: "倉存管理",
+    //     path: 'inventory',
+    //     icon: 'Box',
+    //     auth: [-1, 1, 0, 2, 3]
+    // },
+    // {
+    //     name: "盤點",
+    //     path: 'appInventory',
+    //     icon: 'Box',
+    //     auth: [0, 1]
+    // },
     {
         name: "設定",
         path: 'setting',

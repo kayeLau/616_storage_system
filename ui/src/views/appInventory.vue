@@ -127,14 +127,14 @@ onMounted(async () => {
     font-weight: 600;
 }
 
+.product-standard {
+    color: #ccc
+}
+
 .product-row {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-}
-
-.product-standard {
-    color: #ccc
 }
 
 .product-tabs {
