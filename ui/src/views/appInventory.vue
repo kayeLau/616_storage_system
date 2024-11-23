@@ -123,14 +123,6 @@ onMounted(async () => {
 </script>
 
 <style>
-.product-name {
-    font-weight: 600;
-}
-
-.product-standard {
-    color: #ccc
-}
-
 .product-row {
     display: flex;
     justify-content: flex-end;

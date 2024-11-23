@@ -20,12 +20,12 @@
                         <div style="color: #cfcfcf;font-size: 14px;padding-right: 8px;">{{ product.standard }}</div>
                         <div>
                             <!-- <el-icon @click="emitOrderDetailChange(product, true)">
-                            <CirclePlusFilled />
-                        </el-icon> -->
+                                <CirclePlusFilled />
+                            </el-icon> -->
                             {{ product.orderQuantity }}
                             <!-- <el-icon @click="emitOrderDetailChange(product, false)">
-                            <RemoveFilled />
-                        </el-icon> -->
+                                <RemoveFilled />
+                            </el-icon> -->
                         </div>
                     </div>
                 </div>
@@ -45,12 +45,16 @@
 
                 <div class="order-list" style="height: 60vh;">
                     <div v-for="(product, index) of orderList" :key="index" class="order-item"
-                        :style="product.orderQuantity === null ? 'background-color: var(--el-color-danger-light-7)' : ''">
+                        :style="product.orderQuantity === null || product.orderQuantity === 0 ? 'background-color: var(--el-color-danger-light-7)' : ''">
                         <div style="width: 80%;">
+                            <div>{{ classifyDict[product.classify] }}</div>
                             <div class="product-name">{{ product.productCode }} - {{ product.productName }}</div>
                             <div class="product-standard">{{ product.standard }}</div>
                         </div>
-                        <div style="width: 20%;text-align: end;">{{ product.orderQuantity }}{{ product.unit }}</div>
+                        <div style="width: 20%;text-align: end;">
+                            <span class="bold-large-font">{{ product.orderQuantity }}</span>
+                            {{ product.unit }}
+                        </div>
                     </div>
                 </div>
 
@@ -61,11 +65,13 @@
     </div>
 </template>
 <script setup>
-import { defineProps, computed, ref , defineEmits } from 'vue';
+import { defineProps, computed, ref, defineEmits } from 'vue';
 import { getStorge } from '../utils/auth';
 import { createOrder } from '../request/orders';
 import { createInventory } from '../request/inventory';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { classifyDict } from '../request/dict';
+
 
 const userInfo = computed(() => {
     let user = getStorge('userInfo')
@@ -82,7 +88,7 @@ const emits = defineEmits(['sumbit'])
 const orderList = computed(() => {
     return Object.values(props.orderMap)
         .filter(item => item.orderQuantity !== 0 || item.checked === true || item.prompt === 1)
-        .sort((a,b) => a.classify - b.classify )
+        .sort((a, b) => a.classify - b.classify)
 })
 
 const comfireWord = computed(() => {
@@ -142,15 +148,15 @@ async function comfireOrder() {
     }
     const _orderList = orderList.value.map(item => {
         return {
-            orderId:item.orderId,
-            productId:item.productId,
-            orderQuantity:item.orderQuantity,
-            assignQuantity:item.assignQuantity,
-            orderMode:item.orderMode,
-            remark:item.remark,
+            orderId: item.orderId,
+            productId: item.productId,
+            orderQuantity: item.orderQuantity,
+            assignQuantity: item.assignQuantity,
+            orderMode: item.orderMode,
+            remark: item.remark,
         }
     })
-    await createOrder({ orderList:_orderList }).then(res => {
+    await createOrder({ orderList: _orderList }).then(res => {
         if (res.success) {
             ElMessage({ type: 'success', message: '提交成功' })
             drawerSwitch.value = false
@@ -163,7 +169,7 @@ async function comfireOrder() {
 async function comfireInventory() {
     const inventoryList = orderList.value.map(item => {
         return {
-            id:item.id,
+            id: item.id,
             productId: item.productId,
             orderQuantity: item.orderQuantity,
         }

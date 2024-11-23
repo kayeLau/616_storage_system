@@ -87,3 +87,16 @@ body {
     height: 28px;
     background-size: contain;
 }
+
+.bold-large-font{
+    font-size: large;
+    font-weight: 600;
+}
+
+.product-name {
+    font-weight: 600;
+}
+
+.product-standard {
+    color: #b2b1b1
+}
