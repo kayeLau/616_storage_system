@@ -16,7 +16,7 @@ const AppDataSource = new DataSource({
     host: "localhost",
     port: 3306,
     username: "root",
-    password: "Iqaqeq18",
+    password: "iqaqeq18",
     database: "616_storage_system",
     synchronize: true,
     logging: false,
