@@ -43,6 +43,7 @@ import cart from '../components/cart.vue'
 import { ref, onMounted, unref } from 'vue';
 import { readProduct } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
+import { createApiLog } from '../request/api';
 import { classifyDict, classifySort } from '../request/dict';
 
 let loading = ref(true)
@@ -145,6 +146,7 @@ async function checkExistOrder() {
                 setProductListView(item)
             })
         }
+        createApiLog(res.data)
     })
 }
 

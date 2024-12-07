@@ -1,4 +1,4 @@
-import { updateApi, readApi , createApi } from '../models/apiManage_model';
+import { updateApi, readApi, createApi } from '../models/apiManage_model';
 
 module.exports = class Setting {
 
@@ -14,7 +14,7 @@ module.exports = class Setting {
     updateApi(req, res, next) {
         const data = {
             access: req.body.access,
-            id:req.body.id,
+            id: req.body.id,
         }
 
         updateApi(data).then(result => {
@@ -27,7 +27,7 @@ module.exports = class Setting {
     createApi(req, res, next) {
         const data = {
             name: req.body.name,
-            url:req.body.url
+            url: req.body.url
         }
 
         createApi(data).then(result => {
@@ -35,5 +35,9 @@ module.exports = class Setting {
         }).catch(err => {
             next(err)
         })
+    }
+
+    createApiLog(req, res, next) {
+        res.json({ success: true })
     }
 }
