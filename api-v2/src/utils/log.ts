@@ -23,4 +23,30 @@ const logger = createLogger({
     ],
 });
 
-module.exports = logger;
+const neverLog = new Set([
+    '/api/readApi',
+    '/inventory/readInventory',
+    '/member/logout',
+    '/member/login',
+    '/member/readMember',
+    '/member/register',
+    '/order/exportDailyMeetSummary',
+    '/order/readHistoryOrder',
+    '/order/readOrder',
+    '/order/readOrderDetail',
+    '/product/readProduct',
+    '/setting/readAllSetting',
+    '/setting/readSetting',
+    '/shop/readBindProduct',
+    '/shop/readPartition',
+    '/shop/readShop',
+])
+const addLog = (req, res, next) => {
+    if(!neverLog.has(req.path)){
+        const userName = req.userInfo ? req.userInfo.name : '';
+        logger.info(`${req.method} ${userName} ${req.url} ${JSON.stringify(req.body)}`);
+    }
+    next();
+  }
+
+module.exports = addLog;

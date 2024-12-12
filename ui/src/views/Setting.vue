@@ -74,15 +74,6 @@ function fetchApi() {
     })
 }
 
-// function addApi(){
-//     createApi().then(res => {
-//         if(res.success){
-
-//         }
-//     })
-// }
-// addApi()
-
 function editApi(item){
     const dict = exchangeKeyValue(apiAccessDict)
     const access = item.access.map(item => dict[item]).join(',')
@@ -144,17 +135,5 @@ onMounted(() => {
 .setting-title {
     color: var(--el-color-primary);
     padding: 10px 0;
-}
-
-.el-dialog__header {
-    text-align: start;
-}
-
-.el-form-item__content {
-    justify-content: flex-end;
-}
-
-.el-form-item__label {
-    justify-content: flex-start
 }
 </style>

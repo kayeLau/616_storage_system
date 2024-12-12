@@ -1,5 +1,4 @@
 const path = require('path');
-const cookieParser = require('cookie-parser');
 const Express = require('express')
 const app = Express();
 require("reflect-metadata");
@@ -12,7 +11,7 @@ import { initializeDatabase } from './data-source';
 app.use(Express.json());
 app.use(Express.static(path.join(__dirname, 'public')));
 app.use(Express.urlencoded({ extended: false }));
-app.use(cookieParser());
+
 
 const startApp = async () => {
   await initializeDatabase();
@@ -23,15 +22,11 @@ startApp();
 const auth = require('./middleware/auth')
 const rateLimiter = require('./middleware/rateLimiter')
 const helmet = require('helmet')
-const log = require("./utils/log");
+const addLog = require("./utils/log");
 app.use(auth)
 app.use(helmet())
 app.use(rateLimiter)
-app.use((req, res, next) => {
-  const userName = req.userInfo ? req.userInfo.name : '';
-  log.info(`${req.method} ${userName} ${req.url} ${JSON.stringify(req.body)}`);
-  next();
-});
+app.use(addLog);
 
 // router
 const usersRouter = require('./routes/member');
@@ -41,6 +36,7 @@ const ordersRouter = require('./routes/order')
 const settingRouter = require('./routes/setting')
 const inventoryRouter = require('./routes/inventory')
 const apiRouter = require('./routes/api')
+const fileRouter = require('./routes/file')
 app.use('/member', usersRouter);
 app.use('/shop', shopsRouter)
 app.use('/product', productsRouter)
@@ -48,6 +44,7 @@ app.use('/order', ordersRouter)
 app.use('/setting', settingRouter)
 app.use('/inventory', inventoryRouter)
 app.use('/api', apiRouter)
+app.use('/file', fileRouter)
 
 // error handler
 app.use(function (err, req, res, next) {

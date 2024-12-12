@@ -1,6 +1,6 @@
 import { updateApi, readApi, createApi } from '../models/apiManage_model';
 
-module.exports = class Setting {
+module.exports = class Api {
 
     readApi(req, res, next) {
         readApi().then(result => {

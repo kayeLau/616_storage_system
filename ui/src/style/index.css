@@ -100,3 +100,15 @@ body {
 .product-standard {
     color: #b2b1b1
 }
+
+.el-dialog__header {
+    text-align: start;
+}
+
+.el-form-item__content {
+    justify-content: flex-end;
+}
+
+.el-form-item__label {
+    justify-content: flex-start
+}

@@ -10,14 +10,15 @@ import { Order } from "./entity/Order"
 import { OrderDetail } from "./entity/OrderDetail"
 import { Inventory } from "./entity/Inventory"
 import { Api } from "./entity/Api"
+const config = require('./config/development_config')
 
 const AppDataSource = new DataSource({
     type: "mysql",
     host: "localhost",
     port: 3306,
-    username: "root",
-    password: "iqaqeq18",
-    database: "616_storage_system",
+    username: config.mysql.user,
+    password: config.mysql.password,
+    database: config.mysql.database,
     synchronize: true,
     logging: false,
     entities: [Setting, Member, Partition, Shop , ShopProduct, Product, Order, OrderDetail, Inventory, Api],
