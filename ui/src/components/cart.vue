@@ -71,6 +71,8 @@ import { createOrder } from '../request/orders';
 import { createInventory } from '../request/inventory';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { classifyDict } from '../request/dict';
+import { useRouter } from 'vue-router';
+const router = useRouter()
 
 
 const userInfo = computed(() => {
@@ -111,8 +113,8 @@ const cartBtnColor = computed(() => {
     }
 })
 
-let detailBoxSwitch = ref(false)
-let drawerSwitch = ref(false)
+let detailBoxSwitch = ref(false) // 下方弹出框
+let drawerSwitch = ref(false) // 确定详情页
 
 function jumpToOrderComfire() {
     if (orderList.value.length > 0) {
@@ -120,11 +122,18 @@ function jumpToOrderComfire() {
     }
 }
 
-let submitDisabled = ref(false)
+function jumptoHome() {
+    const screenWidth = window.screen.width
+    const path = screenWidth > 750 ? '/order' : '/appOrder';
+    router.push({ path })
+}
+
+let submitDisabled = ref(false) // 提交btn disable
 async function comfireHandle() {
     submitDisabled.value = true
     if (props.flag === 'order') {
         await comfireOrder()
+        jumptoHome()
     } else if (props.flag === 'inventory') {
         await comfireInventory()
     }
