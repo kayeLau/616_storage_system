@@ -6,3 +6,7 @@ tmp/
 temp/
 dist/
 logs/
+
+# local env files
+.env.local
+.env.*.local
