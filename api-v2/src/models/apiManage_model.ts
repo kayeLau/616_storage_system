@@ -30,6 +30,21 @@ export function readApi() {
         })
 }
 
+export function readApiByPath(data) {
+    return apiRepository
+        .createQueryBuilder('api')
+        .getMany()
+        .then(result => {
+            return {
+                ...result.find(item => item.url === data.path),
+                success: true
+            }
+        })
+        .catch((err) => {
+            return Promise.reject({ success: false, message: err.message })
+        })
+}
+
 export function createApi(data) {
     return apiRepository.save(data)
 }

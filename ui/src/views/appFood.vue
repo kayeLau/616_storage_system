@@ -130,7 +130,6 @@ async function getProducts() {
             });
             products.value = products.value
                 .sort((a, b) => classifySort.indexOf(a.name) - classifySort.indexOf(b.name))
-                .filter(item => Object.keys(item.children).length);
         }
     })
 }
