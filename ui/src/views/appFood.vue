@@ -11,7 +11,7 @@
             <el-tabs v-model="tabName" class="product-tabs" type="border-card" tabPosition="left">
                 <el-tab-pane v-for="(item, index) of products" :name="item.name" :key="index">
                     <template #label>
-                            <span>{{ item.label }}</span>
+                        <span>{{ item.label }}</span>
                     </template>
                     <template #default>
                         <div class="product-list">
@@ -34,7 +34,8 @@
             </el-tabs>
         </el-skeleton>
 
-        <cart v-show="!loading" flag="order" :orderMap="orderMap" @orderDetailChange="orderDetailChange" @sumbit="checkExistOrder"></cart>
+        <cart v-show="!loading" flag="order" :orderMap="orderMap" @orderDetailChange="orderDetailChange"
+            @sumbit="checkExistOrder"></cart>
     </div>
 </template>
 
@@ -43,7 +44,6 @@ import cart from '../components/cart.vue'
 import { ref, onMounted, unref } from 'vue';
 import { readProduct } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
-import { createApiLog } from '../request/api';
 import { classifyDict, classifySort } from '../request/dict';
 
 let loading = ref(true)
@@ -83,12 +83,12 @@ function setMustOrderChecked(product) {
 
 // 回顯已存在的訂單
 function setProductListView(product) {
-    const target = products.value.find(item => item.name === (product.classify));
-    target.children[product.productId] = product
-
     const promptNum = 0
     if (product.prompt) {
         products.value[promptNum].children[product.productId] = product
+    } else {
+        const target = products.value.find(item => item.name === (product.classify));
+        target.children[product.productId] = product
     }
 }
 
@@ -110,6 +110,7 @@ async function getProducts() {
                         children: {}
                     }
                 }
+
                 // 必點
                 if (item.prompt) {
                     const _item = {
@@ -130,6 +131,7 @@ async function getProducts() {
             });
             products.value = products.value
                 .sort((a, b) => classifySort.indexOf(a.name) - classifySort.indexOf(b.name))
+                .filter(item => Object.keys(item.children).length);
         }
     })
 }
@@ -145,7 +147,6 @@ async function checkExistOrder() {
                 setProductListView(item)
             })
         }
-        createApiLog(res.data)
     })
 }
 
