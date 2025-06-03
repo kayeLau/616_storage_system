@@ -11,7 +11,7 @@
   </div>
 </template>
 <script setup>
-import { readProduct, updateProduct, createProduct, deleteProduct } from '../request/products'
+import { readProduct, updateProduct, createProduct } from '../request/products'
 import { freezersNumDict, classifyDict, departmentDict, dictToOptions, productDisable, productSummary } from '../request/dict'
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
@@ -133,13 +133,13 @@ function editHandle(index, row) {
   jsonFormShow.value = !jsonFormShow.value
 }
 
-function deleteHandle(index, row) {
-  deleteProduct({ productId: row.productId }).then(res => {
-    if (res.success) {
-      KtableRef.value.fatchList()
-    }
-  })
-}
+// function deleteHandle(index, row) {
+//   deleteProduct({ productId: row.productId }).then(res => {
+//     if (res.success) {
+//       KtableRef.value.fatchList()
+//     }
+//   })
+// }
 //#endregion
 
 //#region tabel
@@ -186,7 +186,7 @@ const operations = {
   size: "small",
   children: [
     { type: "primary", name: '編輯', icon: 'Edit', onClick: editHandle },
-    {  btnType:"popconfirm", type: "danger", name: '删除', icon: 'Delete', onClick: deleteHandle }
+    // {  btnType:"popconfirm", type: "danger", name: '删除', icon: 'Delete', onClick: deleteHandle }
   ]
 }
 const params = {
