@@ -1,12 +1,34 @@
-.idea/
-.vscode/
-api-v2/node_modules/
+.DS_Store
+node_modules
+/dist
+
 api-v2/build/
 api-v2/tmp/
 api-v2/temp/
 api-v2/dist/
 api-v2/logs/
 api-v2/.env
+ui/dist/
+api/.env
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # local env files
 .env.local
