@@ -1,0 +1,13 @@
+.idea/
+.vscode/
+api-v2/node_modules/
+api-v2/build/
+api-v2/tmp/
+api-v2/temp/
+api-v2/dist/
+api-v2/logs/
+api-v2/.env
+
+# local env files
+.env.local
+.env.*.local
