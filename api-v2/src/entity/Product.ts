@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column , OneToMany} from "typeorm"
-import { OrderDetail } from './OrderDetail';
 
 @Entity()
 export class Product {
@@ -34,7 +33,7 @@ export class Product {
     @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updateDate: Date;
 
-    @Column()
+    @Column({comment:'0:可用 1:禁用 2:隐藏'})
     disable: number
 
     @Column()

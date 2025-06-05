@@ -1,12 +1,11 @@
 import { readProduct, readBandProduct, createProduct, updateProduct, deleteProduct } from '../models/productManage_model';
-import { verifyToken } from '../models/verification';
 
 module.exports = class product {
     async readProduct(req, res, next) {
-        const token = req.headers['token'];
+        const userInfo = req.userInfo
         let options = { 
             freezersNum: req.body.freezersNum, 
-            disable: req.body.disable, 
+            disable: req.body.disable,
             productName: req.body.productName, 
             summary: req.body.summary, 
             classify: req.body.classify,
@@ -15,16 +14,12 @@ module.exports = class product {
         const page = req.body.page || 1
         let bandList = []
         try {
-            const tokenResult = await verifyToken(token, true)
-            if (tokenResult.success === false) {
-                res.json(tokenResult)
-                return
-            }
-
-            const auth = tokenResult.userInfo.auth
+            const auth = userInfo.auth
             if (!(auth === -1 || auth === 2)) {
-                bandList = await readBandProduct({ shopId: tokenResult.userInfo.shopId })
-                options.disable = 0
+                bandList = await readBandProduct({ shopId: userInfo.shopId })
+                options.disable = 0 // 只查可用的产品
+            }else{
+                options.disable = [1,0] // 只查可用及禁用的产品
             }
 
             await readProduct(options, size, page).then(result => {

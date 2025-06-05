@@ -133,13 +133,13 @@ function editHandle(index, row) {
   jsonFormShow.value = !jsonFormShow.value
 }
 
-// function deleteHandle(index, row) {
-//   deleteProduct({ productId: row.productId }).then(res => {
-//     if (res.success) {
-//       KtableRef.value.fatchList()
-//     }
-//   })
-// }
+function deleteHandle(index, row) {
+  updateProduct({ productId: row.productId , disable:2 }).then(res => {
+    if (res.success) {
+      KtableRef.value.fatchList()
+    }
+  })
+}
 //#endregion
 
 //#region tabel
@@ -186,7 +186,7 @@ const operations = {
   size: "small",
   children: [
     { type: "primary", name: '編輯', icon: 'Edit', onClick: editHandle },
-    // {  btnType:"popconfirm", type: "danger", name: '删除', icon: 'Delete', onClick: deleteHandle }
+    {  btnType:"popconfirm", type: "danger", name: '删除', icon: 'Delete', onClick: deleteHandle }
   ]
 }
 const params = {
