@@ -20,18 +20,28 @@ interface verifyTokenResult {
 // 驗證用戶Token
 // @ params
 // getUser 是否需要取得用戶資料
-export async function verifyToken(token, ip, getUser = false): Promise<verifyTokenResult> {
+export async function verifyToken(token, getUser = false, ip): Promise<verifyTokenResult> {
     const time = Math.floor(Date.now() / 1000);
 
     if (token) {
         return jwt.verify(token, config.secret, async (err, decode) => {
             if (!err && decode.exp > time) {
                 let userInfo: UserInfo
+                // 获取用户资料
                 if (getUser) {
                     userInfo = await memberRepository
                         .createQueryBuilder("member")
                         .where('member.id = :id', { id: decode.data })
                         .getOne()
+
+                    // 获对比ip
+                    if (userInfo.ipAddress && userInfo.ipAddress !== ip) {
+                        return {
+                            success: false,
+                            msg: "token verify fail",
+                            ip: userInfo.ipAddress
+                        }
+                    }
                 }
                 return {
                     msg: "token verify success",

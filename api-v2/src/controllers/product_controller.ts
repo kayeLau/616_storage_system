@@ -19,7 +19,7 @@ module.exports = class product {
                 bandList = await readBandProduct({ shopId: userInfo.shopId })
                 options.disable = 0 // 只查可用的产品
             }else{
-                options.disable = [1,0] // 只查可用及禁用的产品
+                options.disable = options.disable ? options.disable : [1,0] // 只查可用及禁用的产品
             }
 
             await readProduct(options, size, page).then(result => {

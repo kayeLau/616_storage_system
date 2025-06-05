@@ -36,9 +36,9 @@ export class Product {
     @Column({comment:'0:可用 1:禁用 2:隐藏'})
     disable: number
 
-    @Column()
+    @Column({comment:'0:否 1:是'})
     summary: number
 
-    @Column()
+    @Column({comment:'0:否 1:是'})
     prompt: number
 }

@@ -32,7 +32,7 @@
                         </component>
                     </el-menu>
                     <div class="version">
-                        v1.0.2.0
+                        {{ version }}
                     </div>
                 </el-aside>
 
@@ -50,6 +50,7 @@ import { getStorge, removeToken } from '../utils/auth'
 import { authDict } from '../request/dict'
 import { useRouter } from 'vue-router';
 import { logout } from '../request/users';
+const version = process.env.VUE_APP_VERSION
 
 const router = useRouter()
 async function logOutbyUser() {
