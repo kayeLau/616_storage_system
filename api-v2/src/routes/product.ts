@@ -11,7 +11,7 @@ router.post('/createProduct',productModifyMethod.createProduct)
 
 router.post('/updateProduct',productModifyMethod.updateProduct)
 
-router.post('/deleteProduct',productModifyMethod.deleteProduct)
+// router.post('/deleteProduct',productModifyMethod.deleteProduct)
 
 
 module.exports = router;

@@ -24,10 +24,10 @@ export function updateProduct(data){
     });
 }
 
-export function deleteProduct(data){
-  return request({
-      url: '/product/deleteProduct',
-      method: 'post',
-      data,
-    });
-}
+// export function deleteProduct(data){
+//   return request({
+//       url: '/product/deleteProduct',
+//       method: 'post',
+//       data,
+//     });
+// }
