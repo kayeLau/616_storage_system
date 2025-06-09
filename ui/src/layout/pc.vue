@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onBeforeUnmount } from 'vue';
+import { computed, ref } from 'vue';
 import { getStorge, removeToken } from '../utils/auth'
 import { authDict } from '../request/dict'
 import { useRouter } from 'vue-router';
@@ -128,9 +128,6 @@ function avatarNavHandle() {
     avatarDetailShow.value = !avatarDetailShow.value
 }
 
-onBeforeUnmount(async () => {
-    await logout()
-})
 </script>
 
 <style scoped>

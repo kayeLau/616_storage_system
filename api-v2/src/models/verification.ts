@@ -64,7 +64,6 @@ export async function verifyToken(token: string | undefined, getUser = false, ip
 
 // 驗證用戶權限
 export function verifyaAuth(url: String, auth:Number): Promise<verifyTokenResult> {
-    console.log(auth)
     return readApiByPath(url).then(res => {
         if (res.success && res.data) {
             const accessList = res.data.access.split(',')

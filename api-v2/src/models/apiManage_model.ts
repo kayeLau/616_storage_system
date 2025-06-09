@@ -21,7 +21,7 @@ export function readApi() {
         .getMany()
         .then(result => {
             return {
-                data: result.filter(item => item.access !== '*'),
+                data: result.filter(item => item.access !== '*' && item.access !== '-1'),
                 success: true
             }
         })
@@ -31,7 +31,6 @@ export function readApi() {
 }
 
 export function readApiByPath(url) {
-    console.log(url)
     return apiRepository
         .createQueryBuilder('api')
         .where("api.url = :url", { url: url })
