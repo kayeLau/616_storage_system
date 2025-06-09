@@ -20,11 +20,10 @@ interface verifyTokenResult {
 // 驗證用戶Token
 // @ params
 // getUser 是否需要取得用戶資料
-export async function verifyToken(token, getUser = false, ip): Promise<verifyTokenResult> {
-    const time = Math.floor(Date.now() / 1000);
-
+export async function verifyToken(token: string | undefined, getUser = false, ip: string): Promise<verifyTokenResult> {
     if (token) {
         return jwt.verify(token, config.secret, async (err, decode) => {
+            const time = Math.floor(Date.now() / 1000);
             if (!err && decode.exp > time) {
                 let userInfo: UserInfo
                 // 获取用户资料
@@ -64,18 +63,28 @@ export async function verifyToken(token, getUser = false, ip): Promise<verifyTok
 }
 
 // 驗證用戶權限
-export async function verifyaAuth(url, auth): Promise<verifyTokenResult> {
-    await readApiByPath(url).then(res => {
-        if (res.success) {
-            return {
-                msg: "auth verify success",
-                success: true,
+export function verifyaAuth(url: String, auth:Number): Promise<verifyTokenResult> {
+    console.log(auth)
+    return readApiByPath(url).then(res => {
+        if (res.success && res.data) {
+            const accessList = res.data.access.split(',')
+            const passAuth = accessList.includes(String(auth)) || accessList.includes('*')
+            if (passAuth) {
+                return {
+                    msg: "auth verify success",
+                    success: true,
+                }
+            } else {
+                return {
+                    msg: "auth verify fail",
+                    success: false,
+                }
             }
         }
+    }).catch(err => {
+        return {
+            msg: "auth verify fail",
+            success: false,
+        }
     })
-
-    return {
-        msg: "auth verify fail",
-        success: false,
-    }
 }

@@ -30,13 +30,15 @@ export function readApi() {
         })
 }
 
-export function readApiByPath(data) {
+export function readApiByPath(url) {
+    console.log(url)
     return apiRepository
         .createQueryBuilder('api')
-        .getMany()
+        .where("api.url = :url", { url: url })
+        .getOne()
         .then(result => {
             return {
-                ...result.find(item => item.url === data.path),
+                data: result,
                 success: true
             }
         })
