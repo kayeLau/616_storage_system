@@ -65,24 +65,24 @@ export async function verifyToken(token: string | undefined, getUser = false, ip
 // 驗證用戶權限
 export function verifyaAuth(url: String, auth:Number): Promise<verifyTokenResult> {
     return readApiByPath(url).then(res => {
-        if (res.success && res.data) {
+        if (res && res.success && res.data) {
             const accessList = res.data.access.split(',')
-            const passAuth = accessList.includes(String(auth)) || accessList.includes('*')
+            const passAuth = accessList.includes(String(auth)) || accessList.includes('*') || auth === -1
             if (passAuth) {
                 return {
                     msg: "auth verify success",
                     success: true,
                 }
-            } else {
-                return {
-                    msg: "auth verify fail",
-                    success: false,
-                }
             }
+        }
+        
+        return {
+            msg: "沒有權限",
+            success: false,
         }
     }).catch(err => {
         return {
-            msg: "auth verify fail",
+            msg: "權限驗證錯誤",
             success: false,
         }
     })
