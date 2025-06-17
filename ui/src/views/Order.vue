@@ -32,12 +32,13 @@
 
 <script setup>
 import orderDetailList from '../components/orderDetailList.vue';
+import Ktable from '../components/table.vue';
 import { readProduct } from '../request/products';
 import { readShop } from '../request/shops'
 import { readOrder, readHistoryOrder, readOrderDetail } from '../request/orders';
 import { departmentDict, orderStateDict } from '../request/dict';
 import { exportMeatSummary, exportAllSummary, exportOrderExcel } from '../utils/export';
-import Ktable from '../components/table.vue';
+import { getDefaultDateRange , getDefaultExportDate } from '../utils/tools';
 import { ref, onMounted, computed } from 'vue';
 import { getStorge } from '../utils/auth'
 import { ElButton, ElDatePicker } from 'element-plus'
@@ -46,18 +47,7 @@ const userInfo = computed(() => {
   let user = getStorge('userInfo')
   return user ? JSON.parse(user) : {}
 })
-// readShop
-async function fatchShopList() {
-  let result = []
-  await readShop({ size: 999, page: 1 }).then(res => {
-    if (res.success) {
-      result = res.data.map(item => {
-        return { label: item.shopName, value: item.shopId }
-      })
-    }
-  })
-  searchFormColumns.value[1].options = result
-}
+
 //#region order tabel
 const KtableRef2 = ref()
 const departmentFormatter = (row, column) => {
@@ -72,7 +62,7 @@ const orderStateFormatter = (row, column) => {
 
 // 表格顏色
 function tableRowClassName({ row }) {
-  if (row.isToday === 1) {
+  if (Number(row.isToday) === 1) {
     return 'warning-row'
   }
 }
@@ -96,12 +86,15 @@ const operations = {
   ]
 }
 
-const defaultExportDate = computed(() => {
-  let date = new Date(Date.parse(exportDate.value))
-  date.setDate(date.getDate() - 1)
-  return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
-})
 const exportDate = ref(new Date())
+function _exportAllSummary(date){
+  const exportDate = getDefaultExportDate(date)
+  return exportAllSummary(exportDate)
+}
+function _exportMeatSummary(date){
+  const exportDate = getDefaultExportDate(date)
+  return exportMeatSummary(exportDate)
+}
 
 const customBtn = ref([
   {
@@ -118,7 +111,7 @@ const customBtn = ref([
             exportDate.value = value
           }, type: "date"
         }),
-        h(ElButton, { onclick: () => exportAllSummary(defaultExportDate.value), type: 'success', plain: true }, '確定')
+        h(ElButton, { onclick: () => _exportAllSummary(exportDate.value), type: 'success', plain: true }, '確定')
       ])
     },
   },
@@ -136,27 +129,20 @@ const customBtn = ref([
             exportDate.value = value
           }, type: "date"
         }),
-        h(ElButton, { style: { margin: '0px' }, onclick: () => exportMeatSummary(defaultExportDate.value), type: 'success', plain: true }, '確定')
+        h(ElButton, { style: { margin: '0px' }, onclick: () => _exportMeatSummary(exportDate.value), type: 'success', plain: true }, '確定')
       ])
     },
   }
 ])
 
-const defaultDateRange = computed(() => {
-  let date = new Date()
-  let endDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0') + ' 23:59:59'
-  date.setDate(date.getDate() - 1)
-  let startDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0') + ' 00:00:00'
-  return [startDate, endDate]
-})
-
+const defaultDateRange = ref(getDefaultDateRange())
 const params = {
   size: 20,
   page: 1,
   updateDate: defaultDateRange.value
 }
 
-const searchFormColumns = ref([
+const searchFormColumns = [
   {
     type: 'datePicker',
     prop: 'updateDate',
@@ -166,10 +152,16 @@ const searchFormColumns = ref([
     type: 'select',
     prop: 'orderShopId',
     label: '落單門店:',
-    options: [],
+    options: readShop({ size: 999, page: 1 }).then(res => {
+      if (res.success) {
+        return res.data.map(item => {
+          return { label: item.shopName, value: item.shopId }
+        })
+      }
+    }),
     hide: userInfo.value.auth !== -1
   }
-])
+]
 //#endregion
 
 //#region order detail tabel
@@ -226,45 +218,6 @@ function resetexpandRowKeys() {
 //#endregion
 
 //#region jsonForm
-const editFormModel = ref({})
-const editFormColumns = ref([
-  {
-    type: 'select',
-    prop: 'productCode',
-    label: '產品編號:',
-    options: [],
-    disabled: true,
-    change: productChange
-  },
-  {
-    type: 'input',
-    prop: 'productName',
-    label: '產品名稱:',
-    disabled: true
-  },
-  {
-    type: 'input',
-    prop: 'orderQuantity',
-    label: '下單數量:',
-    disabled: true
-  },
-  {
-    type: 'input',
-    prop: 'assignQuantity',
-    label: '分配數量:',
-  },
-  {
-    type: 'input',
-    prop: 'remark',
-    label: '備注:',
-  },
-])
-
-function productChange(productCode) {
-  let product = products.value.find(item => item.productCode === productCode)
-  editFormModel.value.productName = product.productName
-}
-
 let loading = ref(false)
 async function refreshList() {
   loading.value = true
@@ -279,7 +232,6 @@ async function refreshList() {
 
 // 獲取產品列表
 let products = ref([]) // 產品列表
-let productsOption = ref([])
 function getProducts() {
   const params = {
     size: 999,
@@ -288,13 +240,6 @@ function getProducts() {
   readProduct(params).then(res => {
     if (res.success) {
       products.value = res.data
-      productsOption = res.data.map(item => {
-        return {
-          value: item.productCode,
-          label: item.productCode
-        }
-      })
-      editFormColumns.value[0].options = productsOption
     } else {
       products.value = []
     }
@@ -303,7 +248,6 @@ function getProducts() {
 //#endregion
 onMounted(() => {
   getProducts()
-  fatchShopList()
 })
 
 </script>

@@ -16,6 +16,14 @@ export function readOrderDetail(data){
       });
 }
 
+export function readOrderDatailSummary(data){
+    return request({
+        url: '/order/readOrderDatailSummary',
+        method: 'post',
+        data,
+      });
+}
+
 export function createOrder(data){
   return request({
       url: '/order/createOrder',

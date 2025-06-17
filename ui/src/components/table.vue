@@ -93,6 +93,7 @@
 import { defineProps, defineExpose, reactive, onMounted, ref, defineEmits, h } from 'vue';
 import { ElMessage } from 'element-plus'
 import expandTable from './expandTable.vue'
+import { isPromise } from '../utils/tools';
 
 const emit = defineEmits(['selectionChange'])
 
@@ -129,9 +130,31 @@ const props = defineProps({
 let data = ref([])
 let _params = reactive(props.params)
 let _operationsChildren = props.operations ? props.operations.children.filter(item => !item.hide) : []
-let _searchFormColumns = props.searchFormColumns.filter(item => !item.hide)
+let _searchFormColumns = ref([])
 let _customBtn = props.customBtn.filter(item => !item.hide)
 
+// 異步獲取下拉框選項
+async function waitSearchFormColumns(){
+    const promises = []
+    const pIndexs = []
+    const searchFormColumns = props.searchFormColumns.filter(item => !item.hide)
+    searchFormColumns.forEach((item,index) => {
+        if(item.options && isPromise(item.options)){
+            promises.push(item.options)
+            pIndexs.push(index)
+        }
+    })
+
+    await Promise.all(promises).then(res => {
+        res.forEach((item,index) => {
+            const pIndex = pIndexs[index]
+            if(searchFormColumns[pIndex].options){
+                searchFormColumns[pIndex].options = item
+            }
+        })
+    })
+    _searchFormColumns.value = searchFormColumns
+}
 
 async function fatchList() {
     let result = {}
@@ -157,6 +180,7 @@ function handleSelectionChange(value) {
 defineExpose({ fatchList })
 
 onMounted(() => {
+    waitSearchFormColumns()
     fatchList()
 })
 </script>
