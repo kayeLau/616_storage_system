@@ -1,6 +1,8 @@
 import { readSettingTimeRange } from '../utils';
-import { readOrder, readOrderDetail, createOrder, createOrderDetail, readHistoryOrder,
-    updateAssignQuantity, setOrderState, exportOrderMeat , checkOrderRepeated} from '../models/orderManage_model';
+import {
+    readOrder, readOrderDetail, createOrder, createOrderDetail, readHistoryOrder,
+    updateAssignQuantity, setOrderState, exportOrderMeat, checkOrderRepeated
+} from '../models/orderManage_model';
 import { readShop } from '../models/shopManage_model';
 import { readProduct } from '../models/productManage_model';
 
@@ -18,12 +20,12 @@ interface orderList {
     id: string, // 訂單ID
     productId: number,
     orderQuantity: number,
-    assignQuantity?:string,
+    assignQuantity?: string,
     orderMode: number,
     updateDate: string,
-    orderId:string,
-    remark?:string,
-    lastEditBy?:string
+    orderId: string,
+    remark?: string,
+    lastEditBy?: string
 }
 
 interface summaryProductIdsMap {
@@ -37,6 +39,7 @@ interface summaryProductItem {
 }
 
 module.exports = class order {
+    // 獲取訂單
     async readOrder(req, res, next) {
         const userInfoAuth = Number(req.userInfo.auth)
         const orderShopId = userInfoAuth === 0 || userInfoAuth === 1 ? req.userInfo.shopId : userInfoAuth === -1 ? req.body.orderShopId : "";
@@ -60,6 +63,7 @@ module.exports = class order {
         })
     }
 
+    // 獲取訂單明細
     async readOrderDetail(req, res, next) {
         const orderId = req.body.orderId
         readOrderDetail(orderId).then(result => {
@@ -67,6 +71,49 @@ module.exports = class order {
         }).catch(err => {
             next(err)
         })
+    }
+
+    // 查看訂單明細項匯總
+    async readOrderDatailSummary(req, res, next) {
+        const options = { updateDate: req.body.updateDate, orderShopId: req.body.orderShopId }
+        const result = {}
+        try {
+            const orderIds: Array<String> = await readOrder(options, 999, 1).then(res => {
+                if (res.success) {
+                    return res.data.map(item => item.id)
+                }
+                return []
+            })
+
+            for (const orderId of orderIds) {
+                const orderDetail = await readOrderDetail(orderId).then(res => res.data)
+                orderDetail.forEach(item => {
+                    if (!result[item.productId]) {
+                        result[item.productId] = {
+                            productId: item.productId,
+                            orderQuantity: item.orderQuantity,
+                            assignQuantity: item.assignQuantity,
+                            productName: item.productName,
+                            productCode: item.productCode,
+                            unit: item.unit,
+                            standard: item.standard,
+                            classify: item.classify,
+                            freezersNum: item.freezersNum,
+                        }
+                    }else{
+                        result[item.productId].orderQuantity += item.orderQuantity
+                        result[item.productId].assignQuantity += item.assignQuantity
+                    }
+                })
+            }
+
+            res.json({
+                success:true,
+                data:Object.values(result)
+            })
+        } catch (err) {
+            next(err)
+        }
     }
 
     // 前線員工建立新訂單
@@ -100,14 +147,14 @@ module.exports = class order {
             const orderId = orderList[0].orderId
             orderList = orderList.map(item => {
                 return {
-                    orderId:item.orderId,
-                    productId:item.productId,
-                    orderQuantity:item.orderQuantity,
-                    assignQuantity:item.assignQuantity,
-                    orderMode:item.orderMode,
-                    remark:item.remark,
-                    status:item.assignQuantity === null || item.assignQuantity === undefined ? 0 : 1,
-                    lastEditBy:userInfo.name
+                    orderId: item.orderId,
+                    productId: item.productId,
+                    orderQuantity: item.orderQuantity,
+                    assignQuantity: item.assignQuantity,
+                    orderMode: item.orderMode,
+                    remark: item.remark,
+                    status: item.assignQuantity === null || item.assignQuantity === undefined ? 0 : 1,
+                    lastEditBy: userInfo.name
                 }
             })
             createOrderDetail(orderList).then(async result => {
@@ -146,8 +193,8 @@ module.exports = class order {
         try {
             await updateAssignQuantity(data, userInfo)
             await setOrderState(orderId)
-            res.json({success:true})
-        } catch(err) {
+            res.json({ success: true })
+        } catch (err) {
             next(err)
         }
     }

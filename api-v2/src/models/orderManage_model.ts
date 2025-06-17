@@ -9,7 +9,7 @@ const orderRepository = AppDataSource.getRepository(Order);
 const orderDetailRepository = AppDataSource.getRepository(OrderDetail);
 
 
-// 根據orderCode groupby
+// 根據orderCode groupby訂單, 并輸出各分店每天最後一筆訂單
 async function getOrderAndGroupBy(options, size, page) {
     const { conditions, parameters } = optionsGenerater(options, "order");
     const orderDateRange = await readSettingTimeRange();
@@ -253,6 +253,7 @@ export async function exportOrderMeat(options, size, page, summaryProductIdsMap,
     }
 }
 
+// 查看歷史訂單
 export async function readHistoryOrder(options, size, page) {
     const total = await orderRepository
         .createQueryBuilder("order")

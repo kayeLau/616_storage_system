@@ -9,6 +9,8 @@ router.post('/readOrder',orderModifyMethod.readOrder)
 
 router.post('/readOrderDetail',orderModifyMethod.readOrderDetail)
 
+router.post('/readOrderDatailSummary',orderModifyMethod.readOrderDatailSummary)
+
 router.post('/createOrder',orderModifyMethod.createOrder)
 
 // router.post('/deleteOrder',orderModifyMethod.deleteOrder)
