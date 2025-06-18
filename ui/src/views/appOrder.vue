@@ -28,27 +28,15 @@
 <script setup>
 import { readOrder } from '../request/orders';
 import { orderStateDict } from '../request/dict';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { exportMeatSummary, exportAllSummary, exportOrderExcel } from '../utils/export';
+import { getDefaultDateRange , getDefaultExportDate } from '../utils/tools';
 const router = useRouter()
 
-const defaultDateRange = computed(() => {
-  let date = new Date()
-  let endDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0') + ' 23:59:59'
-  date.setDate(date.getDate() - 1)
-  let startDate = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0') + ' 00:00:00'
-  return [startDate, endDate]
-})
+const defaultDateRange = ref(getDefaultDateRange())
 
-const exportDate = ref()
-const defaultExportDate = () => {
-  let date = new Date()
-  date.setDate(date.getDate() - 1)
-  return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
-}
-exportDate.value = defaultExportDate()
-
+const exportDate = ref(getDefaultExportDate())
 
 const params = ref({
   size: 20,
@@ -74,7 +62,7 @@ const orderStateFormatter = (state) => {
 
 // 表格顏色
 function cardColor(isToday) {
-  if (isToday === 1) {
+  if (Number(isToday) === 1) {
     return 'warning-card'
   }
 }

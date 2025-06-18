@@ -35,7 +35,7 @@
             </el-form>
         </el-scrollbar>
     </div>
-    <el-dialog v-model="dialogShow" title="分店地址" custom-class='dialog' width="80%" height="60%" @open="openHandler"
+    <el-dialog v-model="dialogShow" title="設置必點產品" custom-class='dialog' width="80%" height="60%" @open="openHandler"
         destroy-on-close>
         <component :is='dialogComponent'></component>
     </el-dialog>
@@ -79,7 +79,6 @@ function fetchApi() {
                 item.access = item.access === null || item.access === '' ? [] : item.access.split(',').map(item => apiAccessDict[item]);
                 return item
             })
-            console.log(apis.value)
         }
     })
 }
@@ -143,7 +142,6 @@ async function getLogsNamae() {
 function downloadLogFile() {
     if (models.value.logName) {
         downloadLog({ fileName: models.value.logName }).then(res => {
-            console.log(res)
             let blob = new Blob([res], { type: "application/text" })
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);

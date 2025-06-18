@@ -48,12 +48,14 @@ const userInfo = computed(() => {
   return user ? JSON.parse(user) : {}
 })
 
-//#region order tabel
+//#region Tabel
 const KtableRef2 = ref()
 const departmentFormatter = (row, column) => {
   let cell = row[column.property]
   return departmentDict[cell]
 }
+
+// 訂單狀態顏色
 const orderStateFormatter = (row, column) => {
   let cell = row[column.property]
   let color = cell === 0 ? 'var(--el-color-danger)' : 'var(--el-color-success)'
@@ -67,6 +69,7 @@ function tableRowClassName({ row }) {
   }
 }
 
+// table column
 const columns = [
   { props: 'state', label: '訂單狀態', formatter: orderStateFormatter, width: 100 },
   { props: 'shopName', label: '落單門店', width: 180 },
@@ -86,16 +89,10 @@ const operations = {
   ]
 }
 
-const exportDate = ref(new Date())
-function _exportAllSummary(date){
-  const exportDate = getDefaultExportDate(date)
-  return exportAllSummary(exportDate)
-}
-function _exportMeatSummary(date){
-  const exportDate = getDefaultExportDate(date)
-  return exportMeatSummary(exportDate)
-}
+// 導出日期selector
+const exportDate = ref(getDefaultExportDate())
 
+// table下方button
 const customBtn = ref([
   {
     type: 'popover',
@@ -106,12 +103,14 @@ const customBtn = ref([
     render: (h) => {
       return h('div', { style: { display: 'flex', gap: '5px' } }, [
         h(ElDatePicker, {
-          teleported: false, modelValue: exportDate.value,
+          teleported: false, 
+          modelValue: exportDate.value,
+          valueFormat:"YYYY-MM-DD",
           ['onUpdate:modelValue']: (value) => {
             exportDate.value = value
           }, type: "date"
         }),
-        h(ElButton, { onclick: () => _exportAllSummary(exportDate.value), type: 'success', plain: true }, '確定')
+        h(ElButton, { onclick: () => exportAllSummary(exportDate.value), type: 'success', plain: true }, '確定')
       ])
     },
   },
@@ -124,12 +123,14 @@ const customBtn = ref([
     render: (h) => {
       return h('div', { style: { display: 'flex', gap: '5px' } }, [
         h(ElDatePicker, {
-          teleported: false, modelValue: exportDate.value,
+          teleported: false, 
+          valueFormat:"YYYY-MM-DD",
+          modelValue: exportDate.value,
           ['onUpdate:modelValue']: (value) => {
             exportDate.value = value
           }, type: "date"
         }),
-        h(ElButton, { style: { margin: '0px' }, onclick: () => _exportMeatSummary(exportDate.value), type: 'success', plain: true }, '確定')
+        h(ElButton, { style: { margin: '0px' }, onclick: () => exportMeatSummary(exportDate.value), type: 'success', plain: true }, '確定')
       ])
     },
   }
@@ -142,6 +143,7 @@ const params = {
   updateDate: defaultDateRange.value
 }
 
+// 搜索框
 const searchFormColumns = [
   {
     type: 'datePicker',
@@ -164,15 +166,20 @@ const searchFormColumns = [
 ]
 //#endregion
 
-//#region order detail tabel
+//#region Detail Tabel
 let currentRow = ref([])
-
+const KtableRef3 = ref()
+let orderDetailShow = ref(false)
+let historyDetailShow = ref(false)
+let expandRowKeys = ref([])
+let historyParams = ref({})
+let loading = ref(false)
 const ODparams = {
   size: 20,
   page: 1,
 }
 
-let orderDetailShow = ref(false)
+// 展開訂單明細
 function showDetailHandle(index, row) {
   readOrderDetail({ orderId: row.id }).then(res => {
     if (res.success) {
@@ -186,8 +193,7 @@ function showDetailHandle(index, row) {
   })
 }
 
-const KtableRef3 = ref()
-let historyDetailShow = ref(false)
+// 展開歷史訂單
 async function showHistoryHandle(index, row) {
   historyParams.value = {
     size: 99,
@@ -197,10 +203,8 @@ async function showHistoryHandle(index, row) {
   resetexpandRowKeys()
   historyDetailShow.value = !historyDetailShow.value
 }
-let historyParams = ref({})
 
-// 展開
-let expandRowKeys = ref([])
+// 切換展開的歷史訂單
 async function expandChange(row, expandRow) {
   if (expandRow.length) {
     await readOrderDetail({ orderId: row.id }).then(res => {
@@ -211,14 +215,11 @@ async function expandChange(row, expandRow) {
     expandRowKeys.value = expandRow.map(item => item.id)
   }
 }
+
 function resetexpandRowKeys() {
   expandRowKeys.value = []
 }
 
-//#endregion
-
-//#region jsonForm
-let loading = ref(false)
 async function refreshList() {
   loading.value = true
   await KtableRef2.value.fatchList()
@@ -229,6 +230,9 @@ async function refreshList() {
   })
   loading.value = false
 }
+
+//#endregion
+
 
 // 獲取產品列表
 let products = ref([]) // 產品列表
@@ -245,7 +249,7 @@ function getProducts() {
     }
   })
 }
-//#endregion
+
 onMounted(() => {
   getProducts()
 })

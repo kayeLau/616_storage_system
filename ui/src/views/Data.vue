@@ -21,10 +21,10 @@ const params = {
 
 let columns = [
     { props: 'productCode', label: '產品號碼', width: 100 },
-    { props: 'productName', label: '產品名稱', width: 200 },
+    { props: 'productName', label: '產品名稱', width: 250 },
     { props: 'orderQuantity', label: '下單數量', width: 100, formatter: (row, column) => row[column.property] + row.unit},
     { props: 'assignQuantity', label: '分配數量', width: 100, formatter: (row, column) => row[column.property] + row.unit},
-    { props: 'standard', label: '規格', width: 100 }
+    { props: 'standard', label: '規格', width: 250 }
 ]
 
 // getOrderDatailSummary

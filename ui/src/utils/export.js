@@ -1,3 +1,4 @@
+import { ElMessage } from 'element-plus'
 import FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
 import XLSXStyle from 'xlsx-style-medalsoft';
@@ -8,7 +9,7 @@ import { classifyDict, departmentDict, freezersNumDict, productDisable, productS
 
 export function exportMeatSummary(defaultExportDate) {
   exportDailyMeetSummary({ exportDate: defaultExportDate, exportType: 1 }).then(res => {
-    if (res.success) {
+    if (res.success && res.data.shopName.length) {
       const date = new Date()
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
       let shopName = res.data.shopName
@@ -28,6 +29,8 @@ export function exportMeatSummary(defaultExportDate) {
         jsonData
       }
       exportExcel({ exportDate: [dailyMeetSummary], usezip: false, zipFileName: '', hpt: 40, wpt: 3, header: '1' })
+    } else {
+      ElMessage({ type: 'error', message: '沒有可導出的數據' })
     }
   })
 }
@@ -36,7 +39,7 @@ export function exportAllSummary(defaultExportDate) {
   let user = getStorge('userInfo')
   let userInfo = user ? JSON.parse(user) : {}
   exportDailyMeetSummary({ exportDate: defaultExportDate, exportType: 0 }).then(res => {
-    if (res.success) {
+    if (res.success && res.data.shopName.length) {
       const date = new Date()
       const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
       let products = res.data.products
@@ -68,6 +71,8 @@ export function exportAllSummary(defaultExportDate) {
         jsonData
       }
       exportExcel({ exportDate: [dailyMeetSummary], header: '1', hpt: 30, wpt: 2.5 })
+    } else {
+      ElMessage({ type: 'error', message: '沒有可導出的數據' })
     }
   })
 }

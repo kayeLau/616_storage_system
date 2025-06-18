@@ -21,7 +21,7 @@ import { ElUpload, ElButton } from 'element-plus'
 
 const KtableRef = ref()
 
-//#region edit
+//#region Edit
 let JsonFormComfireCallBack = ref(() => { })
 let jsonFormShow = ref(false)
 const editFormModel = ref({})
@@ -142,7 +142,7 @@ function deleteHandle(index, row) {
 }
 //#endregion
 
-//#region tabel
+//#region Tabel
 const freezersNumFormatter = (row, column) => {
   let cell = row[column.property]
   return freezersNumDict[cell]
@@ -191,7 +191,8 @@ const operations = {
 }
 const params = {
   size: 20,
-  page: 1
+  page: 1,
+  disable:'0'
 }
 const searchFormColumns = [
   {
