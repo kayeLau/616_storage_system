@@ -70,7 +70,7 @@ const customBtn = [
         type: 'button',
         btnType: 'success',
         onClick: () => {
-            const exportDate = defaultDateRange.value
+            const updateDate = defaultDateRange.value
             const orderShopId = params.orderShopId
             const shop = shops.find(item => item.value === orderShopId)
             if (!orderShopId) {
@@ -78,7 +78,7 @@ const customBtn = [
                 return
             }
             exportOrderDatailSummary({
-                exportDate,
+                updateDate,
                 orderShopId,
                 shopName: shop ? shop.label : '',
                 size:999,

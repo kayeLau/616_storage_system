@@ -125,8 +125,8 @@ export async function exportOrderExcel(index, row) {
 
 // 導出指定時間段分店下單匯總
 export async function exportOrderDatailSummary(params) {
-  const startDate = new Date(params.exportDate[0])
-  const endDate = new Date(params.exportDate[1])
+  const startDate = new Date(params.updateDate[0])
+  const endDate = new Date(params.updateDate[1])
   const exportDateStr = formatterDate(new Date(startDate)) + '-' + formatterDate(new Date(endDate)) + '_'
   let result = []
   await readOrderDatailSummary({ ...params }).then(res => {

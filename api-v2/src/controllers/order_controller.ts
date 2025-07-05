@@ -87,6 +87,8 @@ module.exports = class order {
                 return []
             })
 
+            console.log(orderIds)
+
             for (const orderId of orderIds) {
                 const orderDetail = await readOrderDetail(orderId).then(res => res.data)
                 orderDetail.forEach(item => {
@@ -113,7 +115,7 @@ module.exports = class order {
 
             const startIndex = (page - 1) * size;
             const endIndex = startIndex + size;
-            console.log(result)
+
             res.json({
                 success: true,
                 data: Array.from(result.values()).slice(startIndex, endIndex),
