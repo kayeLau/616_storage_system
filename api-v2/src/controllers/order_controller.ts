@@ -44,8 +44,8 @@ module.exports = class order {
         const userInfoAuth = Number(req.userInfo.auth)
         const orderShopId = userInfoAuth === 0 || userInfoAuth === 1 ? req.userInfo.shopId : userInfoAuth === -1 ? req.body.orderShopId : "";
         const options = { updateDate: req.body.updateDate, orderShopId }
-        const size = req.body.size || 1
-        const page = req.body.page || 20
+        const size = req.body.size || 20
+        const page = req.body.page || 1
         if (userInfoAuth === 2) {
             let shopIdList = await readShop({}, 999, 1).then(result => {
                 if (result.success) {
@@ -76,7 +76,9 @@ module.exports = class order {
     // 查看訂單明細項匯總
     async readOrderDatailSummary(req, res, next) {
         const options = { updateDate: req.body.updateDate, orderShopId: req.body.orderShopId }
-        const result = {}
+        const result = new Map()
+        const size = req.body.size || 20
+        const page = req.body.page || 1
         try {
             const orderIds: Array<String> = await readOrder(options, 999, 1).then(res => {
                 if (res.success) {
@@ -88,28 +90,34 @@ module.exports = class order {
             for (const orderId of orderIds) {
                 const orderDetail = await readOrderDetail(orderId).then(res => res.data)
                 orderDetail.forEach(item => {
-                    if (!result[item.productId]) {
-                        result[item.productId] = {
+                    if (!result.has(item.productId)) {
+                        result.set(item.productId, {
                             productId: item.productId,
                             orderQuantity: item.orderQuantity,
-                            assignQuantity: item.assignQuantity,
+                            assignQuantity: item.assignQuantity || 0,
                             productName: item.productName,
                             productCode: item.productCode,
                             unit: item.unit,
                             standard: item.standard,
                             classify: item.classify,
                             freezersNum: item.freezersNum,
-                        }
-                    }else{
-                        result[item.productId].orderQuantity += item.orderQuantity
-                        result[item.productId].assignQuantity += item.assignQuantity
+                        })
+                    } else {
+                        const currentValue = result.get(item.productId)
+                        currentValue.orderQuantity += item.orderQuantity
+                        currentValue.assignQuantity += item.assignQuantity ||  0
+                        result.set(item.productId, currentValue)
                     }
                 })
             }
 
+            const startIndex = (page - 1) * size;
+            const endIndex = startIndex + size;
+            console.log(result)
             res.json({
-                success:true,
-                data:Object.values(result)
+                success: true,
+                data: Array.from(result.values()).slice(startIndex, endIndex),
+                total: result.size
             })
         } catch (err) {
             next(err)
@@ -168,6 +176,7 @@ module.exports = class order {
         }
     }
 
+    // 查看當天是否已下單
     async checkOrderRepeated(req, res, next) {
         const userInfo = req.userInfo
         const orderDateRange = await readSettingTimeRange()

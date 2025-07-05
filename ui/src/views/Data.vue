@@ -1,7 +1,7 @@
 <template>
     <el-card class="Ktable-container">
         <Ktable ref='KtableRef' :columns="columns" :params="params" :getList="getOrderDatailSummary"
-            :searchFormColumns="searchFormColumns" :customBtn="[]"></Ktable>
+            :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
     </el-card>
 </template>
 <script setup>
@@ -10,11 +10,13 @@ import { readOrderDatailSummary } from '../request/orders'
 import { readShop } from '../request/shops'
 import { ref } from 'vue';
 import { getDefaultDateRange } from '../utils/tools';
+import { exportOrderDatailSummary } from '../utils/export';
+import { ElMessage } from 'element-plus'
 
 const defaultDateRange = ref(getDefaultDateRange(7))
 
 const params = {
-    size: 999,
+    size: 20,
     page: 1,
     updateDate: defaultDateRange.value,
 }
@@ -22,21 +24,24 @@ const params = {
 let columns = [
     { props: 'productCode', label: '產品號碼', width: 100 },
     { props: 'productName', label: '產品名稱', width: 250 },
-    { props: 'orderQuantity', label: '下單數量', width: 100, formatter: (row, column) => row[column.property] + row.unit},
-    { props: 'assignQuantity', label: '分配數量', width: 100, formatter: (row, column) => row[column.property] + row.unit},
-    { props: 'standard', label: '規格', width: 250 }
+    { props: 'orderQuantity', label: '下單數量', width: 120, formatter: (row, column) => row[column.property] + row.unit },
+    { props: 'assignQuantity', label: '分配數量', width: 120, formatter: (row, column) => row[column.property] + row.unit },
+    { props: 'standard', label: '規格' }
 ]
 
 // getOrderDatailSummary
 async function getOrderDatailSummary(params) {
-    if (!params.orderShopId) return
-    const res = await readOrderDatailSummary(params);
-    return {
-        ...res,
-        total: res.data.length
+    if (!params.orderShopId) {
+        return {
+            success: true,
+            data: []
+        }
     }
+    const res = await readOrderDatailSummary(params);
+    return { ...res }
 }
 
+let shops = []
 const searchFormColumns = [
     {
         type: 'datePicker',
@@ -49,11 +54,37 @@ const searchFormColumns = [
         label: '落單門店:',
         options: readShop({ size: 999, page: 1 }).then(res => {
             if (res.success) {
-                return res.data.map(item => {
+                shops = res.data.map(item => {
                     return { label: item.shopName, value: item.shopId }
                 })
+                return shops
             }
         }),
+    }
+]
+
+const customBtn = [
+    {
+        label: '導出匯總表',
+        icon: 'Printer',
+        type: 'button',
+        btnType: 'success',
+        onClick: () => {
+            const exportDate = defaultDateRange.value
+            const orderShopId = params.orderShopId
+            const shop = shops.find(item => item.value === orderShopId)
+            if (!orderShopId) {
+                ElMessage({ type: 'warning', message: '請先選擇店舖' })
+                return
+            }
+            exportOrderDatailSummary({
+                exportDate,
+                orderShopId,
+                shopName: shop ? shop.label : '',
+                size:999,
+                page:1
+            })
+        }
     }
 ]
 

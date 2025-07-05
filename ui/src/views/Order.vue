@@ -93,7 +93,7 @@ const operations = {
 const exportDate = ref(getDefaultExportDate())
 
 // table下方button
-const customBtn = ref([
+const customBtn = [
   {
     type: 'popover',
     btnType: 'success',
@@ -134,7 +134,7 @@ const customBtn = ref([
       ])
     },
   }
-])
+]
 
 const defaultDateRange = ref(getDefaultDateRange())
 const params = {

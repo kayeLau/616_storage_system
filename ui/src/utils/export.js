@@ -4,19 +4,20 @@ import * as XLSX from 'xlsx';
 import XLSXStyle from 'xlsx-style-medalsoft';
 import JSZip from 'jszip';
 import { getStorge } from '../utils/auth';
-import { exportDailyMeetSummary, readOrderDetail } from '../request/orders';
+import { exportDailyMeetSummary, readOrderDetail, readOrderDatailSummary } from '../request/orders';
 import { classifyDict, departmentDict, freezersNumDict, productDisable, productSummary, exchangeKeyValue } from '../request/dict';
 import { formatterDate } from '../utils/tools'
 
 // 導出鮮肉類總表
-export function exportMeatSummary(defaultExportDate) {
-  exportDailyMeetSummary({ exportDate: defaultExportDate, exportType: 1 }).then(res => {
+export function exportMeatSummary(exportDate) {
+  exportDailyMeetSummary({ exportDate, exportType: 1 }).then(res => {
     if (res.success && res.data.shopName.length) {
-      const exportDateStr = formatterDate(new Date(defaultExportDate))
+      const exportDateStr = formatterDate(new Date(exportDate))
       let shopName = res.data.shopName
       let products = res.data.products
       let jsonData = products.map((product) => {
         let summary = product.orderItems.reduce((prev, acc) => prev + acc) + product.unit
+        // 各分店下單產品數量
         let row = shopName.map((item, columnIndex) => {
           let order = product.orderItems[columnIndex]
           return order + product.unit
@@ -37,12 +38,12 @@ export function exportMeatSummary(defaultExportDate) {
 }
 
 // 導出總表(非鮮肉類)
-export function exportAllSummary(defaultExportDate) {
+export function exportAllSummary(exportDate) {
   let user = getStorge('userInfo')
   let userInfo = user ? JSON.parse(user) : {}
-  exportDailyMeetSummary({ exportDate: defaultExportDate, exportType: 0 }).then(res => {
+  exportDailyMeetSummary({ exportDate, exportType: 0 }).then(res => {
     if (res.success && res.data.shopName.length) {
-      const exportDateStr = formatterDate(new Date(defaultExportDate))
+      const exportDateStr = formatterDate(new Date(exportDate))
       let products = res.data.products
       if (userInfo.auth === 3) {
         products = products.filter(item => item.freezersNum === 1 || item.freezersNum === 3 || item.freezersNum === 4)
@@ -120,6 +121,34 @@ export async function exportOrderExcel(index, row) {
     ]
   }
   exportExcel({ exportDate: [shipping, delivery], usezip: true, zipFileName: String(exportDateStr + row.shopName), header: '2', wpt: 3 })
+}
+
+// 導出指定時間段分店下單匯總
+export async function exportOrderDatailSummary(params) {
+  const startDate = new Date(params.exportDate[0])
+  const endDate = new Date(params.exportDate[1])
+  const exportDateStr = formatterDate(new Date(startDate)) + '-' + formatterDate(new Date(endDate)) + '_'
+  let result = []
+  await readOrderDatailSummary({ ...params }).then(res => {
+    if (res.success) {
+      result = res.data
+    }
+  })
+  const shipping = {
+    sheetNames: exportDateStr + params.shopName + '匯總表',
+    jsonData: [
+      ['產品編號', '產品名稱', '下單數量', '分配數量', '規格'],
+      ...result.map(item => [
+        item.productCode,
+        item.productName,
+        item.orderQuantity,
+        item.assignQuantity,
+        item.standard,
+      ])
+    ]
+  };
+
+  exportExcel({ exportDate: [shipping], usezip: false, header: '2', wpt: 3 })
 }
 
 /* ========================= base ========================= */
