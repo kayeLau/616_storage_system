@@ -14,7 +14,7 @@ import { getDefaultDateRange } from '../utils/tools';
 const defaultDateRange = ref(getDefaultDateRange(7))
 
 const params = {
-    size: 20,
+    size: 999,
     page: 1,
     updateDate: defaultDateRange.value,
 }
@@ -56,4 +56,5 @@ const searchFormColumns = [
         }),
     }
 ]
+
 </script>

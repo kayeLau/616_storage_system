@@ -6,12 +6,13 @@ import JSZip from 'jszip';
 import { getStorge } from '../utils/auth';
 import { exportDailyMeetSummary, readOrderDetail } from '../request/orders';
 import { classifyDict, departmentDict, freezersNumDict, productDisable, productSummary, exchangeKeyValue } from '../request/dict';
+import { formatterDate } from '../utils/tools'
 
+// 導出鮮肉類總表
 export function exportMeatSummary(defaultExportDate) {
   exportDailyMeetSummary({ exportDate: defaultExportDate, exportType: 1 }).then(res => {
     if (res.success && res.data.shopName.length) {
-      const date = new Date()
-      const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
+      const exportDateStr = formatterDate(new Date(defaultExportDate))
       let shopName = res.data.shopName
       let products = res.data.products
       let jsonData = products.map((product) => {
@@ -25,7 +26,7 @@ export function exportMeatSummary(defaultExportDate) {
       jsonData.unshift(['產品名稱', ...shopName, '產品名稱', '出貨總數'])
 
       const dailyMeetSummary = {
-        sheetNames: today + '工埸鮮肉匯總表',
+        sheetNames: exportDateStr + '工埸鮮肉匯總表',
         jsonData
       }
       exportExcel({ exportDate: [dailyMeetSummary], usezip: false, zipFileName: '', hpt: 40, wpt: 3, header: '1' })
@@ -35,13 +36,13 @@ export function exportMeatSummary(defaultExportDate) {
   })
 }
 
+// 導出總表(非鮮肉類)
 export function exportAllSummary(defaultExportDate) {
   let user = getStorge('userInfo')
   let userInfo = user ? JSON.parse(user) : {}
   exportDailyMeetSummary({ exportDate: defaultExportDate, exportType: 0 }).then(res => {
     if (res.success && res.data.shopName.length) {
-      const date = new Date()
-      const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
+      const exportDateStr = formatterDate(new Date(defaultExportDate))
       let products = res.data.products
       if (userInfo.auth === 3) {
         products = products.filter(item => item.freezersNum === 1 || item.freezersNum === 3 || item.freezersNum === 4)
@@ -67,7 +68,7 @@ export function exportAllSummary(defaultExportDate) {
       jsonData.unshift(header)
 
       const dailyMeetSummary = {
-        sheetNames: today + '出貨匯總表',
+        sheetNames: exportDateStr + '出貨匯總表',
         jsonData
       }
       exportExcel({ exportDate: [dailyMeetSummary], header: '1', hpt: 30, wpt: 2.5 })
@@ -77,10 +78,11 @@ export function exportAllSummary(defaultExportDate) {
   })
 }
 
+// 導出分店送貨單匯總
 export async function exportOrderExcel(index, row) {
-  const date = new Date()
-  const today = String(date.getDate()).padStart(2, '0') + String(date.getMonth() + 1).padStart(2, '0') + date.getFullYear()
-  const todayF = String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear()
+  const date = new Date(row.createDate)
+  const exportDateStr = formatterDate(new Date(date)) + '_'
+  const exportDateStrF = formatterDate(new Date(date), '/')
   let children = []
   await readOrderDetail({ orderId: row.id }).then(res => {
     if (res.success) {
@@ -88,9 +90,9 @@ export async function exportOrderExcel(index, row) {
     }
   })
   const shipping = {
-    sheetNames: today + row.shopName + '出貨表',
+    sheetNames: exportDateStr + row.shopName + '出貨表',
     jsonData: [
-      [row.shopCode, row.shopName, '', todayF],
+      [row.shopCode, row.shopName, '', exportDateStrF],
       ['貨品編號', '貨品名稱', '數量/重量', '單位', '包裝規格'],
       ...children.map(item => [
         item.productCode,
@@ -103,7 +105,7 @@ export async function exportOrderExcel(index, row) {
   };
 
   const delivery = {
-    sheetNames: today + row.shopName + '送貨單',
+    sheetNames: exportDateStr + row.shopName + '送貨單',
     jsonData: [
       [row.shopName, row.orderUserName[0], '', '', '', row.updateDate],
       ['貨品名稱', '分配數量', '單位', '下單數量', '包裝規格', '備注'],
@@ -117,7 +119,7 @@ export async function exportOrderExcel(index, row) {
       ])
     ]
   }
-  exportExcel({ exportDate: [shipping, delivery], usezip: true, zipFileName: String(today + row.shopName), header: '2', wpt: 3 })
+  exportExcel({ exportDate: [shipping, delivery], usezip: true, zipFileName: String(exportDateStr + row.shopName), header: '2', wpt: 3 })
 }
 
 /* ========================= base ========================= */
