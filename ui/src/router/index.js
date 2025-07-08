@@ -60,6 +60,15 @@ const routes = [
     }]
   },
   {
+    path: '/menu',
+    component: layout,
+    children:[{
+      path:'',
+      name: 'menu',
+      component: () => import('../views/Menu.vue')
+    }]
+  },
+  {
     path: '/user',
     component: layout,
     children:[{

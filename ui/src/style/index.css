@@ -4,6 +4,7 @@
 @import "./table.css";
 @import "./ststistic.css";
 @import "./transition.css";
+@import "./tabs.css";
 
 :root {
     --background-color: #f2f6fc;

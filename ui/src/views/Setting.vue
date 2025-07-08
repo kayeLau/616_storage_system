@@ -1,39 +1,49 @@
 <template>
     <div class="setting">
-        <h3 class="title">系統設定</h3>
-        <el-form ref='formRef' :model="editFormModels" label-position="left">
-            <el-form-item label="截單時間" prop="lastOrder">
-                <el-time-select v-model="editFormModels.lastOrder" start="01:00" step="01:00" end="23:00" size="small"
-                    placeholder="請選擇時間" clearable format="HH" style="width: 150px;" @change="sumbitLastOrder" />
-            </el-form-item>
-            <el-form-item label="設點必點產品" prop="promptItem" align="right">
-                <el-button type="primary" style="width: 150px;" size="small" @click="setDialogShow(0)">編輯</el-button>
-            </el-form-item>
-        </el-form>
-        <div class="title">日志</div>
-        <el-form ref='formRef' :model="models" label-position="left">
-            <el-form-item label="日志下載" prop="logName">
-                <el-select style="width: 150px;" v-model="models.logName" size="small" placeholder="請選擇時間" clearable
-                    @change="downloadLogFile">
-                    <el-option v-for="opt of logsOption" :key="opt" :label="opt" :value="opt"></el-option>
-                </el-select>
-            </el-form-item>
-        </el-form>
-        <!-- 接口管理 -->
-        <h3 class="title">API權限設定</h3>
-        <el-scrollbar style="height: 100%;">
-            <el-form class="">
-                <el-form-item v-for="(item, index) of apis" :key="index" :label="item.name" label-position="left"
-                    label-width="180px">
-                    <el-checkbox-group v-model="item.access" @change="editApi(item)">
-                        <el-checkbox label="廚房" />
-                        <el-checkbox label="樓面" />
-                        <el-checkbox label="區經" />
-                        <el-checkbox label="工埸" />
-                    </el-checkbox-group>
-                </el-form-item>
-            </el-form>
-        </el-scrollbar>
+        <el-tabs v-model="tabsValue">
+            <el-tab-pane name="sys" label="系統">
+                <h3 class="title">系統設定</h3>
+                <el-form ref='formRef' :model="editFormModels" label-position="left">
+                    <el-form-item label="截單時間" prop="lastOrder">
+                        <el-time-select v-model="editFormModels.lastOrder" start="01:00" step="01:00" end="23:00"
+                            size="small" placeholder="請選擇時間" clearable format="HH" style="width: 150px;"
+                            @change="sumbitLastOrder" />
+                    </el-form-item>
+                    <el-form-item label="設點必點產品" prop="promptItem" align="right">
+                        <el-button type="primary" style="width: 150px;" size="small"
+                            @click="setDialogShow(0)">編輯</el-button>
+                    </el-form-item>
+                </el-form>
+                <div class="title">日志</div>
+                <el-form ref='formRef' :model="models" label-position="left">
+                    <el-form-item label="日志下載" prop="logName">
+                        <el-select style="width: 150px;" v-model="models.logName" size="small" placeholder="請選擇時間"
+                            clearable @change="downloadLogFile">
+                            <el-option v-for="opt of logsOption" :key="opt" :label="opt" :value="opt"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form>
+            </el-tab-pane>
+            <el-tab-pane name="auth" label="菜單權限">
+
+            </el-tab-pane>
+            <el-tab-pane name="api" label="API權限">
+                <h3 class="title">API權限設定</h3>
+                <el-scrollbar style="height: 100%;">
+                    <el-form class="">
+                        <el-form-item v-for="(item, index) of apis" :key="index" :label="item.name"
+                            label-position="left" label-width="180px">
+                            <el-checkbox-group v-model="item.access" @change="editApi(item)">
+                                <el-checkbox label="廚房" />
+                                <el-checkbox label="樓面" />
+                                <el-checkbox label="區經" />
+                                <el-checkbox label="工埸" />
+                            </el-checkbox-group>
+                        </el-form-item>
+                    </el-form>
+                </el-scrollbar>
+            </el-tab-pane>
+        </el-tabs>
     </div>
     <el-dialog v-model="dialogShow" title="設置必點產品" custom-class='dialog' width="80%" height="60%" @open="openHandler"
         destroy-on-close>
@@ -49,6 +59,7 @@ import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus'
 import promptItem from '../components/promptItem.vue'
 
+let tabsValue = ref('sys')
 /* 必點 */
 let dialogComponent = ref(null)
 let dialogShow = ref(false)
@@ -166,5 +177,4 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
 }
-
 </style>

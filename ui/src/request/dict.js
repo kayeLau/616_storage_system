@@ -76,14 +76,20 @@ export const orderMode = {
     1: '追加',
 }
 
-export const productDisable = {
+export const disable = {
     0: '啟用',
-    1: '隱藏',
+    1: '禁用',
 }
 
 export const productSummary = {
     0: '不需要',
     1: '需要',
+}
+
+export const menuClassifyDict = {
+    0: '單品',
+    1: '套餐',
+    2: '加配',
 }
 
 export function dictToOptions(dict) {

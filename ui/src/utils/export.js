@@ -5,7 +5,7 @@ import XLSXStyle from 'xlsx-style-medalsoft';
 import JSZip from 'jszip';
 import { getStorge } from '../utils/auth';
 import { exportDailyMeetSummary, readOrderDetail, readOrderDatailSummary } from '../request/orders';
-import { classifyDict, departmentDict, freezersNumDict, productDisable, productSummary, exchangeKeyValue } from '../request/dict';
+import { classifyDict, departmentDict, freezersNumDict, disable, productSummary, exchangeKeyValue } from '../request/dict';
 import { formatterDate } from '../utils/tools'
 
 // 導出鮮肉類總表
@@ -157,7 +157,7 @@ export function xlsxToJson(fileBinaryString) {
   const _classifyDict = exchangeKeyValue(classifyDict)
   const _departmentDict = exchangeKeyValue(departmentDict)
   const _freezersNumDict = exchangeKeyValue(freezersNumDict)
-  const _productDisable = exchangeKeyValue(productDisable)
+  const _disable = exchangeKeyValue(disable)
   const _productSummary = exchangeKeyValue(productSummary)
   let result = []
 
@@ -174,7 +174,7 @@ export function xlsxToJson(fileBinaryString) {
         productName: item.productName,
         unit: item.unit,
         standard: item.standard,
-        disable: Number(_productDisable[item.disable]),
+        disable: Number(_disable[item.disable]),
         summary: Number(_productSummary[item.summary]),
         prompt: 0,
       }

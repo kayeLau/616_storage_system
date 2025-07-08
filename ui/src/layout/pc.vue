@@ -72,10 +72,16 @@ const menus = [
         auth: [-1, 1, 0, 2, 3]
     },
     {
-        name: "產品管理",
+        name: "原料管理",
         path: 'product',
         icon: 'Goods',
         whiteList: false,
+        auth: [-1]
+    },
+    {
+        name: "菜單管理",
+        path: 'menu',
+        icon: 'Dish',
         auth: [-1]
     },
     {

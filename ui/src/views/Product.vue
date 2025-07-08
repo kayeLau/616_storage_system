@@ -12,7 +12,7 @@
 </template>
 <script setup>
 import { readProduct, updateProduct, createProduct } from '../request/products'
-import { freezersNumDict, classifyDict, departmentDict, dictToOptions, productDisable, productSummary } from '../request/dict'
+import { freezersNumDict, classifyDict, departmentDict, dictToOptions, disable, productSummary } from '../request/dict'
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
 import { ref } from 'vue'
@@ -68,7 +68,7 @@ const editFormColumns = ref([
     type: 'select',
     prop: 'disable',
     label: '狀態:',
-    options: dictToOptions(productDisable)
+    options: dictToOptions(disable)
   },
   {
     type: 'select',
@@ -163,14 +163,14 @@ const summaryFormatter = (row, column) => {
   return productSummary[cell]
 }
 
-const productDisableFormatter = (row, column) => {
+const disableFormatter = (row, column) => {
   let cell = row[column.property]
   let color = cell === 1 ? 'var(--el-color-danger)' : 'var(--el-color-success)'
-  return `<span style='color:${color}'>${productDisable[cell]}<span>`
+  return `<span style='color:${color}'>${disable[cell]}<span>`
 }
 
 const columns = [
-  { props: 'disable', label: '狀態', formatter: productDisableFormatter, width: 60 },
+  { props: 'disable', label: '狀態', formatter: disableFormatter, width: 60 },
   { props: 'productCode', label: '產品編號', width: 80 },
   { props: 'productName', label: '產品名稱', width: 130 },
   { props: 'classify', label: '分類', formatter: classifyFormatter , width: 120},
@@ -216,7 +216,7 @@ const searchFormColumns = [
     type: 'select',
     prop: 'disable',
     label: '狀態:',
-    options: dictToOptions(productDisable)
+    options: dictToOptions(disable)
   },
   {
     type: 'select',
@@ -272,7 +272,7 @@ function exportProductExcel() {
       let jsonData = []
       jsonData = res.data.map(item => {
         return [
-          productDisable[item.disable],
+          disable[item.disable],
           item.productId,
           item.productCode,
           item.productName,

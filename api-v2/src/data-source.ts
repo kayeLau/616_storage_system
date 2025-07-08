@@ -9,6 +9,8 @@ import { Product } from "./entity/Product"
 import { Order } from "./entity/Order"
 import { OrderDetail } from "./entity/OrderDetail"
 import { Inventory } from "./entity/Inventory"
+import { Menu } from "./entity/Menu"
+import { FoodOptions } from "./entity/FoodOptions"
 import { Api } from "./entity/Api"
 const config = require('./config/development_config')
 
@@ -21,7 +23,8 @@ const AppDataSource = new DataSource({
     database: config.mysql.database,
     synchronize: true,
     logging: false,
-    entities: [Setting, Member, Partition, Shop , ShopProduct, Product, Order, OrderDetail, Inventory, Api],
+    entities: [ Setting, Member, Partition, Shop , ShopProduct, 
+        Product, Order, OrderDetail, Inventory, Api, Menu , FoodOptions],
     migrations: [],
     subscribers: [],
 })
