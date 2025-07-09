@@ -78,12 +78,12 @@ const menus = [
         whiteList: false,
         auth: [-1]
     },
-    {
-        name: "菜單管理",
-        path: 'menu',
-        icon: 'Dish',
-        auth: [-1]
-    },
+    // {
+    //     name: "菜單管理",
+    //     path: 'menu',
+    //     icon: 'Dish',
+    //     auth: [-1]
+    // },
     {
         name: "用戶管理",
         path: 'user',

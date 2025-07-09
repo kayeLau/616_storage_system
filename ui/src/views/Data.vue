@@ -70,7 +70,7 @@ const customBtn = [
         type: 'button',
         btnType: 'success',
         onClick: () => {
-            const updateDate = defaultDateRange.value
+            const updateDate = params.updateDate
             const orderShopId = params.orderShopId
             const shop = shops.find(item => item.value === orderShopId)
             if (!orderShopId) {
