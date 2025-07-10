@@ -26,7 +26,7 @@
     </div>
 </template>
 <script setup>
-import { readHistoryOrder, readOrderDetail } from '../request/orders';
+import { readHistoryOrder, readOrderDetail } from '../../request/orders';
 import { ref } from 'vue';
 import { useRoute , useRouter } from 'vue-router'
 const router = useRouter()
@@ -68,7 +68,7 @@ function detailTitleColor(state){
 }
 
 function goBack(){
-    router.push({ path: '/appOrder' })
+    router.push({ path: '/order' })
 }
 
 </script>

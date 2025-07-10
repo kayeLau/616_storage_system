@@ -2,8 +2,7 @@
     <div>
         <el-tabs v-model="tabsValue" class="ktable-tabs" type="card">
             <el-tab-pane key="" label="菜品"></el-tab-pane>
-            <el-tab-pane key="" label="菜品"></el-tab-pane>
-            <el-tab-pane key="" label="菜品"></el-tab-pane>
+            <el-tab-pane key="" label="口味"></el-tab-pane>
         </el-tabs>
         <el-card class="menu-container">
             <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params" :getList="readMenu"
@@ -16,12 +15,12 @@
     </div>
 </template>
 <script setup>
-import { readMenu, updateMenu, createMenu } from '../request/menu'
-import { menuClassifyDict, disable, dictToOptions } from '../request/dict'
-import Ktable from '../components/table.vue'
-import jsonForm from '../components/jsonForm.vue'
+import { readMenu, updateMenu, createMenu } from '../../request/menu'
+import { menuClassifyDict, disable, dictToOptions } from '../../request/dict'
+import Ktable from '../../components/table.vue'
+import jsonForm from '../../components/jsonForm.vue'
 import { ref } from 'vue'
-import { exportExcel } from '../utils/export'
+import { exportExcel } from '../../utils/export'
 
 const KtableRef = ref()
 

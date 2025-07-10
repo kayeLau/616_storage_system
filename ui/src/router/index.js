@@ -1,8 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import pcLayout from '../layout/pc.vue'
-import phoneLayout from '../layout/phone.vue'
-const screenWidth = window.screen.width
-const layout = screenWidth > 750 ? pcLayout : phoneLayout
+import layout from '../layout/index.vue'
 
 const routes = [
   {
@@ -20,16 +17,7 @@ const routes = [
     children:[{
       path:'',
       name: 'Order',
-      component: () => import('../views/Order.vue')
-    }]
-  },
-  {
-    path: '/appOrder',
-    component: layout,
-    children:[{
-      path:'',
-      name: 'appOrder',
-      component: () => import('../views/appOrder.vue')
+      component: () => import('../views/Order/index.vue')
     }]
   },
   {
@@ -38,7 +26,7 @@ const routes = [
     children:[{
       path:'',
       name: 'appOrderDetail',
-      component: () => import('../views/appOrderDetail.vue')
+      component: () => import('../views/Order/appOrderDetail.vue')
     }]
   },
   {
@@ -65,7 +53,7 @@ const routes = [
     children:[{
       path:'',
       name: 'menu',
-      component: () => import('../views/Menu.vue')
+      component: () => import('../views/Menu/index.vue')
     }]
   },
   {

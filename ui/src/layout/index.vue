@@ -1,10 +1,10 @@
 <template>
     <div class="common-layout">
         <el-container>
-            <el-header class="header-bar">
+            <el-header class="header-bar" v-if="layout === 'pc'">
                 <img src="../assets/616_logo.png" alt="616_logo" class='logo'>
                 <div class="avatar" @click="avatarNavHandle">
-                    <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+                    <el-avatar :src="avatarLink" />
                     <el-card class="avatar-detail" v-show="avatarDetailShow">
                         <div class="avatar-detail-info">
                             <span>{{ authDict[userInfo.auth] }}</span>
@@ -14,9 +14,32 @@
                     </el-card>
                 </div>
             </el-header>
+            <el-header class="header-bar" v-else>
+                <el-avatar @click="avatarNavHandle" :src="avatarLink" />
+                <img src="../assets/616_logo.png" alt="616_logo" class='logo'>
+                <el-drawer v-model="phoneNavShow" direction="ltr" size="80%">
+                    <div class="phone-nav">
+                        <div>
+                            <router-link v-for='(item, index) of menus' :key='index' :to="item.path"
+                                @click="avatarNavHandle">
+                                <div class="phone-nav-link">
+                                    <el-icon>
+                                        <component :is='item.icon'></component>
+                                    </el-icon>
+                                    <span style="padding-left: 10px;">{{ item.name }}</span>
+                                </div>
+                            </router-link>
+                        </div>
+                        <div>
+                            <div>{{ authDict[userInfo.auth] }} - {{ userInfo.name }}</div>
+                            <el-button type="primary" style="width: 100%" @click="logOutbyUser">登出</el-button>
+                        </div>
+                    </div>
+                </el-drawer>
+            </el-header>
 
             <el-container>
-                <el-aside width="180px" class='aside'>
+                <el-aside width="180px" class='aside' v-if="layout === 'pc'">
                     <el-menu default-active="1" class="el-menu-vertical-demo" router background-color="#f2f6fc">
                         <component v-for='(item, index) of menus' :key='index' :index="item.path"
                             :is='item.childen ? "el-sub-menu" : "el-menu-item"'>
@@ -51,6 +74,7 @@ import { authDict } from '../request/dict'
 import { useRouter } from 'vue-router';
 import { logout } from '../request/users';
 const version = process.env.VUE_APP_VERSION
+const avatarLink = 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
 
 const router = useRouter()
 async function logOutbyUser() {
@@ -78,12 +102,12 @@ const menus = [
         whiteList: false,
         auth: [-1]
     },
-    // {
-    //     name: "菜單管理",
-    //     path: 'menu',
-    //     icon: 'Dish',
-    //     auth: [-1]
-    // },
+    {
+        name: "菜單管理",
+        path: 'menu',
+        icon: 'Dish',
+        auth: [-1]
+    },
     {
         name: "用戶管理",
         path: 'user',
@@ -129,18 +153,29 @@ const menus = [
 ].filter(item => item.auth.includes(userInfo.value.auth))
 
 let avatarDetailShow = ref(false)
-
+let phoneNavShow = ref(false)
 function avatarNavHandle() {
-    avatarDetailShow.value = !avatarDetailShow.value
+    if (layout.value === 'pc') {
+        avatarDetailShow.value = !avatarDetailShow.value
+    } else {
+        phoneNavShow.value = !phoneNavShow.value
+    }
 }
+
+let layout = ref(window.screen.width > 750 ? 'pc' : 'phone')
+window.addEventListener('resize', () => {
+    layout.value = window.screen.width > 750 ? 'pc' : 'phone'
+    console.log(layout.value)
+});
 
 </script>
 
 <style scoped>
-.common-layout{
+.common-layout {
     height: 100vh;
     overflow: hidden;
 }
+
 .el-main {
     --el-main-padding: 0 10px;
     height: 100%;
@@ -203,5 +238,30 @@ function avatarNavHandle() {
     padding-right: 8px;
     position: relative;
     height: calc(100vh - 60px);
+}
+
+.phone-nav {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.phone-nav-link {
+    color: #000;
+    font-size: 25px;
+}
+
+.phone-nav a {
+    text-decoration: none;
+}
+
+.phone-nav-link {
+    color: #000;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 3px;
 }
 </style>

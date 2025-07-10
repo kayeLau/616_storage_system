@@ -31,16 +31,16 @@
 </template>
 
 <script setup>
-import orderDetailList from '../components/orderDetailList.vue';
-import Ktable from '../components/table.vue';
-import { readProduct } from '../request/products';
-import { readShop } from '../request/shops'
-import { readOrder, readHistoryOrder, readOrderDetail } from '../request/orders';
-import { departmentDict, orderStateDict } from '../request/dict';
-import { exportMeatSummary, exportAllSummary, exportOrderExcel } from '../utils/export';
-import { getDefaultDateRange , getDefaultExportDate } from '../utils/tools';
+import orderDetailList from '../../components/orderDetailList.vue';
+import Ktable from '../../components/table.vue';
+import { readProduct } from '../../request/products';
+import { readShop } from '../../request/shops'
+import { readOrder, readHistoryOrder, readOrderDetail } from '../../request/orders';
+import { departmentDict, orderStateDict } from '../../request/dict';
+import { exportMeatSummary, exportAllSummary, exportOrderExcel } from '../../utils/export';
+import { getDefaultDateRange , getDefaultExportDate } from '../../utils/tools';
 import { ref, onMounted, computed } from 'vue';
-import { getStorge } from '../utils/auth'
+import { getStorge } from '../../utils/auth'
 import { ElButton, ElDatePicker } from 'element-plus'
 // get userinfo
 const userInfo = computed(() => {

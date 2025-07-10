@@ -26,12 +26,12 @@
   </div>
 </template>
 <script setup>
-import { readOrder } from '../request/orders';
-import { orderStateDict } from '../request/dict';
+import { readOrder } from '../../request/orders';
+import { orderStateDict } from '../../request/dict';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { exportMeatSummary, exportAllSummary, exportOrderExcel } from '../utils/export';
-import { getDefaultDateRange , getDefaultExportDate } from '../utils/tools';
+import { exportMeatSummary, exportAllSummary, exportOrderExcel } from '../../utils/export';
+import { getDefaultDateRange , getDefaultExportDate } from '../../utils/tools';
 const router = useRouter()
 
 const defaultDateRange = ref(getDefaultDateRange())
