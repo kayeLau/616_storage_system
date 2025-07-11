@@ -13,4 +13,8 @@ router.post('/updateMenu',menuModifyMethod.updateMenu)
 
 router.post('/deleteMenu',menuModifyMethod.deleteMenu)
 
+router.post('/readTasteOptions',menuModifyMethod.readTasteOptions)
+
+router.post('/createTasteOptions',menuModifyMethod.createTasteOptions)
+
 module.exports = router;

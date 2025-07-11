@@ -1,13 +1,16 @@
 <template>
     <div>
         <el-tabs v-model="tabsValue" class="ktable-tabs" type="card">
-            <el-tab-pane key="" label="菜品"></el-tab-pane>
-            <el-tab-pane key="" label="口味"></el-tab-pane>
+            <el-tab-pane key="" label="菜品">
+                <el-card class="menu-container">
+                    <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params"
+                        :getList="readMenu" :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
+                </el-card>
+            </el-tab-pane>
+            <el-tab-pane key="" label="口味">
+                <tasteOptions></tasteOptions>
+            </el-tab-pane>
         </el-tabs>
-        <el-card class="menu-container">
-            <Ktable ref='KtableRef' :columns="columns" :operations="operations" :params="params" :getList="readMenu"
-                :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
-        </el-card>
         <el-drawer v-model="jsonFormShow" title="菜品資料" direction="rtl" :style="{ minWidth: '300px' }">
             <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules"
                 :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList"></jsonForm>
@@ -19,6 +22,7 @@ import { readMenu, updateMenu, createMenu } from '../../request/menu'
 import { menuClassifyDict, disable, dictToOptions } from '../../request/dict'
 import Ktable from '../../components/table.vue'
 import jsonForm from '../../components/jsonForm.vue'
+import tasteOptions from './tasteOptions.vue'
 import { ref } from 'vue'
 import { exportExcel } from '../../utils/export'
 
@@ -93,37 +97,6 @@ const editFormRules = {
         { required: true, message: '請選擇展示狀態', trigger: 'blur' },
     ],
 }
-
-function refreshList() {
-    KtableRef.value.fatchList()
-    jsonFormShow.value = !jsonFormShow.value
-}
-
-function createHandle() {
-    editFormModel.value = {}
-    JsonFormComfireCallBack.value = createMenu
-    editFormColumns.value[0].disabled = false
-    jsonFormShow.value = !jsonFormShow.value
-}
-
-function editHandle(index, row) {
-    editFormModel.value = {
-        ...row,
-        classify: String(row.classify),
-        disable: String(row.disable),
-    }
-    JsonFormComfireCallBack.value = updateMenu
-    editFormColumns.value[0].disabled = true
-    jsonFormShow.value = !jsonFormShow.value
-}
-
-function deleteHandle(index, row) {
-    updateMenu({ id: row.id, disable: 2 }).then(res => {
-        if (res.success) {
-            KtableRef.value.fatchList()
-        }
-    })
-}
 //#endregion
 
 //#region Tabel
@@ -197,7 +170,36 @@ const customBtn = [
     },
 ]
 
+function refreshList() {
+    KtableRef.value.fatchList()
+    jsonFormShow.value = !jsonFormShow.value
+}
 
+function createHandle() {
+    editFormModel.value = {}
+    JsonFormComfireCallBack.value = createMenu
+    editFormColumns.value[0].disabled = false
+    jsonFormShow.value = !jsonFormShow.value
+}
+
+function editHandle(index, row) {
+    editFormModel.value = {
+        ...row,
+        classify: String(row.classify),
+        disable: String(row.disable),
+    }
+    JsonFormComfireCallBack.value = updateMenu
+    editFormColumns.value[0].disabled = true
+    jsonFormShow.value = !jsonFormShow.value
+}
+
+function deleteHandle(index, row) {
+    updateMenu({ id: row.id, disable: 2 }).then(res => {
+        if (res.success) {
+            KtableRef.value.fatchList()
+        }
+    })
+}
 function exportMenuExcel() {
     readMenu({ size: 999, page: 1 }).then(res => {
         if (res.success) {

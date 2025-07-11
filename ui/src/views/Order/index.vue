@@ -2,13 +2,14 @@
     <component :is="component"></component>
 </template>
 <script setup>
-import { shallowRef } from 'vue';
-import Order from './Order.vue'
-import appOrder from './appOrder.vue'
+import { computed } from 'vue';
+import Order from './Order.vue';
+import appOrder from './appOrder.vue';
+import { useWindowSize } from '../../hooks/useWindowSize';
+const { device } = useWindowSize();
 
-let component = shallowRef(null)
-
-const screenWidth = window.screen.width
-component.value = screenWidth > 750 ? Order : appOrder
+const component = computed(() => {
+    return device.value === 'pc' ? Order : appOrder
+})
 
 </script>

@@ -1,7 +1,7 @@
 <template>
     <div class="common-layout">
         <el-container>
-            <el-header class="header-bar" v-if="layout === 'pc'">
+            <el-header class="header-bar" v-if="device === 'pc'">
                 <img src="../assets/616_logo.png" alt="616_logo" class='logo'>
                 <div class="avatar" @click="avatarNavHandle">
                     <el-avatar :src="avatarLink" />
@@ -39,7 +39,7 @@
             </el-header>
 
             <el-container>
-                <el-aside width="180px" class='aside' v-if="layout === 'pc'">
+                <el-aside width="180px" class='aside' v-if="device === 'pc'">
                     <el-menu default-active="1" class="el-menu-vertical-demo" router background-color="#f2f6fc">
                         <component v-for='(item, index) of menus' :key='index' :index="item.path"
                             :is='item.childen ? "el-sub-menu" : "el-menu-item"'>
@@ -50,13 +50,10 @@
                                 <span>{{ item.name }}</span>
                             </template>
                             <el-menu-item v-for='(subItem, subIndex) of item.childen' :key='"s" + subIndex'
-                                :index="subItem.path">item
-                                one</el-menu-item>
+                                :index="subItem.path"></el-menu-item>
                         </component>
                     </el-menu>
-                    <div class="version">
-                        {{ version }}
-                    </div>
+                    <div class="version">{{ version }}</div>
                 </el-aside>
 
                 <el-main>
@@ -73,6 +70,8 @@ import { getStorge, removeToken } from '../utils/auth'
 import { authDict } from '../request/dict'
 import { useRouter } from 'vue-router';
 import { logout } from '../request/users';
+import { useWindowSize } from '../hooks/useWindowSize';
+const { device } = useWindowSize();
 const version = process.env.VUE_APP_VERSION
 const avatarLink = 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
 
@@ -155,21 +154,13 @@ const menus = [
 let avatarDetailShow = ref(false)
 let phoneNavShow = ref(false)
 function avatarNavHandle() {
-    if (layout.value === 'pc') {
+    if (device.value === 'pc') {
         avatarDetailShow.value = !avatarDetailShow.value
     } else {
         phoneNavShow.value = !phoneNavShow.value
     }
 }
-
-let layout = ref(window.screen.width > 750 ? 'pc' : 'phone')
-window.addEventListener('resize', () => {
-    layout.value = window.screen.width > 750 ? 'pc' : 'phone'
-    console.log(layout.value)
-});
-
 </script>
-
 <style scoped>
 .common-layout {
     height: 100vh;

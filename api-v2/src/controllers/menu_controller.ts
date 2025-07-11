@@ -1,6 +1,7 @@
 import { readMenu, createMenu, updateMenu, deleteMenu } from '../models/menu_model';
+import { readTasteOptions, createTasteOptions } from '../models/tasteOptions_model';
 
-module.exports = class menu {
+module.exports = class Menu {
     async readMenu(req, res, next) {
         let options = { 
             disable: req.body.disable,
@@ -62,6 +63,38 @@ module.exports = class menu {
         const menuId = req.body.menuId
 
         deleteMenu(menuId).then(result => {
+            res.json(result)
+        }).catch(err => {
+            next(err)
+        })
+    }
+
+    async readTasteOptions(req, res, next) {
+        let options = { 
+            disable: req.body.disable,
+            title: req.body.title, 
+        }
+
+        try {
+            await readTasteOptions(options).then(result => {
+                res.json(result)
+            })
+        } catch (err) {
+            next(err)
+        }
+
+    }
+
+    createTasteOptions(req, res, next) {
+        const data = {
+            disable: req.body.disable,
+            flag: req.body.flag,
+            title: req.body.title,
+            label: req.body.label,
+            value: req.body.value
+        }
+
+        createTasteOptions(data).then(result => {
             res.json(result)
         }).catch(err => {
             next(err)

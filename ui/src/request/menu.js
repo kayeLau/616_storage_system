@@ -23,3 +23,19 @@ export function updateMenu(data){
       data,
     });
 }
+
+export function readTasteOptions(data){
+  return request({
+      url: '/menu/readTasteOptions',
+      method: 'post',
+      data,
+    });
+}
+
+export function createTasteOptions(data){
+  return request({
+      url: '/menu/createTasteOptions',
+      method: 'post',
+      data,
+    });
+}

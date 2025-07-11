@@ -5,6 +5,7 @@ import './style/index.css'
 import App from './App.vue'
 import router from './router'
 import './utils/permission' // permission control
+import './hooks/useWindowSize';
 
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import store from './store'

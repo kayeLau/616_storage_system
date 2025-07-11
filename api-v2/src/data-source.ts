@@ -10,7 +10,7 @@ import { Order } from "./entity/Order"
 import { OrderDetail } from "./entity/OrderDetail"
 import { Inventory } from "./entity/Inventory"
 import { Menu } from "./entity/Menu"
-import { FoodOptions } from "./entity/FoodOptions"
+import { TasteOptions } from "./entity/TasteOptions"
 import { Api } from "./entity/Api"
 const config = require('./config/development_config')
 
@@ -24,7 +24,7 @@ const AppDataSource = new DataSource({
     synchronize: true,
     logging: false,
     entities: [ Setting, Member, Partition, Shop , ShopProduct, 
-        Product, Order, OrderDetail, Inventory, Api, Menu , FoodOptions],
+        Product, Order, OrderDetail, Inventory, Api, Menu , TasteOptions],
     migrations: [],
     subscribers: [],
 })
