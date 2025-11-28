@@ -35,3 +35,13 @@ export function optionsGenerater(options, table) {
     }
     return { conditions, parameters }
 }
+
+export function sqlValue(val: any): string {
+    if (val === null || val === undefined) return 'NULL';
+    if (typeof val === 'string') return `'${val.replace(/'/g, "\\'")}'`;
+    if (typeof val === 'number') return val.toString();
+    if (typeof val === 'boolean') return val.toString();
+    if (val instanceof Date)
+        return `'${val.toISOString().slice(0, 19).replace('T', ' ')}'`;
+    return `'${String(val).replace(/'/g, "\\'")}'`;
+  }

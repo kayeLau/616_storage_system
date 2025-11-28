@@ -18,7 +18,6 @@ export async function readTasteOptions(options) {
             "DATE_FORMAT(tasteOptions.updateDate, '%Y-%m-%d %H:%i:%S') AS updateDate"
         ])
         .where(conditions.join(" AND "), parameters)
-        .groupBy('tasteOptions.flag')
         .getRawMany()
         .then((result) => {
             return {

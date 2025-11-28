@@ -1,8 +1,8 @@
 import { readSettingTimeRange } from '../utils';
 import {
-    readOrder, readOrderDetail, createOrder, createOrderDetail, readHistoryOrder,
-    updateAssignQuantity, setOrderState, exportOrderMeat, checkOrderRepeated
-} from '../models/orderManage_model';
+    readOrder, createOrder, readHistoryOrder, setOrderState, exportOrderMeat, checkOrderRepeated
+} from '../models/order_model';
+import { readOrderDetail, updateAssignQuantity , createOrderDetail } from '../models/orderDetail_model';
 import { readShop } from '../models/shopManage_model';
 import { readProduct } from '../models/productManage_model';
 
@@ -87,8 +87,6 @@ module.exports = class order {
                 return []
             })
 
-            console.log(orderIds)
-
             for (const orderId of orderIds) {
                 const orderDetail = await readOrderDetail(orderId).then(res => res.data)
                 orderDetail.forEach(item => {
@@ -107,7 +105,7 @@ module.exports = class order {
                     } else {
                         const currentValue = result.get(item.productId)
                         currentValue.orderQuantity += item.orderQuantity
-                        currentValue.assignQuantity += item.assignQuantity ||  0
+                        currentValue.assignQuantity += item.assignQuantity || 0
                         result.set(item.productId, currentValue)
                     }
                 })
@@ -167,10 +165,12 @@ module.exports = class order {
                     lastEditBy: userInfo.name
                 }
             })
+            console.log(113)
             createOrderDetail(orderList).then(async result => {
                 await setOrderState(orderId)
                 res.json(result)
             }).catch(err => {
+                console.log(err)
                 next(err)
             })
         } else {

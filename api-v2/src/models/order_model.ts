@@ -1,12 +1,11 @@
 import { readSettingTimeRange } from '../utils';
 import AppDataSource from '../data-source';
 import { Order } from '../entity/Order';
-import { OrderDetail } from '../entity/OrderDetail';
 import { Product } from '../entity/Product';
 import { Shop } from '../entity/Shop';
 import { optionsGenerater } from './base_model';
+import { readOrderDetail, createOrderDetail, getOrderDetailStatus } from './orderDetail_model'
 const orderRepository = AppDataSource.getRepository(Order);
-const orderDetailRepository = AppDataSource.getRepository(OrderDetail);
 
 
 // 根據orderCode groupby訂單, 并輸出各分店每天最後一筆訂單
@@ -74,44 +73,6 @@ export async function readOrder(options, size, page) {
     })
 }
 
-// 獲取訂單明細
-export async function readOrderDetail(orderId) {
-    return orderDetailRepository
-        .createQueryBuilder('orderDetail')
-        .select([
-            'orderDetail.id AS id',
-            'orderDetail.orderId AS orderId',
-            'orderDetail.productId AS productId',
-            'orderDetail.orderQuantity AS orderQuantity',
-            'orderDetail.assignQuantity AS assignQuantity',
-            "DATE_FORMAT(orderDetail.updateDate, '%Y-%m-%d %H:%i:%S') AS updateDate",
-            'orderDetail.orderMode AS orderMode',
-            'orderDetail.status AS status',
-            'orderDetail.remark AS remark',
-            'orderDetail.lastEditBy AS lastEditBy',
-            'product.productName AS productName',
-            'product.productCode AS productCode',
-            'product.unit AS unit',
-            'product.standard AS standard',
-            'product.classify AS classify',
-            'product.freezersNum AS freezersNum',
-            'product.prompt AS prompt',
-        ])
-        .innerJoin(Product, 'product', 'orderDetail.productId = product.productId')
-        .where('orderDetail.orderId = :orderId', { orderId })
-        .orderBy('product.productCode', 'ASC')
-        .getRawMany()
-        .then((result) => {
-            return {
-                success: true,
-                data: result,
-            };
-        })
-        .catch((err) => {
-            return Promise.reject({ success: false, message: err.message })
-        })
-}
-
 // 創建訂單
 export async function createOrder(data) {
     const existingOrder = await orderRepository
@@ -143,13 +104,7 @@ export async function createOrder(data) {
             lastEditBy: data.orderUserName // 最後修改人ID
         }
     })
-    await orderDetailRepository.save(orderList);
-    return { success: true }
-}
-
-// 倉庫追加
-export async function createOrderDetail(orderList) {
-    await orderDetailRepository.save(orderList)
+    await createOrderDetail(orderList);
     return { success: true }
 }
 
@@ -177,47 +132,13 @@ export async function checkOrderRepeated(options) {
     }
 }
 
-// 設置訂單細項
-export function updateAssignQuantity(list, userInfo) {
-    return orderDetailRepository
-        .createQueryBuilder("orderDetail")
-        .update(OrderDetail)
-        .set({
-            orderQuantity: () => "CASE id " +
-                list.map(detail => `WHEN ${detail.id} THEN ${detail.orderQuantity === null ? null : Number(detail.orderQuantity)}`).join(' ') +
-                " END",
-            assignQuantity: () => "CASE id " +
-                list.map(detail => `WHEN ${detail.id} THEN ${detail.assignQuantity === null ? null : Number(detail.assignQuantity)}`).join(' ') +
-                " END",
-            status: () => "CASE id " +
-                list.map(detail => `WHEN ${detail.id} THEN ${userInfo.auth === 2 ? 0 : 1}`).join(' ') +
-                " END",
-            remark: () => "CASE id " +
-                list.map(detail => `WHEN ${detail.id} THEN '${detail.remark || '-'}'`).join(' ') +
-                " END",
-            lastEditBy: () => "CASE id " +
-                list.map(detail => `WHEN ${detail.id} THEN '${userInfo.name || '-'}'`).join(' ') +
-                " END"
-        })
-        .whereInIds(list.map(detail => detail.id))
-        .execute()
-        .then(() => { return { success: true } })
-        .catch((err) => {
-            return Promise.reject({ success: false, message: err.message })
-        })
-}
-
 // 設置訂單狀態
-export async function setOrderState(orderId) {
-    let orderState = 0
-    const incompleteOrder = await orderDetailRepository
-        .createQueryBuilder("orderDetail")
-        .where("orderDetail.orderId = :orderId AND orderDetail.status = :status", { orderId, status: 0 })
-        .getCount();
-
-    if (incompleteOrder === 0) {
-        orderState = 1
-    }
+export async function setOrderState(orderId: string) {
+    const orderState = await getOrderDetailStatus(orderId).then(res => {
+        if(res.success){
+            return Number(res.data) === 0 ? 0 : 1
+        }
+    })
 
     return orderRepository
         .createQueryBuilder()
@@ -283,7 +204,7 @@ export async function readHistoryOrder(options, size, page) {
         .getRawMany()
         .then((result) => {
             return {
-                data:result.map(item => {
+                data: result.map(item => {
                     item.children = []
                     return item
                 }),
