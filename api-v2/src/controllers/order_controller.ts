@@ -165,7 +165,6 @@ module.exports = class order {
                     lastEditBy: userInfo.name
                 }
             })
-            console.log(113)
             createOrderDetail(orderList).then(async result => {
                 await setOrderState(orderId)
                 res.json(result)

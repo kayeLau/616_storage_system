@@ -100,11 +100,9 @@ export async function createOrderDetail(orderList: any[], year?: number) {
 
     try {
         await orderDetailRepository.query(sql);
-        console.log(`成功插入 ${orderList.length} 筆資料到 ${tableName}`);
         return { success: true };
     } catch (err: any) {
-        console.error('插入失敗 SQL:', sql);
-        throw new Error(`插入 ${tableName} 失敗: ${err.message}`);
+        return Promise.reject({ success: false, message: err.message });
     }
 }
 

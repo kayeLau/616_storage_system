@@ -136,7 +136,7 @@ export async function checkOrderRepeated(options) {
 export async function setOrderState(orderId: string) {
     const orderState = await getOrderDetailStatus(orderId).then(res => {
         if(res.success){
-            return Number(res.data) === 0 ? 0 : 1
+            return Number(res.data) === 0 ? 1 : 0
         }
     })
 
