@@ -2,7 +2,7 @@ import { readSettingTimeRange } from '../utils';
 import {
     readOrder, createOrder, readHistoryOrder, setOrderState, exportOrderMeat, checkOrderRepeated
 } from '../models/order_model';
-import { readOrderDetail, updateAssignQuantity , createOrderDetail } from '../models/orderDetail_model';
+import { readOrderDetail, updateAssignQuantity, createOrderDetail } from '../models/orderDetail_model';
 import { readShop } from '../models/shopManage_model';
 import { readProduct } from '../models/productManage_model';
 
@@ -66,7 +66,8 @@ module.exports = class order {
     // 獲取訂單明細
     async readOrderDetail(req, res, next) {
         const orderId = req.body.orderId
-        readOrderDetail(orderId).then(result => {
+        const orderDate = req.body.orderDate ? req.body.orderDate.substring(0, 4) : new Date().getFullYear();
+        readOrderDetail(orderId, orderDate).then(result => {
             res.json(result)
         }).catch(err => {
             next(err)
@@ -80,15 +81,17 @@ module.exports = class order {
         const size = req.body.size || 20
         const page = req.body.page || 1
         try {
-            const orderIds: Array<String> = await readOrder(options, 999, 1).then(res => {
+            const orderDataIds: Array<String> = await readOrder(options, 999, 1).then(res => {
                 if (res.success) {
-                    return res.data.map(item => item.id)
+                    return res.data.map(item => item.id + '-' + item.orderDate)
                 }
                 return []
             })
 
-            for (const orderId of orderIds) {
-                const orderDetail = await readOrderDetail(orderId).then(res => res.data)
+            for (const orderDataId of orderDataIds) {
+                const orderId = orderDataId.substring(0, 36)
+                const orderDate = orderDataId.substring(37, 41)
+                const orderDetail = await readOrderDetail(orderId, orderDate).then(res => res.data)
                 orderDetail.forEach(item => {
                     if (!result.has(item.productId)) {
                         result.set(item.productId, {

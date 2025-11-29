@@ -1,7 +1,9 @@
 <template>
     <div class="app-order-detail">
         <div @click="goBack" class="go-back">
-            <el-icon ><ArrowLeftBold /></el-icon>
+            <el-icon>
+                <ArrowLeftBold />
+            </el-icon>
             返回
         </div>
         <el-scrollbar>
@@ -12,12 +14,13 @@
                             <el-icon class="header-icon">
                                 <info-filled />
                             </el-icon>
-                            <span>第{{item.orderIndex}}次落单 {{ item.updateDate }}</span>
+                            <span>第{{ item.orderIndex }}次落单 {{ item.updateDate }}</span>
                         </div>
                     </template>
                     <div v-for="(item, index) of item.children" :key="'s' + index" class="detail-container">
                         <h3>{{ item.productCode }} - {{ item.productName }}</h3>
-                        <div style="text-align: right;">{{ item.assignQuantity }} / {{ item.orderQuantity }} {{ item.unit }}</div>
+                        <div style="text-align: right;">{{ item.assignQuantity }} / {{ item.orderQuantity }} {{
+                            item.unit }}</div>
                         <div>{{ item.standard }}</div>
                     </div>
                 </el-collapse-item>
@@ -28,7 +31,7 @@
 <script setup>
 import { readHistoryOrder, readOrderDetail } from '../../request/orders';
 import { ref } from 'vue';
-import { useRoute , useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
@@ -51,10 +54,10 @@ async function fatchOrder() {
 fatchOrder()
 
 async function fetchOrderDetail() {
-    if(!activeName.value)return;
-    await readOrderDetail({ orderId: activeName.value }).then(res => {
+    if (!activeName.value) return;
+    const activeItem = data.value.find(item => item.id === activeName.value)
+    await readOrderDetail({ orderId: activeName.value, orderDate: activeItem.orderDate }).then(res => {
         if (res.success) {
-            const activeItem = data.value.find(item => item.id === activeName.value)
             if (activeItem) {
                 activeItem.children = res.data
             }
@@ -62,27 +65,27 @@ async function fetchOrderDetail() {
     })
 }
 
-function detailTitleColor(state){
+function detailTitleColor(state) {
     let color = state === 0 ? 'var(--el-color-danger)' : 'var(--el-color-success)'
     return { color: color }
 }
 
-function goBack(){
+function goBack() {
     router.push({ path: '/order' })
 }
 
 </script>
 <style>
-.app-order-detail{
+.app-order-detail {
     overflow: hidden;
 }
 
-.detail-title{
+.detail-title {
     padding-left: 10px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap:5px;
+    gap: 5px;
     font-size: 20px;
     font-weight: 600;
 }
@@ -96,7 +99,8 @@ function goBack(){
     display: grid;
     grid-template-columns: 2fr 1fr;
 }
-.go-back{
+
+.go-back {
     display: flex;
     align-items: center;
     padding-left: 10px;

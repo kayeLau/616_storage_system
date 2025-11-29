@@ -38,7 +38,7 @@ import { readShop } from '../../request/shops'
 import { readOrder, readHistoryOrder, readOrderDetail } from '../../request/orders';
 import { departmentDict, orderStateDict } from '../../request/dict';
 import { exportMeatSummary, exportAllSummary, exportOrderExcel } from '../../utils/export';
-import { getDefaultDateRange , getDefaultExportDate } from '../../utils/tools';
+import { getDefaultDateRange, getDefaultExportDate } from '../../utils/tools';
 import { ref, onMounted, computed } from 'vue';
 import { getStorge } from '../../utils/auth'
 import { ElButton, ElDatePicker } from 'element-plus'
@@ -103,9 +103,9 @@ const customBtn = [
     render: (h) => {
       return h('div', { style: { display: 'flex', gap: '5px' } }, [
         h(ElDatePicker, {
-          teleported: false, 
+          teleported: false,
           modelValue: exportDate.value,
-          valueFormat:"YYYY-MM-DD",
+          valueFormat: "YYYY-MM-DD",
           ['onUpdate:modelValue']: (value) => {
             exportDate.value = value
           }, type: "date"
@@ -123,8 +123,8 @@ const customBtn = [
     render: (h) => {
       return h('div', { style: { display: 'flex', gap: '5px' } }, [
         h(ElDatePicker, {
-          teleported: false, 
-          valueFormat:"YYYY-MM-DD",
+          teleported: false,
+          valueFormat: "YYYY-MM-DD",
           modelValue: exportDate.value,
           ['onUpdate:modelValue']: (value) => {
             exportDate.value = value
@@ -181,7 +181,7 @@ const ODparams = {
 
 // 展開訂單明細
 function showDetailHandle(index, row) {
-  readOrderDetail({ orderId: row.id }).then(res => {
+  readOrderDetail({ orderId: row.id, orderDate: row.orderDate }).then(res => {
     if (res.success) {
       currentRow.value = {
         orderCode: row.orderCode,
@@ -206,8 +206,9 @@ async function showHistoryHandle(index, row) {
 
 // 切換展開的歷史訂單
 async function expandChange(row, expandRow) {
+  console.log(row, expandRow)
   if (expandRow.length) {
-    await readOrderDetail({ orderId: row.id }).then(res => {
+    await readOrderDetail({ orderId: row.id, orderDate: row.orderDate }).then(res => {
       if (res.success) {
         row.children = res.data
       }
@@ -222,8 +223,9 @@ function resetexpandRowKeys() {
 
 async function refreshList() {
   loading.value = true
+  const { id, orderDate } = currentRow.value
   await KtableRef2.value.fatchList()
-  await readOrderDetail({ orderId: currentRow.value.id }).then(res => {
+  await readOrderDetail({ orderId: id, orderDate }).then(res => {
     if (res.success) {
       currentRow.value.children = res.data
     }

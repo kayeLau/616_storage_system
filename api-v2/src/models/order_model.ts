@@ -118,7 +118,7 @@ export async function checkOrderRepeated(options) {
         .getOne()
 
     if (existingOrder) {
-        return readOrderDetail(existingOrder.id).then(result => {
+        return readOrderDetail(existingOrder.id, existingOrder.orderDate).then(result => {
             return {
                 success: true,
                 data: {
@@ -135,7 +135,7 @@ export async function checkOrderRepeated(options) {
 // 設置訂單狀態
 export async function setOrderState(orderId: string) {
     const orderState = await getOrderDetailStatus(orderId).then(res => {
-        if(res.success){
+        if (res.success) {
             return Number(res.data) === 0 ? 1 : 0
         }
     })
@@ -157,7 +157,7 @@ export async function exportOrderMeat(options, size, page, summaryProductIdsMap,
     const order = await getOrderAndGroupBy(options, size, page)
     const summaryProductIds = Object.keys(summaryProductIdsMap)
     const orderDetail = order.data.map((item) => {
-        return readOrderDetail(item.id).then(res => {
+        return readOrderDetail(item.id, item.orderDate).then(res => {
             let index = shopsList.indexOf(item.shopName)
             summaryProductIds.forEach(summaryProductId => {
                 let target = res.data.find(item => item.productId === Number(summaryProductId))
@@ -193,6 +193,7 @@ export async function readHistoryOrder(options, size, page) {
             "DATE_FORMAT(order.createDate, '%Y-%m-%d %H:%i:%S') AS createDate",
             "DATE_FORMAT(order.updateDate, '%Y-%m-%d %H:%i:%S') AS updateDate",
             'order.orderIndex AS orderIndex',
+            "DATE_FORMAT(order.orderDate, '%Y-%m-%d ') AS orderDate",
             'order.state AS state',
             'shop.shopName AS shopName'
         ])

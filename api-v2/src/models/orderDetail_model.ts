@@ -25,8 +25,8 @@ export async function getOrderDetailStatus(orderId){
 }
 
 // 獲取訂單明細
-export async function readOrderDetail(orderId) {
-    const targetYear = new Date().getFullYear();
+export async function readOrderDetail(orderId,orderDate) {
+    const targetYear = orderDate || new Date().getFullYear();
     const tableName = `order_detail_${targetYear}`
 
     return orderDetailRepository
