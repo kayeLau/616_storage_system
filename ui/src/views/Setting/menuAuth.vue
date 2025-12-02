@@ -1,53 +1,32 @@
 <template>
-    <el-tree :data="data" show-checkbox node-key="id" :default-expanded-keys="[2, 3]" :default-checked-keys="[5]"
-        :props="defaultProps">
-    </el-tree>
+    <el-table
+      class="table" header-cell-class-name="table-header"
+      :data="data"
+      style="width: 100%; margin-bottom: 20px"
+      row-key="id"
+      default-expand-all
+    >
+      <el-table-column prop="nameZh" label="名稱" />
+      <el-table-column prop="auth" label="可訪問角色" />
+      <el-table-column prop="type" label="類型" />
+      <el-table-column prop="path" label="路由" />
+    </el-table>
 </template>
 
-<script>
-export default {
-    data() {
-        return {
-            data: [{
-                id: 1,
-                label: '一级 1',
-                children: [{
-                    id: 4,
-                    label: '二级 1-1',
-                    children: [{
-                        id: 9,
-                        label: '三级 1-1-1'
-                    }, {
-                        id: 10,
-                        label: '三级 1-1-2'
-                    }]
-                }]
-            }, {
-                id: 2,
-                label: '一级 2',
-                children: [{
-                    id: 5,
-                    label: '二级 2-1'
-                }, {
-                    id: 6,
-                    label: '二级 2-2'
-                }]
-            }, {
-                id: 3,
-                label: '一级 3',
-                children: [{
-                    id: 7,
-                    label: '二级 3-1'
-                }, {
-                    id: 8,
-                    label: '二级 3-2'
-                }]
-            }],
-            defaultProps: {
-                children: 'children',
-                label: 'label'
-            }
-        };
-    }
-};
+<script setup>
+import {readMenuAuth } from '../../request/menuAuth'
+import { ref } from 'vue';
+
+let data = ref([])
+
+function getMenuAuth(){
+    readMenuAuth().then(res => {
+        if(res.success){
+            data.value = res.data
+        }
+    })
+}
+
+getMenuAuth()
+
 </script>

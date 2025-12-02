@@ -13,12 +13,15 @@ export class MenuAuth {
     name: string
 
     @Column({ length: 50 })
+    nameZh: string
+
+    @Column({ length: 50 , nullable:true })
     path: string
 
     @Column({ default: 0 })
     parentId: number
 
-    @Column({ comment: '類型' })
+    @Column({ comment: '類型 0:菜單 1:按鈕' })
     type: number
 
     @Column({ comment: '序號' })

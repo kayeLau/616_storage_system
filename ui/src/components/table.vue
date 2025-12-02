@@ -185,16 +185,6 @@ onMounted(() => {
 })
 </script>
 <style>
-.table {
-    width: 100%;
-    height: calc(100% - 90px)
-}
-
-.table-header {
-    --el-table-header-bg-color: var(--el-color-primary-light-3);
-    color: #fff;
-}
-
 .pagination {
     display: flex;
     justify-content: space-between;

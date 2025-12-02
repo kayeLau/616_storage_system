@@ -1,3 +1,11 @@
+.table {
+    width: 100%;
+    height: calc(100% - 90px)
+}
+.table-header {
+    --el-table-header-bg-color: var(--el-color-primary-light-3);
+    color: #fff;
+}
 .el-table .danger-row {
     --el-table-tr-bg-color: var(--el-color-danger-light-9);
 }

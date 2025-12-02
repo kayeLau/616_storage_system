@@ -34,7 +34,7 @@ const routes = [
     component: layout,
     children:[{
       path:'',
-      name: 'Shop',
+      name: 'shop',
       component: () => import('../views/Shop.vue')
     }]
   },
