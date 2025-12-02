@@ -11,6 +11,7 @@ import { OrderDetailBase } from "./entity/OrderDetailBase"
 import { Inventory } from "./entity/Inventory"
 import { Menu } from "./entity/Menu"
 import { TasteOptions } from "./entity/TasteOptions"
+import { MenuAuth } from "./entity/MenuAuth"
 import { Api } from "./entity/Api"
 const config = require('./config/development_config')
 
@@ -23,7 +24,7 @@ const AppDataSource = new DataSource({
     database: config.mysql.database,
     synchronize: true,
     logging: false,
-    entities: [ Setting, Member, Partition, Shop , ShopProduct, 
+    entities: [ Setting, Member, Partition, Shop , ShopProduct, MenuAuth,
         Product, Order, OrderDetailBase, Inventory, Api, Menu , TasteOptions],
     migrations: [],
     subscribers: [],

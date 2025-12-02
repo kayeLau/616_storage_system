@@ -38,6 +38,8 @@ const inventoryRouter = require('./routes/inventory')
 const apiRouter = require('./routes/api')
 const fileRouter = require('./routes/file')
 const menuRouter = require('./routes/menu')
+const menuAuthRouter = require('./routes/menuAuth')
+app.use('/menuAuth', menuAuthRouter);
 app.use('/menu', menuRouter);
 app.use('/member', usersRouter);
 app.use('/shop', shopsRouter)

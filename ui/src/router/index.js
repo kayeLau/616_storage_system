@@ -71,7 +71,7 @@ const routes = [
     children:[{
       path:'',
       name: 'Setting',
-      component: () => import('../views/Setting.vue')
+      component: () => import('../views/Setting/index.vue')
     }]
   },
   {

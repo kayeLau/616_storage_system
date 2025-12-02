@@ -25,7 +25,7 @@
                 </el-form>
             </el-tab-pane>
             <el-tab-pane name="auth" label="菜單權限">
-
+                <menuAuth></menuAuth>
             </el-tab-pane>
             <el-tab-pane name="api" label="API權限">
                 <h3 class="title">API權限設定</h3>
@@ -51,13 +51,14 @@
     </el-dialog>
 </template>
 <script setup>
-import { updateSetting, readAllSetting } from '../request/setting'
-import { readApi, updateApi } from '../request/api'
-import { apiAccessDict, exchangeKeyValue } from '../request/dict'
-import { readLogsName, downloadLog } from '../request/file';
-import { ref, onMounted } from 'vue';
+import { updateSetting, readAllSetting } from '../../request/setting'
+import { readApi, updateApi } from '../../request/api'
+import { apiAccessDict, exchangeKeyValue } from '../../request/dict'
+import { readLogsName, downloadLog } from '../../request/file'
+import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import promptItem from '../components/promptItem.vue'
+import promptItem from '../../components/promptItem.vue'
+import menuAuth from './menuAuth.vue'
 
 let tabsValue = ref('sys')
 /* 必點 */
