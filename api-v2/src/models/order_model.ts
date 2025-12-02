@@ -133,8 +133,8 @@ export async function checkOrderRepeated(options) {
 }
 
 // 設置訂單狀態
-export async function setOrderState(orderId: string) {
-    const orderState = await getOrderDetailStatus(orderId).then(res => {
+export async function setOrderState(orderId: string,  year?: number) {
+    const orderState = await getOrderDetailStatus(orderId, year).then(res => {
         if (res.success) {
             return Number(res.data) === 0 ? 1 : 0
         }

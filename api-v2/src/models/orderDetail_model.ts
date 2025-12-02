@@ -4,8 +4,9 @@ import { Product } from '../entity/Product';
 import { sqlValue } from './base_model'
 const orderDetailRepository = AppDataSource.getRepository(OrderDetailBase).manager;
 
-export async function getOrderDetailStatus(orderId){
-    const targetYear = new Date().getFullYear();
+// 獲取分配狀態
+export async function getOrderDetailStatus(orderId, year?: number){
+    const targetYear = year ?? new Date().getFullYear();
     const tableName = `order_detail_${targetYear}`
 
     return await orderDetailRepository

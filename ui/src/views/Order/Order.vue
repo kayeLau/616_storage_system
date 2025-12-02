@@ -7,18 +7,8 @@
         :products="products" :expandRowKeys="expandRowKeys"></Ktable>
     </el-card>
     <!-- OrderDetail -->
-    <el-dialog v-model="orderDetailShow" width="95%" class="dialog-body" top="5vh">
-      <template #header="{ titleId, titleClass }">
-        <div class="my-header">
-          <span :id="titleId" :class="titleClass">訂單明細 | {{ currentRow.shopName }}</span>
-          <el-icon class="refresh" :class="loading ? 'is-loading' : ''">
-            <Refresh v-show="!loading" @click="refreshList" />
-            <Loading v-show="loading" />
-          </el-icon>
-        </div>
-      </template>
-      <orderDetailList :data="currentRow" :params="ODparams" @refreshList="refreshList" :products="products" />
-    </el-dialog>
+      <orderDetailList :data="currentRow" @refreshList="refreshList" :products="products" :ODshow="ODshow" :loading="loading"
+      @hideDetailHandle="hideDetailHandle" />
     <!-- History -->
     <el-dialog v-model="historyDetailShow" width="95%" class="dialog-body" top="5vh" destroy-on-close
       @close="resetexpandRowKeys" title="訂單明細">
@@ -169,28 +159,30 @@ const searchFormColumns = [
 //#region Detail Tabel
 let currentRow = ref([])
 const KtableRef3 = ref()
-let orderDetailShow = ref(false)
 let historyDetailShow = ref(false)
 let expandRowKeys = ref([])
 let historyParams = ref({})
 let loading = ref(false)
-const ODparams = {
-  size: 20,
-  page: 1,
-}
+let ODshow = ref(false)
 
-// 展開訂單明細
+// 打開編輯訂單明細
 function showDetailHandle(index, row) {
   readOrderDetail({ orderId: row.id, orderDate: row.orderDate }).then(res => {
     if (res.success) {
       currentRow.value = {
         orderCode: row.orderCode,
+        orderDate: row.orderDate,
         id: row.id,
         children: res.data
       }
-      orderDetailShow.value = !orderDetailShow.value
     }
+    ODshow.value = true
   })
+}
+
+// 關閉編輯訂單明細
+function hideDetailHandle(){
+  ODshow.value = false
 }
 
 // 展開歷史訂單
@@ -206,7 +198,6 @@ async function showHistoryHandle(index, row) {
 
 // 切換展開的歷史訂單
 async function expandChange(row, expandRow) {
-  console.log(row, expandRow)
   if (expandRow.length) {
     await readOrderDetail({ orderId: row.id, orderDate: row.orderDate }).then(res => {
       if (res.success) {
@@ -224,6 +215,7 @@ function resetexpandRowKeys() {
 async function refreshList() {
   loading.value = true
   const { id, orderDate } = currentRow.value
+  resetexpandRowKeys()
   await KtableRef2.value.fatchList()
   await readOrderDetail({ orderId: id, orderDate }).then(res => {
     if (res.success) {

@@ -151,11 +151,21 @@ module.exports = class order {
     }
 
     // 管理員追加訂單
-    createAdditionOrder(req, res, next) {
+    async createAdditionOrder(req, res, next) {
         const userInfo = req.userInfo
         let orderList = req.body.orderList
         if (Array.isArray(orderList) && orderList.length) {
             const orderId = orderList[0].orderId
+
+            const orderDate = await readOrder({ id: orderId }, 1, 1)
+                .then(result => {
+                    if (result.success) {
+                        return result.data[0].orderDate.substring(0, 4)
+                    }
+                }).catch(() => {
+                    return new Date().getFullYear()
+                })
+
             orderList = orderList.map(item => {
                 return {
                     orderId: item.orderId,
@@ -168,8 +178,8 @@ module.exports = class order {
                     lastEditBy: userInfo.name
                 }
             })
-            createOrderDetail(orderList).then(async result => {
-                await setOrderState(orderId)
+            createOrderDetail(orderList, orderDate).then(async result => {
+                await setOrderState(orderId, orderDate)
                 res.json(result)
             }).catch(err => {
                 console.log(err)
@@ -203,9 +213,10 @@ module.exports = class order {
         const data = req.body.assignQuantitys
         const userInfo = req.userInfo
         const orderId = req.body.orderId
+        const orderDate = req.body.orderDate.substring(0,4)
         try {
-            await updateAssignQuantity(data, userInfo)
-            await setOrderState(orderId)
+            await updateAssignQuantity(data, userInfo, orderDate)
+            await setOrderState(orderId, orderDate)
             res.json({ success: true })
         } catch (err) {
             next(err)
