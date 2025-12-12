@@ -1,122 +1,112 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import layout from '../layout/index.vue'
+import { getToken } from '@/utils/auth'
+import { useMenuAuth } from '@/hooks/useAuth';
+const { generateRoutes } = useMenuAuth();
+let isAdded = false
 
 const routes = [
   {
     path: '/appFood',
-    component: layout,
-    children:[{
-      path:'',
-      name: 'appFood',
-      component: () => import('../views/appFood.vue')
-    }]
+    name: 'appFood',
+    component: () => import('../views/appFood.vue')
   },
   {
     path: '/order',
-    component: layout,
-    children:[{
-      path:'',
-      name: 'Order',
-      component: () => import('../views/Order/index.vue')
-    }]
+    name: 'order',
+    component: () => import('../views/Order/index.vue')
   },
   {
     path: '/appOrderDetail/:orderCode',
-    component: layout,
-    children:[{
-      path:'',
-      name: 'appOrderDetail',
-      component: () => import('../views/Order/appOrderDetail.vue')
-    }]
+    name: 'appOrderDetail',
+    component: () => import('../views/Order/appOrderDetail.vue')
   },
   {
     path: '/shop',
-    component: layout,
-    children:[{
-      path:'',
-      name: 'shop',
-      component: () => import('../views/Shop.vue')
-    }]
+    name: 'shop',
+    component: () => import('../views/Shop.vue')
   },
   {
     path: '/product',
-    component: layout,
-    children:[{
-      path:'',
-      name: 'Product',
-      component: () => import('../views/Product.vue')
-    }]
+    name: 'product',
+    component: () => import('../views/Product.vue')
   },
   {
     path: '/menu',
-    component: layout,
-    children:[{
-      path:'',
-      name: 'menu',
-      component: () => import('../views/Menu/index.vue')
-    }]
+    name: 'menu',
+    component: () => import('../views/Menu/index.vue')
   },
   {
     path: '/user',
-    component: layout,
-    children:[{
-      path:'',
-      name: 'User',
-      component: () => import('../views/User.vue')
-    }]
+    name: 'user',
+    component: () => import('../views/User.vue')
   },
   {
     path: '/setting',
-    component: layout,
-    children:[{
-      path:'',
-      name: 'Setting',
-      component: () => import('../views/Setting/index.vue')
-    }]
+    name: 'setting',
+    component: () => import('../views/Setting/index.vue')
   },
   {
     path: '/data',
-    component: layout,
-    children:[{
-      path:'',
-      name: 'Data',
-      component: () => import('../views/Data.vue')
-    }]
+    name: 'data',
+    component: () => import('../views/Data.vue')
   },
   {
     path: '/appInventory',
-    component: layout,
-    children:[{
-      path:'',
-      name: 'appInventory',
-      component: () => import('../views/appInventory.vue')
-    }]
+    name: 'appInventory',
+    component: () => import('../views/appInventory.vue')
   },
   {
     path: '/inventory',
-    component: layout,
-    children:[{
-      path:'',
-      name: 'Inventory',
-      component: () => import('../views/Inventory.vue')
-    }]
-  },
-  {
-    path: '/login',
-    component: () => import('../views/Login.vue'),
-  },
-  {
-    path: '/',
-    component: layout,
-    redirect: () => {
-      return { path: '/login' }
-    },
+    name: 'inventory',
+    component: () => import('../views/Inventory.vue')
   },
 ]
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes: [
+    {
+      name:'login',
+      path: '/login',
+      component: () => import('../views/Login.vue'),
+    },
+    {
+      path: '/',
+      name: 'root',
+      component: layout,
+      redirect: '/order', // 默认跳转到第一个有权限的页面
+      children: [] // 这里先空着，动态加
+    },
+  ]
+})
+
+async function addDynamicRoutes() {
+  const accessRoutes = await generateRoutes(routes)
+  accessRoutes.forEach(route => {
+    router.addRoute('root', route)
+  })
+  isAdded = true
+}
+
+router.beforeEach(async (to, from, next) => {
+  const hasToken = getToken()
+  if (!hasToken) next('/login');
+  if (to.path === '/login') {
+    return next('/order')
+  }
+
+if (!isAdded) {
+  await addDynamicRoutes()
+  return next({ ...to, replace: true })
+}
+
+// 如果路由不存在（比如手动输入错误路径）
+if (!router.hasRoute(to.name) && to.path !== '/404') {
+  return next('/404')
+}
+
+next()
 })
 
 export default router

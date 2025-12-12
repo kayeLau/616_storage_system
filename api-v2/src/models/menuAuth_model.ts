@@ -3,7 +3,7 @@ import { MenuAuth } from '../entity/MenuAuth';
 import { optionsGenerater } from './base_model';
 const menuAuthRepository = AppDataSource.getRepository(MenuAuth);
 
-export async function readMenuAuth(options) {
+export async function readMenuAuth(options, isTree) {
     const { conditions, parameters } = optionsGenerater(options, "menuAuth")
 
     return menuAuthRepository
@@ -23,7 +23,7 @@ export async function readMenuAuth(options) {
         .then((result) => {
             return {
                 success: true,
-                data: generateMenuMap(result),
+                data: isTree ? generateMenuMap(result) : result,
             };
         })
 }

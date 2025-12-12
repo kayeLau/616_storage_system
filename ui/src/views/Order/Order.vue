@@ -32,6 +32,9 @@ import { getDefaultDateRange, getDefaultExportDate } from '../../utils/tools';
 import { ref, onMounted, computed } from 'vue';
 import { getStorge } from '../../utils/auth'
 import { ElButton, ElDatePicker } from 'element-plus'
+import { useMenuAuth } from '@/hooks/useAuth';
+const { hideComponent } = useMenuAuth();
+
 // get userinfo
 const userInfo = computed(() => {
   let user = getStorge('userInfo')
@@ -74,7 +77,7 @@ const operations = {
   size: "small",
   children: [
     { type: "primary", name: '編輯', onClick: showDetailHandle, icon: 'Edit' },
-    { type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer', hide: userInfo.value.auth !== -1 },
+    { type: "success", name: '導出', onClick: exportOrderExcel, icon: 'Printer', hide: hideComponent('exportOrderExcel') },
     { type: "warning", name: '歷史訂單', onClick: showHistoryHandle, icon: 'DocumentCopy' }
   ]
 }
