@@ -37,7 +37,6 @@
                     </div>
                 </el-drawer>
             </el-header>
-
             <el-container>
                 <el-aside width="180px" class='aside' v-if="device === 'pc'">
                     <el-menu default-active="1" class="el-menu-vertical-demo" router background-color="#f2f6fc">
@@ -71,7 +70,9 @@ import { authDict } from '../request/dict'
 import { useRouter } from 'vue-router';
 import { logout } from '../request/users';
 import { useWindowSize } from '../hooks/useWindowSize';
+import { useMenuAuth } from '@/hooks/useAuth';
 const { device } = useWindowSize();
+const { generateRoutes } = useMenuAuth();
 const version = process.env.VUE_APP_VERSION
 const avatarLink = 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
 
@@ -83,47 +84,44 @@ async function logOutbyUser() {
         path: '/login'
     })
 }
+
 const userInfo = computed(() => {
     let user = getStorge('userInfo')
     return user ? JSON.parse(user) : {}
 })
-const menus = [
+
+const menus = ref([])
+generateRoutes([
     {
         name: "訂單管理",
         path: 'order',
         icon: 'Tickets',
-        auth: [-1, 1, 0, 2, 3]
     },
     {
         name: "原料管理",
         path: 'product',
         icon: 'Goods',
         whiteList: false,
-        auth: [-1]
     },
-    {
-        name: "菜單管理",
-        path: 'menu',
-        icon: 'Dish',
-        auth: [-1]
-    },
+    // {
+    //     name: "菜單管理",
+    //     path: 'menu',
+    //     icon: 'Dish',
+    // },
     {
         name: "用戶管理",
         path: 'user',
         icon: 'Avatar',
-        auth: [-1]
     },
     {
         name: "店舖管理",
         path: 'shop',
         icon: 'OfficeBuilding',
-        auth: [-1]
     },
     {
         name: "落單",
         path: 'appFood',
         icon: 'Iphone',
-        auth: [0, 1]
     },
     // {
     //     name: "倉存管理",
@@ -141,15 +139,14 @@ const menus = [
         name: "設定",
         path: 'setting',
         icon: 'Setting',
-        auth: [-1]
     },
     {
         name: "數據",
         path: 'data',
         icon: 'TrendCharts',
-        auth: [-1]
     },
-].filter(item => item.auth.includes(userInfo.value.auth))
+], 'path').then(res => menus.value = res)
+
 
 let avatarDetailShow = ref(false)
 let phoneNavShow = ref(false)

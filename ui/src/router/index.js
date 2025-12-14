@@ -12,11 +12,6 @@ const routes = [
     component: () => import('../views/appFood.vue')
   },
   {
-    path: '/order',
-    name: 'order',
-    component: () => import('../views/Order/index.vue')
-  },
-  {
     path: '/appOrderDetail/:orderCode',
     name: 'appOrderDetail',
     component: () => import('../views/Order/appOrderDetail.vue')
@@ -67,7 +62,7 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     {
-      name:'login',
+      name: 'login',
       path: '/login',
       component: () => import('../views/Login.vue'),
     },
@@ -75,8 +70,14 @@ const router = createRouter({
       path: '/',
       name: 'root',
       component: layout,
-      redirect: '/order', // 默认跳转到第一个有权限的页面
-      children: [] // 这里先空着，动态加
+      redirect: '/order',
+      children: [
+        {
+          path: '/order',
+          name: 'order',
+          component: () => import('../views/Order/index.vue')
+        }
+      ]
     },
   ]
 })
@@ -91,22 +92,25 @@ async function addDynamicRoutes() {
 
 router.beforeEach(async (to, from, next) => {
   const hasToken = getToken()
-  if (!hasToken) next('/login');
+  if (!hasToken) {
+    return to.path === '/login' ? next() : next('/login')
+  }
+
   if (to.path === '/login') {
     return next('/order')
   }
 
-if (!isAdded) {
-  await addDynamicRoutes()
-  return next({ ...to, replace: true })
-}
+  if (!isAdded) {
+    await addDynamicRoutes()
+    return next({ ...to, replace: true })
+  }
 
-// 如果路由不存在（比如手动输入错误路径）
-if (!router.hasRoute(to.name) && to.path !== '/404') {
-  return next('/404')
-}
+  // 如果路由不存在（比如手动输入错误路径）
+  if (!router.hasRoute(to.name) && to.path !== '/404') {
+    return next('/404')
+  }
 
-next()
+  next()
 })
 
 export default router

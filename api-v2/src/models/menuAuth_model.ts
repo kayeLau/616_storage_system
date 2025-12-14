@@ -1,10 +1,10 @@
 import AppDataSource from '../data-source';
 import { MenuAuth } from '../entity/MenuAuth';
-import { optionsGenerater } from './base_model';
 const menuAuthRepository = AppDataSource.getRepository(MenuAuth);
 
-export async function readMenuAuth(options, isTree) {
-    const { conditions, parameters } = optionsGenerater(options, "menuAuth")
+export async function readMenuAuth(options) {
+    const auth = options.auth
+    const isTree = options.isTree
 
     return menuAuthRepository
         .createQueryBuilder("MenuAuth")
@@ -18,9 +18,12 @@ export async function readMenuAuth(options, isTree) {
             "menuAuth.type AS type",
             "DATE_FORMAT(menuAuth.updateDate, '%Y-%m-%d %H:%i:%S') AS updateDate"
         ])
-        .where(conditions.join(" AND "), parameters)
         .getRawMany()
         .then((result) => {
+            if(auth !== -1){
+                result = result.filter(item => item.auth.split(',').includes(auth || '*'))
+            }
+
             return {
                 success: true,
                 data: isTree ? generateMenuMap(result) : result,

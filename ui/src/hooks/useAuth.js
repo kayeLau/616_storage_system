@@ -26,10 +26,10 @@ function hideComponent(name) {
     return !permissionMap[name] ? true : false
 }
 
-async function generateRoutes(routes){
+async function generateRoutes(routes, key){
     await getMenuAuth()
     return routes.filter(item => {
-        return menuMap[item.name]
+        return menuMap[key === 'path' ? item.path : item.name]
     })
 }
 
