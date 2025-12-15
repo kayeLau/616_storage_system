@@ -71,15 +71,18 @@ import { useRouter } from 'vue-router';
 import { logout } from '../request/users';
 import { useWindowSize } from '../hooks/useWindowSize';
 import { useMenuAuth } from '@/hooks/useAuth';
+import { clearDynamicRoutes } from '../router/index'
 const { device } = useWindowSize();
-const { generateRoutes } = useMenuAuth();
+const { generateRoutes , clearMenuMap } = useMenuAuth();
 const version = process.env.VUE_APP_VERSION
 const avatarLink = 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
 
 const router = useRouter()
 async function logOutbyUser() {
-    await logout().catch(err => console.err(err))
     removeToken()
+    await logout().catch(err => console.err(err))
+    clearMenuMap()
+    await clearDynamicRoutes()
     router.push({
         path: '/login'
     })
@@ -145,7 +148,10 @@ generateRoutes([
         path: 'data',
         icon: 'TrendCharts',
     },
-], 'path').then(res => menus.value = res)
+], 'path').then(res => {
+    console.log(res)
+    menus.value = res
+})
 
 
 let avatarDetailShow = ref(false)

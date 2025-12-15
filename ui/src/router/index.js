@@ -58,7 +58,7 @@ const routes = [
   },
 ]
 
-const router = createRouter({
+const baseRouters = {
   history: createWebHashHistory(),
   routes: [
     {
@@ -80,7 +80,8 @@ const router = createRouter({
       ]
     },
   ]
-})
+}
+let router = createRouter(baseRouters)
 
 async function addDynamicRoutes() {
   const accessRoutes = await generateRoutes(routes)
@@ -90,9 +91,15 @@ async function addDynamicRoutes() {
   isAdded = true
 }
 
+export async function clearDynamicRoutes(){
+  isAdded = false
+  router = createRouter(baseRouters);
+}
+
 router.beforeEach(async (to, from, next) => {
   const hasToken = getToken()
   if (!hasToken) {
+    isAdded = false
     return to.path === '/login' ? next() : next('/login')
   }
 
@@ -105,7 +112,6 @@ router.beforeEach(async (to, from, next) => {
     return next({ ...to, replace: true })
   }
 
-  // 如果路由不存在（比如手动输入错误路径）
   if (!router.hasRoute(to.name) && to.path !== '/404') {
     return next('/404')
   }

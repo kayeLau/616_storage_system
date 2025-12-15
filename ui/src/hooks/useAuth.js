@@ -1,6 +1,6 @@
 import { readMenuAuth } from '../request/menuAuth';
 
-const menuMap = {};
+let menuMap = {};
 const permissionMap = {};
 
 async function getMenuAuth() {
@@ -33,7 +33,11 @@ async function generateRoutes(routes, key){
     })
 }
 
+function clearMenuMap(){
+    menuMap = {};
+}
+
 
 export const useMenuAuth = () => {
-    return { menuMap , generateRoutes , checkPermission, hideComponent };
+    return { menuMap , generateRoutes , clearMenuMap , checkPermission, hideComponent };
 };
