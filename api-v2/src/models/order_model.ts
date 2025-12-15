@@ -118,7 +118,8 @@ export async function checkOrderRepeated(options) {
         .getOne()
 
     if (existingOrder) {
-        return readOrderDetail(existingOrder.id, existingOrder.orderDate).then(result => {
+        const year = options.orderDate.substring(0,4)
+        return readOrderDetail(existingOrder.id, year).then(result => {
             return {
                 success: true,
                 data: {

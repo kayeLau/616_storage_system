@@ -19,7 +19,7 @@ async function auth(req, res, next) {
                 return
             }
         })
-        await verifyaAuth(path, req.userInfo.auth).then(tokenResult => {
+        await verifyaAuth(path, req.userInfo?.auth).then(tokenResult => {
             if (tokenResult.success === true) {
                 next()
             } else {

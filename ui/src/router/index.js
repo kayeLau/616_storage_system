@@ -81,7 +81,7 @@ const baseRouters = {
     },
   ]
 }
-let router = createRouter(baseRouters)
+const router = createRouter(baseRouters)
 
 async function addDynamicRoutes() {
   const accessRoutes = await generateRoutes(routes)
@@ -91,9 +91,21 @@ async function addDynamicRoutes() {
   isAdded = true
 }
 
-export async function clearDynamicRoutes(){
+export async function clearDynamicRoutes() {
   isAdded = false
-  router = createRouter(baseRouters);
+  router.addRoute({
+    path: '/',
+    name: 'root',
+    component: layout,
+    redirect: '/order',
+    children: [
+      {
+        path: '/order',
+        name: 'order',
+        component: () => import('../views/Order/index.vue')
+      }
+    ]
+  },)
 }
 
 router.beforeEach(async (to, from, next) => {
