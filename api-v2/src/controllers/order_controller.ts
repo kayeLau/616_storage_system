@@ -38,27 +38,36 @@ interface summaryProductItem {
     orderItems: Array<number>
 }
 
-module.exports = class order {
-    // 獲取訂單
-    async readOrder(req, res, next) {
-        const userInfoAuth = Number(req.userInfo.auth)
-        const orderShopId = userInfoAuth === 0 || userInfoAuth === 1 ? req.userInfo.shopId : userInfoAuth === -1 ? req.body.orderShopId : "";
-        const options = { updateDate: req.body.updateDate, orderShopId }
-        const size = req.body.size || 20
-        const page = req.body.page || 1
+module.exports = class Order {
+
+    // 根據Auth獲取 shopId || shopIdLsit
+    async getshopIdListByAuth(userInfoAuth, userInfo, orderShopId) {
+        const shopId = userInfoAuth === 0 || userInfoAuth === 1 ? userInfo.shopId : userInfoAuth === -1 ? orderShopId : "";
         if (userInfoAuth === 2) {
             let shopIdList = await readShop({}, 999, 1).then(result => {
                 if (result.success) {
                     return result.data
-                        .filter(item => item.shopPartition.split(',').find(item => item === String(req.userInfo.shopPartition)))
+                        .filter(item => item.shopPartition.split(',').find(item => item === String(userInfo.shopPartition)))
                         .map(item => item.shopId)
                 }
             }).catch(() => [])
-            options.orderShopId = shopIdList
+            return shopIdList
         }
-        readOrder(options, size, page).then(result => {
+        return shopId
+    }
+
+    // 獲取訂單
+    async readOrder(req, res, next) {
+        const userInfoAuth = Number(req.userInfo.auth)
+        const orderShopId = await this.getshopIdListByAuth(userInfoAuth, req.userInfo, req.body.orderShopId)
+        const options = { updateDate: req.body.updateDate, orderShopId }
+        const size = req.body.size || 20
+        const page = req.body.page || 1
+
+        return readOrder(options, size, page).then(result => {
             res.json(result)
         }).catch(err => {
+            console.log(err)
             next(err)
         })
     }
@@ -67,7 +76,7 @@ module.exports = class order {
     async readOrderDetail(req, res, next) {
         const orderId = req.body.orderId
         const orderDate = req.body.orderDate ? req.body.orderDate.substring(0, 4) : new Date().getFullYear();
-        readOrderDetail(orderId, orderDate).then(result => {
+        return readOrderDetail(orderId, orderDate).then(result => {
             res.json(result)
         }).catch(err => {
             next(err)
@@ -143,7 +152,7 @@ module.exports = class order {
             orderCode: userInfo.shopId + '-' + dateStr,
         }
 
-        createOrder(orderData).then(result => {
+        return createOrder(orderData).then(result => {
             res.json(result)
         }).catch(err => {
             next(err)
@@ -200,7 +209,7 @@ module.exports = class order {
             orderDate: orderDateRange[0].substring(0, 10),
         }
 
-        await checkOrderRepeated(orderData).then(result => {
+        return checkOrderRepeated(orderData).then(result => {
             res.json(result)
         }).catch(err => {
             console.log(err)
@@ -213,7 +222,7 @@ module.exports = class order {
         const data = req.body.assignQuantitys
         const userInfo = req.userInfo
         const orderId = req.body.orderId
-        const orderDate = req.body.orderDate.substring(0,4)
+        const orderDate = req.body.orderDate.substring(0, 4)
         try {
             await updateAssignQuantity(data, userInfo, orderDate)
             await setOrderState(orderId, orderDate)

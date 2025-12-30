@@ -5,7 +5,7 @@ const OrderModifyMethod = require('../controllers/order_controller')
 
 const orderModifyMethod = new OrderModifyMethod()
 
-router.post('/readOrder',orderModifyMethod.readOrder)
+router.post('/readOrder',(req, res, next) => orderModifyMethod.readOrder(req, res, next))
 
 router.post('/readOrderDetail',orderModifyMethod.readOrderDetail)
 
