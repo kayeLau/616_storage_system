@@ -1,5 +1,3 @@
-// entity/OrderDetailBase.ts   ← 改成这样，永远不会再报错！
-
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -9,8 +7,8 @@ import {
 } from "typeorm";
 import { Product } from "./Product";
 
-@Entity()  // 随便写个假表名，反正不会用
-export class OrderDetailBase {   // ← 删掉 extends BaseEntity！！！
+@Entity()
+export class OrderDetailBase {
 
   @PrimaryGeneratedColumn()
   id: number;

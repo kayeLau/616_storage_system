@@ -7,8 +7,8 @@
         :products="products" :expandRowKeys="expandRowKeys"></Ktable>
     </el-card>
     <!-- OrderDetail -->
-      <orderDetailList :data="currentRow" @refreshList="refreshList" :products="products" :ODshow="ODshow" :loading="loading"
-      @hideDetailHandle="hideDetailHandle" />
+    <orderDetailList :data="currentRow" @refreshList="refreshList" :products="products" :ODshow="ODshow"
+      :loading="loading" @hideDetailHandle="hideDetailHandle" />
     <!-- History -->
     <el-dialog v-model="historyDetailShow" width="95%" class="dialog-body" top="5vh" destroy-on-close
       @close="resetexpandRowKeys" title="訂單明細">
@@ -184,7 +184,7 @@ function showDetailHandle(index, row) {
 }
 
 // 關閉編輯訂單明細
-function hideDetailHandle(){
+function hideDetailHandle() {
   ODshow.value = false
 }
 
@@ -208,6 +208,8 @@ async function expandChange(row, expandRow) {
       }
     })
     expandRowKeys.value = expandRow.map(item => item.id)
+  } else {
+    expandRowKeys.value = []
   }
 }
 

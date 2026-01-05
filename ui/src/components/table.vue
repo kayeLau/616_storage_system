@@ -156,6 +156,7 @@ async function waitSearchFormColumns(){
     _searchFormColumns.value = searchFormColumns
 }
 
+// 數據查詢
 async function fatchList() {
     let result = {}
     if (typeof props.getList === 'function') {

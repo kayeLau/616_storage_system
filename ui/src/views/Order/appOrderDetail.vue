@@ -14,7 +14,7 @@
                             <el-icon class="header-icon">
                                 <info-filled />
                             </el-icon>
-                            <span>第{{ item.orderIndex }}次落单 {{ item.updateDate }}</span>
+                            <span style="font-size: small">第{{ item.orderIndex }}次落单 {{ item.updateDate }}</span>
                         </div>
                     </template>
                     <div v-for="(item, index) of item.children" :key="'s' + index" class="detail-container">
