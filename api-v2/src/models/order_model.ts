@@ -158,7 +158,8 @@ export async function exportOrderMeat(options, size, page, summaryProductIdsMap,
     const order = await getOrderAndGroupBy(options, size, page)
     const summaryProductIds = Object.keys(summaryProductIdsMap)
     const orderDetail = order.data.map((item) => {
-        return readOrderDetail(item.id, item.orderDate).then(res => {
+        const year = item.orderDate.substring(0,4)
+        return readOrderDetail(item.id, year).then(res => {
             let index = shopsList.indexOf(item.shopName)
             summaryProductIds.forEach(summaryProductId => {
                 let target = res.data.find(item => item.productId === Number(summaryProductId))
