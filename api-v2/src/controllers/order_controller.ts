@@ -1,6 +1,6 @@
 import { readSettingTimeRange } from '../utils';
 import {
-    readOrder, createOrder, readHistoryOrder, setOrderState, exportOrderMeat, checkOrderRepeated
+    readOrder, createOrder, readHistoryOrder, setOrderState, exportOrder, checkOrderRepeated
 } from '../models/order_model';
 import { readOrderDetail, updateAssignQuantity, createOrderDetail } from '../models/orderDetail_model';
 import { readShop } from '../models/shopManage_model';
@@ -236,7 +236,7 @@ module.exports = class Order {
     async exportDailyMeetSummary(req, res, next) {
         let summaryProductIdsMap: summaryProductIdsMap = {}
         let exportDate = req.body.exportDate
-        let exportType = req.body.exportType
+        let exportType = req.body.exportType // 1:鮮肉類 0:非鮮肉類
         let orderedShops = new Set()
 
         await readOrder({ orderDate: exportDate }, 999, 1).then(result => {
@@ -260,7 +260,7 @@ module.exports = class Order {
             )
         })
 
-        await exportOrderMeat({ orderDate: exportDate }, 999, 1, summaryProductIdsMap, shopsList).then(result => {
+        await exportOrder({ orderDate: exportDate }, 999, 1, summaryProductIdsMap, shopsList).then(result => {
             if (result.success) {
                 res.json(result)
             }

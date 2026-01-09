@@ -153,8 +153,8 @@ export async function setOrderState(orderId: string,  year?: number) {
         })
 }
 
-// 導出肉類總表
-export async function exportOrderMeat(options, size, page, summaryProductIdsMap, shopsList) {
+// 導出匯總表
+export async function exportOrder(options, size, page, summaryProductIdsMap, shopsList) {
     const order = await getOrderAndGroupBy(options, size, page)
     const summaryProductIds = Object.keys(summaryProductIdsMap)
     const orderDetail = order.data.map((item) => {
