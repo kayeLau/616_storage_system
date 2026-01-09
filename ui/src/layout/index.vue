@@ -39,9 +39,9 @@
             </el-header>
             <el-container>
                 <el-aside width="180px" class='aside' v-if="device === 'pc'">
-                    <el-menu default-active="1" class="el-menu-vertical-demo" router background-color="#f2f6fc">
+                    <el-menu :default-active="activeMenu" class="el-menu-vertical-demo" router background-color="#f2f6fc">
                         <component v-for='(item, index) of menus' :key='index' :index="item.path"
-                            :is='item.childen ? "el-sub-menu" : "el-menu-item"'>
+                            :is='item.childen ? "el-sub-menu" : "el-menu-item"' @click="setActiveMenu(item.path)">
                             <template #title>
                                 <el-icon>
                                     <component :is='item.icon'></component>
@@ -56,7 +56,7 @@
                 </el-aside>
 
                 <el-main>
-                    <router-view />
+                    <router-view @setActiveMenu="setActiveMenu"/>
                 </el-main>
             </el-container>
         </el-container>
@@ -65,7 +65,7 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import { getStorge, removeToken } from '../utils/auth'
+import { setStorge, getStorge, removeToken } from '../utils/auth'
 import { authDict } from '../request/dict'
 import { useRouter } from 'vue-router';
 import { logout } from '../request/users';
@@ -73,7 +73,7 @@ import { useWindowSize } from '../hooks/useWindowSize';
 import { useMenuAuth } from '@/hooks/useAuth';
 import { clearDynamicRoutes } from '../router/index'
 const { device } = useWindowSize();
-const { generateRoutes , clearMenuMap } = useMenuAuth();
+const { generateRoutes, clearMenuMap } = useMenuAuth();
 const version = process.env.VUE_APP_VERSION
 const avatarLink = 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
 
@@ -159,6 +159,14 @@ function avatarNavHandle() {
     } else {
         phoneNavShow.value = !phoneNavShow.value
     }
+}
+
+let activeMenu = ref(getStorge('activeMenu') || '1')
+function setActiveMenu(menu){
+    if(menu !== activeMenu.value){
+        activeMenu.value = menu
+    }
+    setStorge('activeMenu',menu)
 }
 </script>
 <style scoped>

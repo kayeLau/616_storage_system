@@ -71,8 +71,6 @@ import { createOrder } from '../request/orders';
 import { createInventory } from '../request/inventory';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { classifyDict } from '../request/dict';
-import { useRouter } from 'vue-router';
-const router = useRouter()
 
 
 const userInfo = computed(() => {
@@ -85,7 +83,7 @@ const props = defineProps({
     flag: String
 })
 
-const emits = defineEmits(['sumbit'])
+const emits = defineEmits(['submit'])
 
 const orderList = computed(() => {
     return Object.values(props.orderMap)
@@ -122,23 +120,16 @@ function jumpToOrderComfire() {
     }
 }
 
-function jumptoHome() {
-    const screenWidth = window.screen.width
-    const path = screenWidth > 750 ? '/order' : '/appOrder';
-    router.push({ path })
-}
-
 let submitDisabled = ref(false) // 提交btn disable
 async function comfireHandle() {
     submitDisabled.value = true
     if (props.flag === 'order') {
         await comfireOrder()
-        jumptoHome()
     } else if (props.flag === 'inventory') {
         await comfireInventory()
     }
     submitDisabled.value = false
-    emits('sumbit')
+    emits('submit')
 }
 
 

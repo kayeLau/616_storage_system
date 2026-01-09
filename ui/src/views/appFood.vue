@@ -35,17 +35,21 @@
         </el-skeleton>
 
         <cart v-show="!loading" flag="order" :orderMap="orderMap" @orderDetailChange="orderDetailChange"
-            @sumbit="checkExistOrder"></cart>
+            @submit="submitOrder">
+        </cart>
     </div>
 </template>
 
 <script setup>
 import cart from '../components/cart.vue'
-import { ref, onMounted, unref } from 'vue';
+import { ref, onMounted, unref, defineEmits } from 'vue';
 import { readProduct } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
 import { classifyDict, classifySort } from '../request/dict';
+import { useRouter } from 'vue-router';
+const router = useRouter()
 
+const emit = defineEmits(['setActiveMenu'])
 let loading = ref(true)
 let orderMap = ref({})
 const products = ref([
@@ -148,6 +152,14 @@ async function checkExistOrder() {
             })
         }
     })
+}
+
+async function submitOrder() {
+    const screenWidth = window.screen.width
+    const path = screenWidth > 750 ? '/order' : '/appOrder';
+    await checkExistOrder()
+    router.push({ path })
+    emit('setActiveMenu', path.substring(1))
 }
 
 onMounted(async () => {
