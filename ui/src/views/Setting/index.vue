@@ -9,18 +9,20 @@
                             size="small" placeholder="請選擇時間" clearable format="HH" style="width: 150px;"
                             @change="sumbitLastOrder" />
                     </el-form-item>
-                    <el-form-item label="設點必點產品" prop="promptItem" align="right">
-                        <el-button type="primary" style="width: 150px;" size="small"
-                            @click="setDialogShow(0)">編輯</el-button>
-                    </el-form-item>
                 </el-form>
-                <div class="title">日志</div>
+                <div class="title">工具</div>
                 <el-form ref='formRef' :model="models" label-position="left">
                     <el-form-item label="日志下載" prop="logName">
                         <el-select style="width: 150px;" v-model="models.logName" size="small" placeholder="請選擇時間"
                             clearable @change="downloadLogFile">
                             <el-option v-for="opt of logsOption" :key="opt" :label="opt" :value="opt"></el-option>
                         </el-select>
+                    </el-form-item>
+                    <el-form-item label="轉換為JSON" prop="promptItem" align="right">
+                        <el-upload v-model:file-list="fileList" :autoUpload="false" class="upload-demo" 
+                        :limit="1" @change="excelToJson" :show-file-list="false">
+                            <el-button type="primary" style="width: 150px;" size="small">上傳</el-button>
+                        </el-upload>
                     </el-form-item>
                 </el-form>
             </el-tab-pane>
@@ -45,10 +47,10 @@
             </el-tab-pane>
         </el-tabs>
     </div>
-    <el-dialog v-model="dialogShow" title="設置必點產品" custom-class='dialog' width="80%" height="60%" @open="openHandler"
+    <!-- <el-dialog v-model="dialogShow" title="設置必點產品" custom-class='dialog' width="80%" height="60%" @open="openHandler"
         destroy-on-close>
         <component :is='dialogComponent'></component>
-    </el-dialog>
+    </el-dialog> -->
 </template>
 <script setup>
 import { updateSetting, readAllSetting } from '../../request/setting'
@@ -57,29 +59,38 @@ import { apiAccessDict, exchangeKeyValue } from '../../request/dict'
 import { readLogsName, downloadLog } from '../../request/file'
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import promptItem from '../../components/promptItem.vue'
+import { xlsxToJson } from '../../utils/export'
 import menuAuth from './menuAuth.vue'
 
 let tabsValue = ref('sys')
-/* 必點 */
-let dialogComponent = ref(null)
-let dialogShow = ref(false)
-let activeComponend = 0
+// let dialogComponent = ref(null)
+// let dialogShow = ref(false)
+// let activeComponend = 0
 
-function openHandler() {
-    switch (activeComponend) {
-        case 0:
-            dialogComponent.value = promptItem
-            break;
-        default:
-            break
-    }
+// function openHandler() {
+//     switch (activeComponend) {
+//         case 0:
+//             dialogComponent.value = promptItem
+//             break;
+//         default:
+//             break
+//     }
 
-}
+// }
 
-function setDialogShow(num) {
-    activeComponend = num
-    dialogShow.value = !dialogShow.value
+// function setDialogShow(num) {
+//     activeComponend = num
+//     dialogShow.value = !dialogShow.value
+// }
+
+// 轉換為JSON
+let fileList = ref([])
+function excelToJson(file){
+  const reader = new FileReader()
+  reader.readAsBinaryString(file.raw)
+  reader.onload = e => {
+    xlsxToJson(e.target.result)
+  };
 }
 
 /* API管理 */

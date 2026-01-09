@@ -8,6 +8,10 @@
       <jsonForm :formModel="editFormModel" :formColumns="editFormColumns" :rules="editFormRules"
         :comfireCallBack="JsonFormComfireCallBack" @sumbitSuccess="refreshList"></jsonForm>
     </el-drawer>
+    <el-dialog v-model="dialogShow" title="設置必點產品" custom-class='dialog' width="80%" height="60%" @open="openHandler"
+        destroy-on-close>
+        <promptItem/>
+    </el-dialog>
   </div>
 </template>
 <script setup>
@@ -16,8 +20,8 @@ import { freezersNumDict, classifyDict, departmentDict, dictToOptions, disable, 
 import Ktable from '../components/table.vue'
 import jsonForm from '../components/jsonForm.vue'
 import { ref } from 'vue'
-import { exportExcel , xlsxToJson } from '../utils/export'
-import { ElUpload, ElButton } from 'element-plus'
+import { exportExcel } from '../utils/export'
+import promptItem from '../components/promptItem.vue'
 
 const KtableRef = ref()
 
@@ -226,7 +230,12 @@ const searchFormColumns = [
   }
 ]
 
-let fileList = ref([])
+let dialogShow = ref(false)
+function showDialog() {
+    dialogShow.value = !dialogShow.value
+}
+
+
 const customBtn = [
   {
     type: 'button',
@@ -243,28 +252,27 @@ const customBtn = [
     onClick: exportProductExcel
   },
   {
-    type: 'render',
-    render: (h) => {
-      return h(ElUpload, {
-          class: "upload-demo", autoUpload: false, onChange:excelToJson, limit:1,
-          ['onUpdate:modelValue']: (value) => {
-            fileList.value = value
-          }
-        }, [
-          h(ElButton, { type: "primary", plain: true, limit: 1 , 
-          style:{ borderTopRightRadius:0 , borderBottomRightRadius:0 }}, '轉換為JSON')
-        ])
-    }
+    type: 'button',
+    btnType: 'primary',
+    label: '設置必點',
+    icon: 'Edit',
+    onClick: showDialog
   },
+  // {
+  //   type: 'render',
+  //   render: (h) => {
+  //     return h(ElUpload, {
+  //         class: "upload-demo", autoUpload: false, onChange:excelToJson, limit:1,
+  //         ['onUpdate:modelValue']: (value) => {
+  //           fileList.value = value
+  //         }
+  //       }, [
+  //         h(ElButton, { type: "primary", plain: true, limit: 1 , 
+  //         style:{ borderTopRightRadius:0 , borderBottomRightRadius:0 }}, '轉換為JSON')
+  //       ])
+  //   }
+  // },
 ]
-
-function excelToJson(file){
-  const reader = new FileReader()
-  reader.readAsBinaryString(file.raw)
-  reader.onload = e => {
-    xlsxToJson(e.target.result)
-  };
-}
 
 function exportProductExcel() {
   readProduct({ size: 999, page: 1 }).then(res => {
@@ -285,7 +293,7 @@ function exportProductExcel() {
           item.updateDate,
         ]
       })
-      jsonData.unshift(['狀態', '產品Id', '產品編號', '產品名稱', '分類 ', '雪房號碼', '負責部門', '規格', '單位', '匯總', '修改時間'])
+      jsonData.unshift(['狀態', '產品Id', '產品編號', '產品名稱', '分類', '雪房號碼', '負責部門', '規格', '單位', '匯總', '修改時間'])
       const products = {
         sheetNames: '產品',
         jsonData

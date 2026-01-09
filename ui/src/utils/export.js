@@ -167,15 +167,15 @@ export function xlsxToJson(fileBinaryString) {
     result = jsonData.map(item => {
       return {
         productId: item.productId,
-        productCode: item.productCode,
-        department: _departmentDict[item.department],
-        freezersNum: Number(_freezersNumDict[item.freezersNum]),
-        classify: Number(_classifyDict[item.classify]),
-        productName: item.productName,
-        unit: item.unit,
-        standard: item.standard,
-        disable: Number(_disable[item.disable]),
-        summary: Number(_productSummary[item.summary]),
+        productCode: item.productCode || item['產品編號'],
+        department: _departmentDict[item.department || item['負責部門']],
+        freezersNum: Number(_freezersNumDict[item.freezersNum || item['雪房號碼']]),
+        classify: Number(_classifyDict[item.classify || item['分類']]),
+        productName: item.productName || item['產品名稱'],
+        unit: item.unit || item['單位'],
+        standard: item.standard || item['規格'],
+        disable: Number(_disable[item.disable || item['狀態']]),
+        summary: Number(_productSummary[item.summary || item['匯總']]),
         prompt: 0,
       }
     })

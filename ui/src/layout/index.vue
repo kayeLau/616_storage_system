@@ -147,7 +147,6 @@ generateRoutes([
         icon: 'TrendCharts',
     },
 ], 'path').then(res => {
-    console.log(res)
     menus.value = res
 })
 
