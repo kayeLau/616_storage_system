@@ -4,8 +4,9 @@ run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 
 jobs:
-  Build-and-Test:
+  Explore-GitHub-Actions:
     runs-on: ubuntu-latest
+    
     defaults:
       run:
         working-directory: ./api-v2
@@ -14,22 +15,24 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v5
 
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}           # 這個還是看根目錄
+          pwd                                  # 會顯示目前工作目錄
+          ls .                                 
+
       - name: 设置 Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: 安装依赖
         run: npm ci
 
       - name: 编译 TypeScript（生成 dist）
-        run: npx tsc
+        run: npx tsc  
 
-      - name: 检查 dist 文件夹是否生成
-        run: |
-          ls -la dist/
-          echo "編譯完成！"
-
-      - name: 运行测试（针对 dist 里的 JS 文件）
+      - name: 运行测试
         run: npm test
