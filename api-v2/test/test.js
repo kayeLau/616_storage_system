@@ -118,17 +118,24 @@ describe('Order Controller 單元測試', function () {
 
   });
 
-  // describe('createOrder - 創建訂單', () => {
-  //   it('應成功添加訂單', async () => {
+  describe('createOrder - 創建訂單', () => {
+    it('應成功添加訂單', async () => {
 
-  //     req.body = { orderList: orderList }
-  //     await order.createOrder(req, res, next);
+      await order.checkOrderRepeated(req, res, next);
+      const result1 = res.json.getCall(0).args[0];
+      expect(result1.success).to.be.true;
 
-  //     const result = res.json.getCall(0).args[0];
-  //     expect(result.success).to.be.true;
 
-  //   });
-  // });
+      if(!result1.data.children.length){
+        req.body = { orderList: orderList }
+        await order.createOrder(req, res, next);
+      }
+
+      const result2 = res.json.getCall(0).args[0];
+      expect(result2.success).to.be.true;
+
+    });
+  });
 
   describe('checkOrderRepeated - 查看當天是否已下單', () => {
     it('應獲取到一個訂單, 且訂單children內容與orderList一致', async () => {
@@ -191,6 +198,7 @@ describe('Order Controller 單元測試', function () {
 
   describe('readOrder - 獲取訂單列表', () => {
     it(`
+      1)訂單isToday應為1
       2)orderIndex應與下單次數一致
       `, async () => {
       const today = new Date()
@@ -207,6 +215,32 @@ describe('Order Controller 單元測試', function () {
       expect(data.isToday).to.equal('1');
       expect(data.orderIndex).to.equal(orderInfo.orderIndex);
 
+    });
+  });
+
+  describe('readOrderDetail - 獲取訂單明細', () => {
+    it(`
+      1)訂單明細只應存在對應年份的分表中
+      `, async () => {
+      req.body = { orderId: orderInfo.id, orderDate: '2025-11-16' }
+      await order.readOrderDetail(req, res, next);
+      const result1 = res.json.getCall(0).args[0];
+      expect(result1.data.length).to.equal(0);
+
+
+
+      req.body = { orderId: orderInfo.id, orderDate: orderInfo.orderDate }
+      await order.readOrderDetail(req, res, next);
+      const result2 = res.json.getCall(0).args[0];
+      const _orderList = result2.data.map(item => {
+        return {
+          productId: item.productId,
+          orderQuantity: item.orderQuantity,
+          orderMode: item.orderMode
+        }
+      })
+      expect(result2.success).to.be.true;
+      expect(orderList).to.include.deep.members(_orderList);
     });
   });
 
