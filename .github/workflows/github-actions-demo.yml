@@ -1,21 +1,36 @@
 name: GitHub Actions Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+
 on: [push]
+
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
+    
+    # ← 這裡加入這一段，讓這個 job 內所有 run 指令都從指定的資料夾開始執行
+    defaults:
+      run:
+        working-directory: ./api-v2
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v5
+
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+
       - name: List files in the repository
         run: |
-          ls ${{ github.workspace }}
+          ls ${{ github.workspace }}           # 這個還是看根目錄
+          pwd                                  # 會顯示目前工作目錄
+          ls .                                 
+
       - name: 设置 Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
       - name: 安装依赖
         run: npm ci
+
       - name: 运行测试
         run: npm test
