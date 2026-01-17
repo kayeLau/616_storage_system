@@ -78,8 +78,7 @@ function toLogin(force = false) {
 }
 
 function toHome() {
-    const screenWidth = window.screen.width
-    const path = screenWidth > 750 ? '/order' : '/appOrder';
+    const path = '/order';
     router.push({ path })
 }
 

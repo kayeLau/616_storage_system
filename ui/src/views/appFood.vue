@@ -155,8 +155,7 @@ async function checkExistOrder() {
 }
 
 async function submitOrder() {
-    const screenWidth = window.screen.width
-    const path = screenWidth > 750 ? '/order' : '/appOrder';
+    const path = '/order';
     await checkExistOrder()
     router.push({ path })
     emit('setActiveMenu', path.substring(1))
