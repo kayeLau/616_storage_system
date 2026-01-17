@@ -7,7 +7,7 @@ export async function readMenuAuth(options) {
     const isTree = options.isTree
 
     return menuAuthRepository
-        .createQueryBuilder("MenuAuth")
+        .createQueryBuilder("menuAuth")
         .select([
             "menuAuth.id AS id",
             "menuAuth.auth AS auth",
