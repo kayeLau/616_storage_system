@@ -1,6 +1,6 @@
 import AppDataSource from '../data-source';
 import { Member } from '../entity/Member';
-import { optionsGenerater } from './base_model';
+import { optionsGenerater } from './common/base_model';
 const jwt = require('jsonwebtoken');
 const config = require('../config/development_config');
 const memberRepository = AppDataSource.getRepository(Member);

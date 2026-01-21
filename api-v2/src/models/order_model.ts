@@ -3,7 +3,7 @@ import AppDataSource from '../data-source';
 import { Order } from '../entity/Order';
 import { Product } from '../entity/Product';
 import { Shop } from '../entity/Shop';
-import { optionsGenerater } from './base_model';
+import { optionsGenerater } from './common/base_model';
 import { readOrderDetail, createOrderDetail, getOrderDetailStatus } from './orderDetail_model'
 const orderRepository = AppDataSource.getRepository(Order);
 

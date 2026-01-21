@@ -2,7 +2,7 @@ import AppDataSource from '../data-source';
 import { Shop } from '../entity/Shop';
 import { Partition } from '../entity/Partition';
 import { ShopProduct } from '../entity/ShopProduct';
-import { optionsGenerater } from './base_model';
+import { optionsGenerater } from './common/base_model';
 const shopRepository = AppDataSource.getRepository(Shop);
 const partitionRepository = AppDataSource.getRepository(Partition);
 const shopProductRepository = AppDataSource.getRepository(ShopProduct);

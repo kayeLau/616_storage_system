@@ -1,6 +1,6 @@
 import AppDataSource from '../data-source';
 import { TasteOptions } from '../entity/TasteOptions';
-import { optionsGenerater } from './base_model';
+import { optionsGenerater } from './common/base_model';
 const tasteOptionsRepository = AppDataSource.getRepository(TasteOptions);
 
 export async function readTasteOptions(options) {

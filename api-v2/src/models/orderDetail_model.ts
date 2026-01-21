@@ -1,7 +1,7 @@
 import AppDataSource from '../data-source';
 import { OrderDetailBase } from '../entity/OrderDetailBase';
 import { Product } from '../entity/Product';
-import { sqlValue } from './base_model'
+import { sqlValue } from './common/base_model'
 const orderDetailRepository = AppDataSource.getRepository(OrderDetailBase).manager;
 
 // 獲取分配狀態

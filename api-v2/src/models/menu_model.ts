@@ -1,6 +1,6 @@
 import AppDataSource from '../data-source';
 import { Menu } from '../entity/Menu';
-import { optionsGenerater } from './base_model';
+import { optionsGenerater } from './common/base_model';
 const menuRepository = AppDataSource.getRepository(Menu);
 
 export async function readMenu(options, size, page) {

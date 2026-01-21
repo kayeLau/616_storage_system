@@ -1,6 +1,6 @@
 import AppDataSource from '../data-source';
 import { Inventory } from '../entity/Inventory';
-import { optionsGenerater } from './base_model';
+import { optionsGenerater } from './common/base_model';
 const inventoryRepository = AppDataSource.getRepository(Inventory);
 
 export async function readInventory(options) {

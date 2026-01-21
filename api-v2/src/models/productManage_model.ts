@@ -1,7 +1,7 @@
 import AppDataSource from '../data-source';
 import { Product } from '../entity/Product';
 import { ShopProduct } from '../entity/ShopProduct';
-import { optionsGenerater } from './base_model';
+import { optionsGenerater } from './common/base_model';
 const productRepository = AppDataSource.getRepository(Product);
 const shopProductRepository = AppDataSource.getRepository(ShopProduct);
 
