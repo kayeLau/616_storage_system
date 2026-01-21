@@ -20,14 +20,11 @@ export async function readMenuAuth(options) {
         ])
         .getRawMany()
         .then((result) => {
-            if (auth === -1) {
-                result = result.filter(item => item.name !== "appFood");
-            } else {
-                result = result.filter(item => {
-                    const auths = item.auth.split(',');
-                    return auths.includes(String(auth)) || auths.includes("*");
-                });
-            }
+            result = result.filter(item => {
+                const auths = item.auth.split(',');
+                return auths.includes(String(auth)) || auths.includes("*");
+            });
+
 
             return {
                 success: true,
