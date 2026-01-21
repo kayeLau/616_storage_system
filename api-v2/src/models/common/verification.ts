@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken')
-const config = require('../config/development_config')
-import { Member } from '../entity/Member';
-import { readApiByPath } from '../models/apiManage_model'
-import AppDataSource from '../data-source';
+const config = require('../../config/development_config')
+import { Member } from '../../entity/Member';
+import { readApiByPath } from '../../models/apiManage_model'
+import AppDataSource from '../../data-source';
 const memberRepository = AppDataSource.getRepository(Member);
 
 interface UserInfo {

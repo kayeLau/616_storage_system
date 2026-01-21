@@ -1,4 +1,4 @@
-import { verifyToken, verifyaAuth } from '../models/verification'
+import { verifyToken, verifyaAuth } from '../models/common/verification'
 
 
 async function auth(req, res, next) {

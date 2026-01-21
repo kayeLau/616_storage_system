@@ -1,6 +1,6 @@
 import { toRegister, updateMember, readMember, deleteMember , toLogin } from '../models/member_model';
 // import { getPartitionItems } from '../models/shopManage_model';
-import { hashPassword } from '../models/encryption';
+import { hashPassword } from '../models/common/encryption';
 
 
 module.exports = class Member {
