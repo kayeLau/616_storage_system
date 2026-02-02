@@ -61,7 +61,7 @@ onMounted(() => {
             formatter: function (params) {
                 const data = params.data || {};
                 const { name, value, standard, unit } = params.data || {};
-                
+
                 if (data.children && data.children.length > 0) {
                     return '';  // 或 return null; 都可讓 tooltip 不出現
                 }
@@ -80,7 +80,7 @@ onMounted(() => {
             borderColor: 'black'
         },
         title: {
-            top: 5,
+            top: 3,
             left: 'center',
             text: '下單產品樹圖',
         },
@@ -96,6 +96,7 @@ onMounted(() => {
                 },
                 levels: [
                     {
+                        colorSaturation: 0.5,
                         itemStyle: {
                             borderWidth: 0,
                             borderColor: 'transparent',
@@ -104,7 +105,7 @@ onMounted(() => {
                         upperLabel: { show: false }
                     },
                     {
-                        colorSaturation: [0.3, 0.6],
+                        colorSaturation: 0.4,
                         itemStyle: {
                             borderColorSaturation: 0.7,
                             gapWidth: 2,
@@ -113,13 +114,6 @@ onMounted(() => {
                         textStyle: {
                             fontSize: '10px'
                         }
-                    },
-                    {
-                        colorSaturation: [0.3, 0.5],
-                        itemStyle: {
-                            borderColorSaturation: 0.6,
-                            gapWidth: 1
-                        },
                     },
                 ]
             }

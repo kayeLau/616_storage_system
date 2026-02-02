@@ -72,6 +72,7 @@ async function getOrderDatailSummary() {
     await readOrderDatailSummary(params.value).then(res => {
         if (res.success) {
             tableData.value = res.data
+            setTimeout(() => echartRef.value.resize(), 0)
         }
     })
 }
@@ -107,9 +108,6 @@ function exportSummary() {
 
 function switchShowWay() {
     isShowInChart.value = !isShowInChart.value
-    if (isShowInChart.value === true) {
-        setTimeout(() => echartRef.value.resize(), 0)
-    }
 }
 
 </script>
