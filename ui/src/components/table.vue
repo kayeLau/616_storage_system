@@ -206,6 +206,7 @@ onMounted(() => {
 
 .el-form--inline .el-form-item {
     margin-right: 20px;
+    margin-bottom:12px
 }
 
 .form-inline {
