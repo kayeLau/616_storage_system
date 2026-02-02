@@ -189,7 +189,7 @@ onMounted(() => {
 .pagination {
     display: flex;
     justify-content: space-between;
-    padding-top: 10px;
+    padding-top: 7px;
 }
 
 .pagination-btn-group {

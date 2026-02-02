@@ -18,7 +18,7 @@ async function getMenuAuth() {
 }
 
 
-function checkPermission(name) {
+export function checkPermission(name) {
     return permissionMap[name] ? true : false
 }
 
@@ -39,5 +39,5 @@ function clearMenuMap(){
 
 
 export const useMenuAuth = () => {
-    return { menuMap , generateRoutes , clearMenuMap , checkPermission, hideComponent };
+    return { menuMap , generateRoutes , clearMenuMap , hideComponent };
 };

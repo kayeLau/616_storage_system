@@ -1,7 +1,15 @@
 <template>
     <el-card class="Ktable-container">
-        <Ktable ref='KtableRef' :columns="columns" :params="params" :getList="getOrderDatailSummary"
-            :searchFormColumns="searchFormColumns" :customBtn="customBtn"></Ktable>
+        <el-tabs tab-position="right" class="demo-tabs full-height" >
+            <el-tab-pane label="落單" class="full-height">
+                <Ktable ref='KtableRef' :columns="columns" :params="params" :getList="getOrderDatailSummary"
+                :searchFormColumns="searchFormColumns" :customBtn="customBtn">
+            </Ktable>
+            </el-tab-pane>
+            <el-tab-pane label="盤點" class="full-height">
+                <echart ref="echartRef"/>
+            </el-tab-pane>
+        </el-tabs>
     </el-card>
 </template>
 <script setup>
@@ -12,6 +20,7 @@ import { ref } from 'vue';
 import { getDefaultDateRange } from '../utils/tools';
 import { exportOrderDatailSummary } from '../utils/export';
 import { ElMessage } from 'element-plus'
+import echart from '../components/echart.vue'
 
 const defaultDateRange = ref(getDefaultDateRange(7))
 
@@ -65,6 +74,12 @@ const searchFormColumns = [
 
 const customBtn = [
     {
+        label: '切換',
+        icon: 'Switch',
+        type: 'button',
+        btnType: 'primary',
+    },
+    {
         label: '導出匯總表',
         icon: 'Printer',
         type: 'button',
@@ -81,11 +96,19 @@ const customBtn = [
                 updateDate,
                 orderShopId,
                 shopName: shop ? shop.label : '',
-                size:999,
-                page:1
+                size: 999,
+                page: 1
             })
         }
     }
 ]
 
 </script>
+<style>
+.full-height {
+    height: 100%;
+}
+.el-tabs__content{
+    height: 100%;
+}
+</style>

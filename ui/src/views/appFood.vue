@@ -34,7 +34,7 @@
             </el-tabs>
         </el-skeleton>
 
-        <cart v-show="!loading" flag="order" :orderMap="orderMap" @orderDetailChange="orderDetailChange"
+        <cart v-show="!loading" :flag="flag" :orderMap="orderMap" @orderDetailChange="orderDetailChange"
             @submit="submitOrder">
         </cart>
     </div>
@@ -42,23 +42,30 @@
 
 <script setup>
 import cart from '../components/cart.vue'
-import { ref, onMounted, unref, defineEmits } from 'vue';
+import { ref, onMounted, unref, defineEmits, defineProps } from 'vue';
 import { readProduct } from '../request/products';
 import { checkOrderRepeated } from '../request/orders';
 import { classifyDict, classifySort } from '../request/dict';
 import { useRouter } from 'vue-router';
 const router = useRouter()
 
+const porps = defineProps({
+    flag: {
+        type: String,
+        default: "order"
+    }
+})
 const emit = defineEmits(['setActiveMenu'])
 let loading = ref(true)
 let orderMap = ref({})
-const products = ref([
+const PRODUCTS = porps.flag === 'order' ? [
     {
         name: 0,
         label: "必點",
         children: {}
     }
-])
+] : [];
+const products = ref(PRODUCTS)
 
 // 購物車項目改變
 function orderDetailChange(product) {
@@ -88,7 +95,7 @@ function setMustOrderChecked(product) {
 // 回顯已存在的訂單
 function setProductListView(product) {
     const promptNum = 0
-    if (product.prompt) {
+    if (product.prompt && porps.flag === 'order') {
         products.value[promptNum].children[product.productId] = product
     } else {
         const target = products.value.find(item => item.name === (product.classify));
@@ -116,7 +123,7 @@ async function getProducts() {
                 }
 
                 // 必點
-                if (item.prompt) {
+                if (item.prompt && porps.flag === "order") {
                     const _item = {
                         ...item,
                         orderQuantity: null,

@@ -91,7 +91,7 @@ onMounted(() => {
 }
 
 .el-card__body {
-  --el-card-padding: 15px;
+  --el-card-padding: 10px 15px;
 }
 
 .order-card-header {

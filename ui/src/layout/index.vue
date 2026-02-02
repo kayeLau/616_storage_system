@@ -124,18 +124,11 @@ generateRoutes([
         path: 'appFood',
         icon: 'Iphone',
     },
-    // {
-    //     name: "倉存管理",
-    //     path: 'inventory',
-    //     icon: 'Box',
-    //     auth: [-1, 1, 0, 2, 3]
-    // },
-    // {
-    //     name: "盤點",
-    //     path: 'appInventory',
-    //     icon: 'Box',
-    //     auth: [0, 1]
-    // },
+    {
+        name: "盤點",
+        path: 'inventory',
+        icon: 'Box',
+    },
     {
         name: "設定",
         path: 'setting',
