@@ -159,8 +159,7 @@ function setActiveMenu(menu){
     if(menu !== activeMenu.value){
         activeMenu.value = menu
     }
-    setStorge('activeMenu',menu)
-}
+    setStorge('activeMenu',menu)}
 </script>
 <style scoped>
 .common-layout {

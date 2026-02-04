@@ -36,7 +36,7 @@
 </template>
 <script setup>
 // import md5 from 'js-md5'
-import { setToken, setStorge } from '../utils/auth'
+import { setToken, setStorge , getStorge } from '../utils/auth'
 import { login } from '../request/users'
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -78,7 +78,7 @@ function toLogin(force = false) {
 }
 
 function toHome() {
-    const path = '/order';
+    let path = getStorge('activeMenu')|| '/order';
     router.push({ path })
 }
 
