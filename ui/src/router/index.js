@@ -62,6 +62,11 @@ const baseRouters = {
       component: () => import('../views/Login.vue'),
     },
     {
+      name: '404',
+      path: '/404',
+      component: () => import('../views/404.vue'),
+    },
+    {
       path: '/',
       name: 'root',
       component: layout,
