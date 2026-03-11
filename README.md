@@ -1,4 +1,4 @@
-# 616 倉儲管理系統 (616 Storage System)
+# 倉儲管理系統 (616 Storage System)
 
 這是一個完整的倉儲與營運管理系統，包含後端 API (Node.js/TypeScript) 與前端介面 (Vue.js)。本系統主要用於管理門店、商品、庫存、訂單及菜單授權等功能。
 
